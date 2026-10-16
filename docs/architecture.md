@@ -1,100 +1,13 @@
 # Architecture
 
-Hirune Axum Kit is a source template for one service. Copy the repository, change
-the application name and settings, and own the result. Internal crates are not
-independently published products. Template updates do not migrate copied apps.
+Hirune Image is a stateless synchronous service. The root crate owns configuration, bootstrap, router construction, request supervision, and executable lifecycle. The application crate owns HTTP-free recipes, facts, validation, planning, budgets, and typed failures. The image-codec crate owns decode/color/resize/encode/verification and all unsafe bindings. Internal crates are source boundaries, not independently published packages.
 
-## Execution and ownership
+An accepted request owns one admission permit from before body collection through completion or cancellation. Bounded multipart parsing produces source bytes and a typed recipe. A supervisor owns the request directory, permit, local file writes, and child. HTTP cancellation signals the supervisor; the supervisor retains resources until outstanding file I/O finishes and the child is killed/reaped.
 
-This is a modular monolith with separately scalable API and worker processes.
-PostgreSQL owns accounts, authentication state, authorization facts, deliveries,
-and jobs. Neither process requires sticky routing or in-memory authority.
-Migration and management commands are explicit one-off processes.
-The separate maintenance executable registers periodic jobs and consumes a
-dedicated queue using restricted database credentials. It shares the same lease,
-retry, and attempt-history implementation as ordinary workers.
+The child validates structural headers before pixel allocation, decodes the source once, normalizes frames, and writes bounded RGBA frame files in its request directory. It then reads these files for each variant sequentially. This avoids holding every raw frame or four native encoders in memory. Spool files are local scratch data, not durable jobs or external storage. tmpfs consumes container memory.
 
-| Location | Owns | May depend on |
-| --- | --- | --- |
-| `src/http/` | shared HTTP extraction, middleware, error mapping, version composition | application services |
-| `src/http/v1/<feature>/` | feature router, handlers, and versioned input/output contracts | owning application service |
-| `src/http/v1/openapi.rs` | version-one contract assembly | feature HTTP contracts |
-| `src/integrations.rs` | explicit provisioning and bounded search-repair coordination | owning services |
-| `src/job_handler.rs` | concrete application job dispatch | owning feature services |
-| `src/bootstrap.rs` | connection and service assembly | application, jobs, mail |
-| `src/bin/` | environment, process tracing, executable lifecycle | bootstrap and runtime |
-| `src/maintenance.rs` | bounded cross-domain cleanup coordination and periodic maintenance registration | owning services and jobs |
-| `crates/application/src/identity/` | accounts, credentials, sessions, authentication flows | auth-core, jobs, mail, SeaORM |
-| `crates/application/src/organizations/` | minimal organizations and scoped memberships | authorization, SeaORM |
-| `crates/application/src/api_access/` | organization-owned clients, hashed API keys, strict shared allocations, admission history | identity and organization services, SeaORM |
-| `crates/application/src/files/` | original attachment metadata, quota, lifecycle, S3 transport, derived filename search | organization service, AWS S3 SDK, Meilisearch REST, SeaORM, jobs |
-| `crates/application/src/posts/` | organization posts, single-level comments, attachment links, post search | identity, organizations, files, notifications, authorization, SeaORM, jobs |
-| `crates/application/src/profiles/` | account profiles and organization-scoped user discovery | identity, organizations, search, SeaORM, jobs |
-| `crates/application/src/notifications/` | durable comment inbox, preferences, session-bound devices, optional FCM delivery | identity, owning content facts, SeaORM, jobs, Google ADC |
-| `crates/application/src/search/` | bounded Meilisearch HTTP/task transport | reqwest; domain modules own documents and eligibility |
-| `crates/application/src/authorization/` | validated Cedar policies and decisions | Cedar |
-| `crates/jobs/` | durable registration, leases, retries, attempt history | SeaORM, Tokio |
-| `crates/mail/` | MJML/Minijinja rendering and SMTP | lettre, mrml, minijinja |
-| `crates/auth-core/` | small cryptographic wrappers | established crypto libraries |
-| `crates/migration/` | schema history | SeaORM migrations |
-| `crates/test-support/` | isolated databases and fixtures | application, migration |
-| `xtask/` | repeatable development and verification commands | tooling only |
-| `.envs/` | tracked examples and ignored per-environment secrets | configuration only |
-| `compose/` | local service composition and production image build | container tooling |
-| `deploy/` | environment selectors and runtime/operator wiring | container tooling |
+Each WebP frame uses an output-bounded native writer with explicit method, lossless/quality, exact alpha, and disabled codec threads. Animated outputs use full-canvas, no-blend frames in a low-level mux, retaining duplicate frames and their timing. Output bytes are structurally inspected and fully decoded in the isolated child before any success headers.
 
-The application crate has no Axum dependency. Its feature modules contain their
-own service, repository, model, and types. HTTP DTOs stay with their versioned
-feature adapter. Each named operation has its own file with its exclusive DTOs;
-shared DTOs stay in `contracts.rs`, URL/method assembly in `routes.rs`, and module
-indexes only declare/re-export modules. Nested comment and OIDC folders keep
-related endpoints together. The top-level HTTP router owns health/OpenAPI routes and nests
-the version router; a version router only composes feature routers. Add a new
-version directory when a real HTTP contract needs one. Business services are not
-duplicated for each API version.
-Notifications separate service assembly, inbox reads/writes, preferences, comment
-recipient registration, devices, and push execution. Post API-client reads do not
-live in search; profile module indexes contain no queries or job registration.
+The parent verifies the result binding, output order, geometry, lengths, hashes, and aggregate budgets. Delivery owns the permit and directory. Its watchdog can close the underlying TCP socket independently of body polling, discard buffered output, clean up, and release admission. Chunks handed to Hyper have independent bounded allocations. A body EOF is a server-side completion boundary, not acknowledgement that the caller consumed all bytes.
 
-Do not create a crate for every module or a trait for every concrete service.
-Introduce a boundary when it makes ownership, dependencies, or testing clearer.
-
-Crate boundaries enforce dependency direction, not a list of technical layers.
-Keeping each feature's service, repository, entities, and internal types together
-makes a business change local. Jobs and mail have independent execution and
-failure contracts; auth-core has no database or async runtime dependency.
-Migration history and development/test tools do not belong in request handling.
-API, worker, and management are binaries of the same assembled application;
-separate process deployment does not require separate service crates.
-
-`bootstrap(settings)` prepares dependencies. `build_router(app, http_settings)`
-only constructs the production router. `serve(listener, router, shutdown)` owns
-listening and shutdown. Tests use these same functions; router construction must
-not start a listener, consumer, scheduler, or detached task.
-
-## Extending the template
-
-Add a feature with explicit service operations and feature-owned persistence.
-Expose it through thin HTTP handlers and typed input/output contracts. Add the
-operation's behavior, transaction boundary, authorization, pagination, and tests
-together. Workers call those same operations when the business behavior is shared.
-
-The initial worker backend is PostgreSQL. Changing a backend is a deliberate
-adapter and transaction decision: a broker needs an outbox when a domain write
-must commit with publication. A common function signature cannot create a
-distributed transaction.
-
-Organization posts and comments connect Cedar, profiles, scoped search,
-pagination, attachments, and notifications through concrete service operations.
-In-app notifications work without FCM credentials. Optional FCM uses the same
-durable PostgreSQL queue. Search documents are expendable projections; PostgreSQL
-decides visible fields, revision eligibility, and authorized result counts.
-
-## Design references
-
-- [Axum state and Tower integration](https://docs.rs/axum/latest/axum/)
-- [SeaORM transactions](https://www.sea-ql.org/SeaORM/docs/advanced-query/transaction/)
-- [Django database transactions](https://docs.djangoproject.com/en/6.0/topics/db/transactions/): explicit transaction boundaries and durable side-effect handling inform the conventions.
-- [Django sessions](https://docs.djangoproject.com/en/6.0/topics/http/sessions/): shared server-side authority and credential rotation inform session behavior.
-
-These are design references. The implementation remains ordinary Rust and Axum.
+Health endpoints bypass image admission. Shutdown stops readiness, closes active transport, signals supervisors, and drains permits after child cleanup. Deployment owns private network access and container limits. No caller URL/path, credentials, durable queue, or storage authority is accepted.

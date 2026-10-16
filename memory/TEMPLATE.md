@@ -6,7 +6,6 @@
 
 ## Validation
 
-Record commands, outcomes, and material limitations. Separate local checks from
-remote CI, provider acceptance, and deployment.
+Record exact checks and material limits. Separate local, container, remote CI, deployment and caller integration.
 
 ## Remaining work
