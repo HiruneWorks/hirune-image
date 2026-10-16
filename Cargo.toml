@@ -47,7 +47,7 @@ tracing-subscriber = { version = "0.3.23", features = ["env-filter", "json"] }
 image = { version = "=0.25.10", default-features = false, features = ["gif", "png", "jpeg"] }
 gif = "=0.14.2"
 libwebp-sys2 = { version = "=0.2.0", features = ["static", "demux", "mux", "1_5"] }
-moxcms = "=0.8.1"
+moxcms = "=0.9.1"
 libc = "0.2.186"
 reqwest = { version = "0.13.5", default-features = false, features = ["json", "multipart", "stream", "rustls"] }
 
