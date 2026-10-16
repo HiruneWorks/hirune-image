@@ -1,6 +1,6 @@
 services:
   image:
-    image: ${HIRUNE_IMAGE:-ghcr.io/hiruneworks/hirune-image:0.1.0}
+    image: ${HIRUNE_IMAGE:-ghcr.io/hiruneworks/hirune-image:0.2.0}
     read_only: true
     user: "65532:65532"
     cap_drop: [ALL]

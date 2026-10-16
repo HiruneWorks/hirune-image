@@ -22,7 +22,7 @@ Run `python3 scripts/verify_response.py result.multipart --source input.gif --re
 
 Run `just check` for formatting, clippy, tests and contract drift. Run `just test-container` for the non-root, read-only Linux image acceptance. The native worker is isolated per request; bounded local scratch files and tmpfs count toward deployment resources.
 
-Pushing `v0.1.0` publishes `ghcr.io/hiruneworks/hirune-image:0.1.0` after code checks and production-container acceptance. The tag must match the workspace package version. Only the exact tested `linux/amd64` image is published; branch pushes, pull requests and manual checks do not publish images. See the [release procedure](deploy/README.md#release-publication).
+Pushing `v0.2.0` publishes `ghcr.io/hiruneworks/hirune-image:0.2.0` after code checks and production-container acceptance. The tag must match the workspace package version. Only the exact tested `linux/amd64` image is published; branch pushes, pull requests and manual checks do not publish images. See the [release procedure](deploy/README.md#release-publication).
 
 Operator budgets can be raised or lowered: [configuration and memory](docs/operations.md), [larger example](.envs/.example/large.env). [Criterion and Sharp service benchmarks](docs/benchmarks.md) measure pipeline components and real HTTP services separately.
 
