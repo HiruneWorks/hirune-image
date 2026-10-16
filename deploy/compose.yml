@@ -1,9 +1,6 @@
 services:
   image:
-    image: hirune-image:local
-    build:
-      context: ..
-      dockerfile: compose/production/app/Dockerfile
+    image: ${HIRUNE_IMAGE:-ghcr.io/hiruneworks/hirune-image:0.1.0}
     read_only: true
     user: "65532:65532"
     cap_drop: [ALL]

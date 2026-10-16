@@ -76,6 +76,9 @@ def main():
                       "--mount", f"type=bind,source={ROOT},target=/work,readonly", "--workdir", "/work",
                       "--env", "PYTHONDONTWRITEBYTECODE=1", CLIENT_IMAGE,
                       "python", "scripts/verify_container.py", "--client", f"http://{name}:8080", capture=True))
+        expected_build = os.environ.get("HIRUNE_EXPECT_BUILD_ID")
+        if expected_build:
+            assert capability["processor"]["build_id"].split(":", 1)[0] == expected_build
         uid = command("docker", "exec", name, "id", "-u", capture=True).strip()
         assert uid != "0"
         assert command("docker", "exec", name, "sh", "-c", "find /tmp -mindepth 1 -maxdepth 1 | wc -l", capture=True).strip() == "0"

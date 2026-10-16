@@ -1,16 +1,38 @@
 name: CI
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
 permissions:
   contents: read
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+env:
+  LOCAL_IMAGE: hirune-image:release-candidate
 jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    outputs:
+      version: ${{ steps.metadata.outputs.version }}
+      image: ${{ steps.metadata.outputs.image }}
     steps:
       - uses: actions/checkout@v7
+      - name: Validate release tag and resolve image metadata
+        id: metadata
+        env:
+          REPOSITORY: ${{ github.repository }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          tag_arguments=()
+          if [[ "${REF_TYPE}" == tag ]]; then
+            tag_arguments=(--tag "${REF_NAME}")
+          fi
+          python3 scripts/release_metadata.py --repository "${REPOSITORY}" "${tag_arguments[@]}" >> "${GITHUB_OUTPUT}"
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: 1.98.1
@@ -20,4 +42,110 @@ jobs:
         with:
           just-version: 1.52.0
       - run: just check
-      - run: just test-container
+
+  container:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      image_id: ${{ steps.identity.outputs.image_id }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
+      - name: Build the release candidate once
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: compose/production/app/Dockerfile
+          platforms: linux/amd64
+          load: true
+          push: false
+          provenance: false
+          tags: ${{ env.LOCAL_IMAGE }}
+          build-args: HIRUNE_BUILD_ID=${{ github.sha }}
+          labels: |
+            org.opencontainers.image.title=Hirune Image
+            org.opencontainers.image.description=Bounded Rust/Axum image processing microservice
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ needs.verify.outputs.version }}
+            org.opencontainers.image.licenses=Apache-2.0
+          cache-from: type=gha,scope=hirune-image-amd64
+          cache-to: type=gha,scope=hirune-image-amd64,mode=max
+      - name: Verify the exact image under production restrictions
+        env:
+          HIRUNE_TEST_IMAGE: ${{ env.LOCAL_IMAGE }}
+          HIRUNE_SKIP_BUILD: "1"
+          HIRUNE_EXPECT_BUILD_ID: ${{ github.sha }}
+        run: python3 scripts/verify_container.py
+      - name: Record the tested image identity
+        id: identity
+        run: |
+          image_id="$(docker image inspect "${LOCAL_IMAGE}" --format '{{.Id}}')"
+          test -n "${image_id}"
+          echo "image_id=${image_id}" >> "${GITHUB_OUTPUT}"
+      - name: Export the tested image
+        if: github.event_name == 'push' && github.ref_type == 'tag'
+        run: docker save --output "${RUNNER_TEMP}/release-candidate.tar" "${LOCAL_IMAGE}"
+      - name: Transfer the tested image to publication
+        if: github.event_name == 'push' && github.ref_type == 'tag'
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-candidate-image
+          path: ${{ runner.temp }}/release-candidate.tar
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    needs: [verify, container]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: write
+    env:
+      IMAGE: ${{ needs.verify.outputs.image }}
+      VERSION: ${{ needs.verify.outputs.version }}
+      EXPECTED_IMAGE_ID: ${{ needs.container.outputs.image_id }}
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-candidate-image
+          path: ${{ runner.temp }}
+      - name: Load and check the tested image identity
+        run: |
+          docker load --input "${RUNNER_TEMP}/release-candidate.tar"
+          actual_id="$(docker image inspect "${LOCAL_IMAGE}" --format '{{.Id}}')"
+          test "${actual_id}" = "${EXPECTED_IMAGE_ID}"
+      - name: Log in to GHCR
+        uses: docker/login-action@v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish the tested versioned image
+        id: publish
+        run: |
+          target="${IMAGE}:${VERSION}"
+          docker tag "${LOCAL_IMAGE}" "${target}"
+          docker push "${target}"
+          digest="$(docker image inspect "${target}" --format '{{index .RepoDigests 0}}')"
+          test -n "${digest}"
+          echo "digest=${digest}" >> "${GITHUB_OUTPUT}"
+      - name: Record the deployment image digest
+        env:
+          DIGEST: ${{ steps.publish.outputs.digest }}
+        run: |
+          {
+            echo '## GHCR image published'
+            echo
+            echo "Version: ${IMAGE}:${VERSION}"
+            echo
+            echo 'The image was verified before publication; deploy by digest:'
+            echo
+            echo '```text'
+            echo "${DIGEST}"
+            echo '```'
+          } >> "${GITHUB_STEP_SUMMARY}"

@@ -1,6 +1,6 @@
 # Hirune Image
 
-A bounded Rust/Axum image microservice. JPEG, PNG, GIF and WebP bytes plus a typed recipe produce verified lossy/lossless WebP variants.
+A bounded Rust/Axum image microservice. JPEG, PNG, GIF and WebP bytes plus a typed recipe produce verified lossy/lossless WebP variants. Run the published GHCR image with the [deployment Compose profile](deploy/README.md), or build from source for development.
 
 Build both executables with `just build`, run `just api`, and inspect `GET /v1/capabilities`. There are no database or storage credentials.
 
@@ -21,5 +21,7 @@ Run `python3 scripts/verify_response.py result.multipart --source input.gif --re
 - [Development and E2E](docs/development.md), [deployment](deploy/README.md), [verification milestones](memory/README.md)
 
 Run `just check` for formatting, clippy, tests and contract drift. Run `just test-container` for the non-root, read-only Linux image acceptance. The native worker is isolated per request; bounded local scratch files and tmpfs count toward deployment resources.
+
+Pushing `v0.1.0` publishes `ghcr.io/hiruneworks/hirune-image:0.1.0` after code checks and production-container acceptance. The tag must match the workspace package version. Only the exact tested `linux/amd64` image is published; branch pushes, pull requests and manual checks do not publish images. See the [release procedure](deploy/README.md#release-publication).
 
 Apache-2.0. Copyright 2026 Levi Laine.

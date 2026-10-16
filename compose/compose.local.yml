@@ -1,0 +1,6 @@
+services:
+  image:
+    image: hirune-image:local
+    build:
+      context: ..
+      dockerfile: compose/production/app/Dockerfile
