@@ -13,7 +13,7 @@ curl --fail-with-body http://127.0.0.1:8080/v1/images/process \
 
 The success response is multipart/related: JSON manifest followed by binary outputs in recipe order. Validate source/recipe SHA-256, part identities, lengths and output hashes before accepting it.
 
-Run `python scripts/verify_response.py result.multipart --source input.gif --recipe contracts/examples/image-recipe-v1.json` for independent hash/part/WebP-structure checks. The isolated worker additionally performs full codec decoding before success.
+Run `python3 scripts/verify_response.py result.multipart --source input.gif --recipe contracts/examples/image-recipe-v1.json` (`python` on Windows) for independent hash/part/WebP-structure checks. The isolated worker additionally performs full codec decoding before success.
 
 - [HTTP, image, budget and cancellation contract](docs/behavior/image-processing.md)
 - [Recipe schema](contracts/image-recipe-v1.schema.json), [manifest schema](contracts/image-manifest-v1.schema.json), [error schema](contracts/error-v1.schema.json)

@@ -1,6 +1,7 @@
 set dotenv-load := true
 set dotenv-path := ".envs/.local/app.env"
 set windows-shell := ["powershell.exe", "-NoLogo", "-NoProfile", "-Command"]
+python_command := if os() == "windows" { "python" } else { "python3" }
 
 default:
     @just --list
@@ -27,4 +28,4 @@ contracts:
     cargo xtask contracts
 
 test-container:
-    python scripts/verify_container.py
+    {{python_command}} scripts/verify_container.py

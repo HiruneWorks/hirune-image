@@ -362,7 +362,8 @@ async fn independent_response_verifier_rejects_tampering_truncation_and_extra_da
         (body[..body.len() / 2].to_vec(), false),
     ] {
         std::fs::write(directory.path().join("response"), bytes).unwrap();
-        let output = std::process::Command::new("python")
+        let interpreter = if cfg!(windows) { "python" } else { "python3" };
+        let output = std::process::Command::new(interpreter)
             .arg("scripts/verify_response.py")
             .arg(directory.path().join("response"))
             .arg("--source")

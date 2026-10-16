@@ -1,6 +1,6 @@
 # Development
 
-Install Rust 1.98.1, a C toolchain (MSVC on Windows), just, and Docker for container acceptance.
+Install Rust 1.98.1, a C toolchain (MSVC on Windows), just, Python 3 for independent response verification, and Docker for container acceptance.
 
 - just build: build API and worker.
 - just api: run the API after building the worker.
