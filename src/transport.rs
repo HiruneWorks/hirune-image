@@ -8,6 +8,7 @@ use std::{
     pin::Pin,
     sync::{Arc, Mutex},
     task::{Context, Poll},
+    time::Duration,
 };
 use tokio::{
     io::{AsyncRead, AsyncWrite, ReadBuf},
@@ -38,7 +39,20 @@ impl Connection {
         }
     }
     pub fn close(&self) {
-        self.inner.socket.lock().expect("socket mutex").take();
+        self.close_socket(false);
+    }
+    pub fn abort(&self) {
+        self.close_socket(true);
+    }
+    fn close_socket(&self, discard_pending_writes: bool) {
+        if let Some(socket) = self.inner.socket.lock().expect("socket mutex").take() {
+            // Abort paths discard kernel-queued bytes; normal completion must drain them.
+            if discard_pending_writes
+                && let Err(error) = socket2::SockRef::from(&socket).set_linger(Some(Duration::ZERO))
+            {
+                tracing::warn!(kind=?error.kind(), "TCP abort configuration failed");
+            }
+        }
         self.inner.closed.cancel();
         self.inner.read_waker.wake();
         self.inner.write_waker.wake();
@@ -119,7 +133,7 @@ impl Listener for BoundedListener {
                     let closed = connection.closed();
                     let shutdown = self.shutdown.clone();
                     tokio::spawn(async move {
-                        tokio::select! {_=closed.cancelled()=>{},_=shutdown.cancelled()=>{if let Some(inner)=weak.upgrade(){Connection{inner}.close();}}}
+                        tokio::select! {_=closed.cancelled()=>{},_=shutdown.cancelled()=>{if let Some(inner)=weak.upgrade(){Connection{inner}.abort();}}}
                     });
                     return (
                         GuardedIo {

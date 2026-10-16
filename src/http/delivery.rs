@@ -107,13 +107,17 @@ pub fn response(
             };
             tokio::select! {_=finished.cancelled()=>return,_=shutdown.cancelled()=>{},_=tokio::time::sleep_until(until)=>{}}
             let mut state = state.lock().expect("delivery mutex");
+            // Completion can win while the watchdog waits for the delivery lock.
+            if finished.is_cancelled() {
+                return;
+            }
             if shutdown.is_cancelled()
                 || Instant::now() >= deadline
                 || Instant::now() >= state.last_progress + Duration::from_millis(idle_ms)
             {
                 state.timed_out = true;
                 if let Some(connection) = &connection {
-                    connection.close();
+                    connection.abort();
                 }
                 state.chunks.clear();
                 state.lease.take();
