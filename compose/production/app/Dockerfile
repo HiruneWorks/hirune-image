@@ -1,19 +1,19 @@
-FROM rust:1.99.0-bookworm AS build
-WORKDIR /source
-COPY . .
-RUN --mount=type=cache,target=/usr/local/cargo/registry \
-    --mount=type=cache,target=/source/target \
-    cargo build --locked --release --workspace --bins \
-    && install -d /artifacts \
-    && install target/release/api target/release/worker target/release/maintenance target/release/manage target/release/migration /artifacts/
+FROM rust:1.98.1-bookworm AS build
+WORKDIR /app
+COPY Cargo.toml Cargo.lock rust-toolchain.toml ./
+COPY .cargo .cargo
+COPY crates crates
+COPY src src
+COPY xtask xtask
+ARG HIRUNE_BUILD_ID=development
+ENV HIRUNE_BUILD_ID=$HIRUNE_BUILD_ID
+RUN cargo build --locked --release --bin api --bin image_worker
 
-FROM debian:bookworm-slim
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
-    && rm -rf /var/lib/apt/lists/* \
-    && useradd --uid 10001 --create-home app
-COPY --from=build /artifacts/ /usr/local/bin/
-USER 10001:10001
-WORKDIR /home/app
-ENV BIND_ADDRESS=0.0.0.0:3000
-EXPOSE 3000
-ENTRYPOINT ["api"]
+FROM debian:bookworm-slim AS runtime
+WORKDIR /app
+COPY --from=build /app/target/release/api /app/api
+COPY --from=build /app/target/release/image_worker /app/image_worker
+USER 65532:65532
+ENV HIRUNE_BIND=0.0.0.0:8080 HIRUNE_TEMP_ROOT=/tmp RUST_LOG=info
+EXPOSE 8080
+ENTRYPOINT ["/app/api"]

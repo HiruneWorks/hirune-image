@@ -23,16 +23,6 @@ updates:
       interval: weekly
 
   - package-ecosystem: docker-compose
-    directory: /compose
-    schedule:
-      interval: weekly
-
-  - package-ecosystem: docker
-    directory: /compose/verification
-    schedule:
-      interval: weekly
-
-  - package-ecosystem: docker-compose
-    directory: /compose/verification
+    directory: /deploy
     schedule:
       interval: weekly

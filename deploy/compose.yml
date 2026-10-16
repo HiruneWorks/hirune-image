@@ -1,49 +1,22 @@
-name: ${COMPOSE_PROJECT_NAME:?Set COMPOSE_PROJECT_NAME}
-
-x-runtime: &runtime
-  image: ${APP_IMAGE:?Set APP_IMAGE}
-  env_file:
-    - ../.envs/.${DEPLOY_ENV:?Set DEPLOY_ENV}/app.env
-  restart: unless-stopped
-  init: true
-  read_only: true
-  tmpfs: ["/tmp:size=512m,mode=1777"]
-  cap_drop: [ALL]
-  security_opt: [no-new-privileges:true]
-  stop_grace_period: 45s
-  logging:
-    driver: json-file
-    options:
-      max-size: 10m
-      max-file: "3"
-
 services:
-  api:
-    <<: *runtime
-    entrypoint: [api]
-    ports:
-      - "127.0.0.1:${API_PORT:-3000}:3000"
-  worker:
-    <<: *runtime
-    entrypoint: [worker]
-  migration:
-    image: ${APP_IMAGE:?Set APP_IMAGE}
-    profiles: [maintenance]
-    env_file:
-      - ../.envs/.${DEPLOY_ENV:?Set DEPLOY_ENV}/migration.env
-    entrypoint: [migration]
-    restart: "no"
+  image:
+    image: hirune-image:local
+    build:
+      context: ..
+      dockerfile: compose/production/app/Dockerfile
     read_only: true
+    user: "65532:65532"
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
-  manage:
-    <<: *runtime
-    profiles: [maintenance]
-    entrypoint: [manage]
-    restart: "no"
-  maintenance:
-    <<: *runtime
-    env_file:
-      - ../.envs/.${DEPLOY_ENV:?Set DEPLOY_ENV}/app.env
-      - ../.envs/.${DEPLOY_ENV:?Set DEPLOY_ENV}/maintenance.env
-    entrypoint: [maintenance]
+    mem_limit: 1g
+    cpus: 2
+    pids_limit: 64
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=512m,mode=1777
+    environment:
+      HIRUNE_CONCURRENCY: "1"
+    networks: [processing]
+    restart: unless-stopped
+networks:
+  processing:
+    internal: true
