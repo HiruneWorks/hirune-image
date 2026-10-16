@@ -158,7 +158,7 @@ pub fn process_job(directory: &Path, job: &JobInput) -> Result<Manifest> {
     })
 }
 pub fn verify_output(bytes: &[u8], limits: &Limits) -> Result<ImageFacts> {
-    let structure = webp_structure(bytes)?;
+    let structure = webp_structure(bytes, limits)?;
     if structure.metadata
         || structure.facts.width > limits.output_dimension
         || structure.facts.height > limits.output_dimension

@@ -53,12 +53,16 @@ def inspect_webp(data):
         cursor += 8 + length + length % 2
     assert cursor == len(data) and width and height
     assert (loops is not None) == bool(delays)
-    assert not delays or len(delays) >= 2 and all(0 < d <= 60000 for d in delays)
+    assert not delays or len(delays) >= 2 and all(0 < d <= 0xffffff for d in delays)
+    assert width <= 16383 and height <= 16383 and sum(delays) <= 2147483647
+    assert len(data) <= 4294967294
     return {"width": width, "height": height, "frame_count": len(delays) or 1,
             "duration_ms": sum(delays), "loop_count": loops if delays else 1}
 
-def verify(payload, source=None, recipe=None):
-    assert len(payload) <= 34 << 20, "response budget"
+def verify(payload, source=None, recipe=None, limits=None):
+    if limits is not None:
+        limits = limits.get("limits", limits)
+        assert len(payload) <= limits["output_bytes"] + 65536 + limits["outputs"] * 2048, "response budget"
     first = payload.split(b"\r\n", 1)[0]
     assert first.startswith(b"--") and 0 < len(first[2:]) <= 70
     boundary = first[2:]
@@ -69,7 +73,7 @@ def verify(payload, source=None, recipe=None):
         b'Content-Type: multipart/related; boundary="' + boundary + b'"\r\nMIME-Version: 1.0\r\n\r\n' + payload)
     assert not message.defects and message.is_multipart()
     parts = list(message.iter_parts())
-    assert 2 <= len(parts) <= 5
+    assert len(parts) >= 2
     for part in parts:
         assert not part.defects
         for name in ("Content-ID", "Content-Type", "Content-Length"):
@@ -81,6 +85,8 @@ def verify(payload, source=None, recipe=None):
     assert set(manifest) == {"contract_version", "processor", "source_sha256", "recipe_sha256", "source", "outputs"}
     assert manifest["contract_version"] == 1
     outputs = manifest["outputs"]
+    if limits is not None:
+        assert len(outputs) <= limits["outputs"]
     assert len(parts) == len(outputs) + 1
     assert len({output["id"] for output in outputs}) == len(outputs)
     if source is not None:
@@ -88,7 +94,20 @@ def verify(payload, source=None, recipe=None):
         assert manifest["source"]["byte_size"] == len(source)
     if recipe is not None:
         assert manifest["recipe_sha256"] == hashlib.sha256(recipe).hexdigest()
-        assert [o["id"] for o in strict_json(recipe)["outputs"]] == [o["id"] for o in outputs]
+        requested = strict_json(recipe)
+        assert [o["id"] for o in requested["outputs"]] == [o["id"] for o in outputs]
+        width, height = manifest["source"]["width"], manifest["source"]["height"]
+        if manifest["source"]["orientation"] >= 5:
+            width, height = height, width
+        for output, item in zip(outputs, requested["outputs"], strict=True):
+            mw, mh = item["resize"]["max_width"], item["resize"]["max_height"]
+            if width <= mw and height <= mh:
+                geometry = width, height
+            elif mw * height <= mh * width:
+                geometry = mw, max(1, height * mw // width)
+            else:
+                geometry = max(1, width * mh // height), mh
+            assert (output["width"], output["height"]) == geometry, "recipe geometry mismatch"
     aggregate = 0
     for part, output in zip(parts[1:], outputs, strict=True):
         data = part.get_payload(decode=True)
@@ -99,10 +118,12 @@ def verify(payload, source=None, recipe=None):
         facts = inspect_webp(data)
         for key, value in facts.items():
             assert type(output[key]) is int and output[key] == value, "output facts mismatch"
-        assert facts["width"] <= 4096 and facts["height"] <= 4096
-        assert facts["frame_count"] <= 120 and facts["duration_ms"] <= 60000
+        if limits is not None:
+            assert max(facts["width"], facts["height"]) <= limits["output_dimension"]
+            assert facts["frame_count"] <= limits["frames"] and facts["duration_ms"] <= limits["duration_ms"]
         aggregate += len(data)
-    assert aggregate <= 32 << 20
+    if limits is not None:
+        assert aggregate <= limits["output_bytes"]
     return manifest
 
 def main():
@@ -110,10 +131,12 @@ def main():
     parser.add_argument("response", type=Path)
     parser.add_argument("--source", type=Path)
     parser.add_argument("--recipe", type=Path)
+    parser.add_argument("--limits", type=Path, help="capabilities snapshot or limits JSON; omit for codec/contract checks only")
     args = parser.parse_args()
     manifest = verify(args.response.read_bytes(),
                       args.source.read_bytes() if args.source else None,
-                      args.recipe.read_bytes() if args.recipe else None)
+                      args.recipe.read_bytes() if args.recipe else None,
+                      strict_json(args.limits.read_bytes()) if args.limits else None)
     print(json.dumps({"result": "PASS", "output_count": len(manifest["outputs"]),
                       "source_sha256": manifest["source_sha256"]}))
 

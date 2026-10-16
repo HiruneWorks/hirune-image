@@ -110,13 +110,13 @@
         },
         "max_height": {
           "format": "uint32",
-          "maximum": 4096,
+          "maximum": 16383,
           "minimum": 1,
           "type": "integer"
         },
         "max_width": {
           "format": "uint32",
-          "maximum": 4096,
+          "maximum": 16383,
           "minimum": 1,
           "type": "integer"
         }
@@ -145,7 +145,6 @@
       "items": {
         "$ref": "#/$defs/OutputInput"
       },
-      "maxItems": 4,
       "minItems": 1,
       "type": "array"
     }

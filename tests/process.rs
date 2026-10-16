@@ -175,9 +175,10 @@ async fn disconnect_during_native_work_cancels_the_child() {
         .unwrap();
     socket.write_all(format!("POST /v1/images/process HTTP/1.1\r\nHost: localhost\r\nContent-Type: multipart/form-data; boundary=strict\r\nContent-Length: {}\r\n\r\n",body.len()).as_bytes()).await.unwrap();
     socket.write_all(&body).await.unwrap();
-    let _pid = wait_for_child(&server).await;
+    let pid = wait_for_child(&server).await;
     drop(socket);
     server.released().await;
+    assert_child_gone(pid);
 }
 #[tokio::test]
 async fn shutdown_stops_readiness_and_reaps_active_work() {
@@ -193,11 +194,21 @@ async fn shutdown_stops_readiness_and_reaps_active_work() {
             .send()
             .await
     });
-    let _pid = wait_for_child(&server).await;
+    let pid = wait_for_child(&server).await;
     server.app.begin_shutdown();
     assert!(!server.app.is_ready());
     server.released().await;
+    assert_child_gone(pid);
     let _ = request.await;
+}
+fn assert_child_gone(pid: u32) {
+    #[cfg(target_os = "linux")]
+    assert!(
+        !std::path::Path::new(&format!("/proc/{pid}")).exists(),
+        "child still present or zombie after release"
+    );
+    #[cfg(not(target_os = "linux"))]
+    let _ = pid;
 }
 #[tokio::test]
 async fn slow_tcp_consumer_is_closed_before_admission_is_reused() {

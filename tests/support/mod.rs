@@ -131,6 +131,14 @@ pub async fn verify(
     source: &[u8],
     recipe: &str,
 ) -> (Manifest, Vec<Vec<u8>>) {
+    verify_with_limits(response, source, recipe, &Limits::default()).await
+}
+pub async fn verify_with_limits(
+    response: reqwest::Response,
+    source: &[u8],
+    recipe: &str,
+    limits: &Limits,
+) -> (Manifest, Vec<Vec<u8>>) {
     assert_eq!(
         response.status(),
         200,
@@ -183,7 +191,7 @@ pub async fn verify(
         assert_eq!(bytes.len() as u64, expected.byte_size);
         assert_eq!(application::images::sha256(&bytes), expected.sha256);
         assert_eq!(
-            image_codec::verify_output(&bytes, &Limits::default()).unwrap(),
+            image_codec::verify_output(&bytes, limits).unwrap(),
             expected.image
         );
         outputs.push(bytes.to_vec());

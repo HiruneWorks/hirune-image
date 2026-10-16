@@ -28,6 +28,7 @@ pub fn decode_source(
     mut on_decoder_start: impl FnMut(),
     mut frame: impl FnMut(RgbaImage, u32) -> Result<()>,
 ) -> Result<DecodedSource> {
+    limits.validate()?;
     let mut normalized_dimensions = (0, 0);
     let mut budget = Budget::default();
     let mut emit =
@@ -38,7 +39,7 @@ pub fn decode_source(
             frame(normalized, delay)
         };
     let (format, facts, orientation, delays) = if bytes.starts_with(b"GIF8") {
-        let structure = gif_structure(bytes)?;
+        let structure = gif_structure(bytes, limits)?;
         limits.preflight(&structure.facts)?;
         let mut decoder = image::codecs::gif::GifDecoder::new(Cursor::new(bytes))
             .map_err(|_| Error::InvalidImage)?;
@@ -67,7 +68,7 @@ pub fn decode_source(
         }
         (SourceFormat::Gif, structure.facts, 1, structure.delays)
     } else if bytes.starts_with(b"RIFF") {
-        let structure = webp_structure(bytes)?;
+        let structure = webp_structure(bytes, limits)?;
         let orientation = structure.orientation;
         let icc = structure.icc;
         on_decoder_start();

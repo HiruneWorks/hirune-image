@@ -10,7 +10,7 @@ pub struct RecipeInput {
     #[schemars(range(min = 1, max = 1))]
     pub contract_version: u32,
     pub animation_policy: AnimationPolicy,
-    #[schemars(length(min = 1, max = 4))]
+    #[schemars(length(min = 1))]
     pub outputs: Vec<OutputInput>,
 }
 #[derive(Debug, Deserialize, Serialize, JsonSchema)]
@@ -25,9 +25,9 @@ pub struct OutputInput {
 #[serde(deny_unknown_fields)]
 pub struct ResizeInput {
     pub fit: ResizeFit,
-    #[schemars(range(min = 1, max = 4096))]
+    #[schemars(range(min = 1, max = 16383))]
     pub max_width: u32,
-    #[schemars(range(min = 1, max = 4096))]
+    #[schemars(range(min = 1, max = 16383))]
     pub max_height: u32,
 }
 #[derive(Debug, Deserialize, Serialize, JsonSchema)]

@@ -1,0 +1,9 @@
+# Operator-defined budgets and image regression coverage
+
+The operator can raise or lower image/request/output, pixel/spool/native-memory, frame/time, concurrency and deadline budgets. Defaults no longer act as maximum policy. Capabilities separates active limits from codec limits. CPU consumption is independently configured. Fixed codec/representation caps and checked arithmetic remain enforced. Worker CLI limits are validated and applied before reading request-derived job metadata, and both IPC directions use checked dynamic bounds.
+
+Astra reviewed configuration, semaphore representation, native conversions, IPC fencing and tests. Its finding that both memory allocation outcomes returned the same HTTP failure was fixed: an allocation that escapes the AS fence now returns a normal success, contradicting the test's required failure. Tests check actual Linux PID absence after admission release and successful subsequent work.
+
+Observed local Windows workspace tests, clippy and schema drift passed. Raised-budget HTTP tests process 8192px, 121 frames/121 seconds, and 1024 maximum-length IDs (larger than prior fixed IPC caps), validated against schemas and independent Python checks. Independent LittleCMS RGB/alpha goldens, scalar resized animation/disposal expectations, every frame delay, identical finite animation frames, corrupt-tail first-frame rejection, extreme geometry invariants and bounded header mutations are covered.
+
+Local Linux Docker tests verified AS allocation denial, CPU termination, reap/cleanup/recovery, operator budgets and process cancellation. Linux resource tests are intentionally absent on Windows. These checks establish functional boundaries, not production capacity. Container profiles and remote CI evidence are recorded with the benchmark follow-up milestone.

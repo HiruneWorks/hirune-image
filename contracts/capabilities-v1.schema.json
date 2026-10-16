@@ -1,9 +1,45 @@
 {
   "$defs": {
+    "CodecLimits": {
+      "properties": {
+        "cycle_duration_ms": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "frame_duration_ms": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "webp_dimension": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "webp_file_bytes": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "webp_dimension",
+        "webp_file_bytes",
+        "frame_duration_ms",
+        "cycle_duration_ms"
+      ],
+      "type": "object"
+    },
     "Limits": {
       "additionalProperties": false,
       "properties": {
         "canvas_pixels": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "child_cpu_seconds": {
           "format": "uint64",
           "minimum": 0,
           "type": "integer"
@@ -112,7 +148,8 @@
         "concurrency",
         "deadline_ms",
         "idle_ms",
-        "child_memory_bytes"
+        "child_memory_bytes",
+        "child_cpu_seconds"
       ],
       "type": "object"
     },
@@ -178,6 +215,9 @@
       "minItems": 3,
       "type": "array"
     },
+    "codec_limits": {
+      "$ref": "#/$defs/CodecLimits"
+    },
     "color_policy": {
       "type": "string"
     },
@@ -225,6 +265,7 @@
     "contract_version",
     "processor",
     "limits",
+    "codec_limits",
     "input_formats",
     "output_format",
     "encoding_modes",

@@ -1,5 +1,5 @@
 use crate::bootstrap::Application;
-use application::images::{Limits, ProcessorInfo};
+use application::images::{CodecLimits, Limits, ProcessorInfo};
 use axum::{Json, extract::State};
 use schemars::JsonSchema;
 use serde::Serialize;
@@ -8,6 +8,7 @@ pub struct Capabilities {
     pub contract_version: u32,
     pub processor: ProcessorInfo,
     pub limits: Limits,
+    pub codec_limits: CodecLimits,
     pub input_formats: [&'static str; 4],
     pub output_format: &'static str,
     pub encoding_modes: [&'static str; 2],
@@ -23,6 +24,7 @@ pub async fn capabilities(State(app): State<Application>) -> Json<Capabilities> 
         contract_version: 1,
         processor: app.processor,
         limits: app.settings.limits.clone(),
+        codec_limits: CodecLimits::default(),
         input_formats: ["jpeg", "png", "gif", "webp"],
         output_format: "webp",
         encoding_modes: ["lossy", "lossless"],

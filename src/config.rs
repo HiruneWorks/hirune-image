@@ -37,6 +37,7 @@ impl Settings {
         setting!(deadline_ms, "HIRUNE_DEADLINE_MS");
         setting!(idle_ms, "HIRUNE_IDLE_MS");
         setting!(child_memory_bytes, "HIRUNE_CHILD_MEMORY_BYTES");
+        setting!(child_cpu_seconds, "HIRUNE_CHILD_CPU_SECONDS");
         limits.validate()?;
         let worker = std::env::var_os("HIRUNE_WORKER")
             .map(PathBuf::from)

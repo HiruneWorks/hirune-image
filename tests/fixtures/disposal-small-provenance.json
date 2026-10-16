@@ -1,0 +1,10 @@
+{
+  "generator": "scripts/generate_animation_reference.py",
+  "source": "manual disposal-expected-*.rgba",
+  "size": [
+    4,
+    3
+  ],
+  "rgb_tolerance": 1,
+  "alpha_tolerance": 0
+}

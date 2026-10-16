@@ -65,6 +65,22 @@ async fn animated_gif_and_webp_preserve_timing_loops_disposal_and_pixels() {
             assert_eq!(output.image.duration_ms, duration);
             assert_eq!(output.image.loop_count, loops);
         }
+        for output in &outputs {
+            let mut delays = Vec::new();
+            image_codec::decode_frames(output, &Limits::default(), |_, delay| {
+                delays.push(delay);
+                Ok(())
+            })
+            .unwrap();
+            assert_eq!(
+                delays,
+                if frames == 4 {
+                    vec![100, 700, 300, 500]
+                } else {
+                    vec![100, 700, 300]
+                }
+            );
+        }
         if name.ends_with(".gif") {
             let stem = name.trim_end_matches(".gif");
             let mut i = 0;
@@ -314,7 +330,14 @@ async fn zero_delay_loop_overflow_and_late_webp_corruption_are_rejected() {
     let mut broken = fixture("rust-finite1-lossless.webp");
     let last = broken.windows(4).rposition(|s| s == b"VP8L").unwrap();
     broken[last + 8] = 0;
-    assert_eq!(server.process(broken, &recipe).await.status(), 422);
+    assert_eq!(server.process(broken.clone(), &recipe).await.status(), 422);
+    assert_eq!(
+        server
+            .process(broken, &recipe.replace("preserve", "first_frame"))
+            .await
+            .status(),
+        422
+    );
     server.released().await;
 }
 #[tokio::test]

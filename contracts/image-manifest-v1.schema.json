@@ -10,25 +10,23 @@
       "properties": {
         "byte_size": {
           "format": "uint64",
-          "maximum": 33554432,
+          "maximum": 4294967294,
           "minimum": 12,
           "type": "integer"
         },
         "duration_ms": {
           "format": "uint32",
-          "maximum": 60000,
+          "maximum": 2147483647,
           "minimum": 0,
           "type": "integer"
         },
         "frame_count": {
           "format": "uint32",
-          "maximum": 120,
           "minimum": 1,
           "type": "integer"
         },
         "height": {
           "format": "uint32",
-          "maximum": 8192,
           "minimum": 1,
           "type": "integer"
         },
@@ -51,7 +49,6 @@
         },
         "width": {
           "format": "uint32",
-          "maximum": 8192,
           "minimum": 1,
           "type": "integer"
         }
@@ -126,7 +123,7 @@
         },
         "duration_ms": {
           "format": "uint32",
-          "maximum": 60000,
+          "maximum": 2147483647,
           "minimum": 0,
           "type": "integer"
         },
@@ -135,13 +132,11 @@
         },
         "frame_count": {
           "format": "uint32",
-          "maximum": 120,
           "minimum": 1,
           "type": "integer"
         },
         "height": {
           "format": "uint32",
-          "maximum": 8192,
           "minimum": 1,
           "type": "integer"
         },
@@ -159,7 +154,6 @@
         },
         "width": {
           "format": "uint32",
-          "maximum": 8192,
           "minimum": 1,
           "type": "integer"
         }
@@ -199,7 +193,6 @@
       "items": {
         "$ref": "#/$defs/OutputFacts"
       },
-      "maxItems": 4,
       "minItems": 1,
       "type": "array"
     },

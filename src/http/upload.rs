@@ -36,7 +36,11 @@ pub async fn read_upload(request: Request, app: &Application, deadline: Instant)
     let mut stream = request.into_body().into_data_stream();
     let mut body = BytesMut::new();
     loop {
-        let until = deadline.min(Instant::now() + Duration::from_millis(limits.idle_ms));
+        let until = deadline.min(
+            Instant::now()
+                .checked_add(Duration::from_millis(limits.idle_ms))
+                .unwrap_or(deadline),
+        );
         let chunk = timeout_at(until, stream.next())
             .await
             .map_err(|_| Error::ProcessingTimeout)?;

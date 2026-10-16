@@ -52,13 +52,13 @@ impl Encoding {
 #[derive(Clone, Debug, Deserialize, Serialize, JsonSchema, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct ImageFacts {
-    #[schemars(range(min = 1, max = 8192))]
+    #[schemars(range(min = 1))]
     pub width: u32,
-    #[schemars(range(min = 1, max = 8192))]
+    #[schemars(range(min = 1))]
     pub height: u32,
-    #[schemars(range(min = 1, max = 120))]
+    #[schemars(range(min = 1))]
     pub frame_count: u32,
-    #[schemars(range(min = 0, max = 60000))]
+    #[schemars(range(min = 0, max = 2147483647))]
     pub duration_ms: u32,
     pub loop_count: u16,
 }
@@ -75,7 +75,7 @@ pub struct OutputFacts {
     #[schemars(regex(pattern = "^[a-z][a-z0-9_]{0,31}$"))]
     pub id: String,
     pub media_type: MediaType,
-    #[schemars(range(min = 12, max = 33554432))]
+    #[schemars(range(min = 12, max = 4294967294u64))]
     pub byte_size: u64,
     #[schemars(regex(pattern = "^[0-9a-f]{64}$"))]
     pub sha256: String,
@@ -107,7 +107,7 @@ pub struct Manifest {
     #[schemars(regex(pattern = "^[0-9a-f]{64}$"))]
     pub recipe_sha256: String,
     pub source: SourceFacts,
-    #[schemars(length(min = 1, max = 4))]
+    #[schemars(length(min = 1))]
     pub outputs: Vec<OutputFacts>,
 }
 #[derive(Debug, Deserialize, Serialize)]

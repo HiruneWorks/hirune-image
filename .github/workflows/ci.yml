@@ -78,6 +78,13 @@ jobs:
           HIRUNE_SKIP_BUILD: "1"
           HIRUNE_EXPECT_BUILD_ID: ${{ github.sha }}
         run: python3 scripts/verify_container.py
+      - name: Verify the larger operator profile
+        env:
+          HIRUNE_TEST_IMAGE: ${{ env.LOCAL_IMAGE }}
+          HIRUNE_SKIP_BUILD: "1"
+          HIRUNE_EXPECT_BUILD_ID: ${{ github.sha }}
+          HIRUNE_VERIFY_PROFILE: large
+        run: python3 scripts/verify_container.py
       - name: Record the tested image identity
         id: identity
         run: |

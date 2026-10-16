@@ -96,17 +96,20 @@ async fn supervise(
         .await
         .map_err(|_| Error::InternalError)?;
     check_cancel(deadline, cancel, app)?;
-    tokio::fs::write(
-        directory.join("job.json"),
-        serde_json::to_vec(job).map_err(|_| Error::InternalError)?,
-    )
-    .await
-    .map_err(|_| Error::InternalError)?;
+    let metadata = serde_json::to_vec(job).map_err(|_| Error::InternalError)?;
+    if metadata.len() as u64 > job.limits.job_metadata_bytes()? {
+        return Err(Error::InvalidRequest);
+    }
+    tokio::fs::write(directory.join("job.json"), metadata)
+        .await
+        .map_err(|_| Error::InternalError)?;
     check_cancel(deadline, cancel, app)?;
     let mut command = Command::new(&app.settings.worker);
     command
         .arg("--job")
         .arg(directory)
+        .arg("--limits")
+        .arg(serde_json::to_string(&job.limits).map_err(|_| Error::InternalError)?)
         .env_clear()
         .stdin(Stdio::null())
         .stdout(Stdio::null())
@@ -131,7 +134,7 @@ async fn supervise(
         .await
         .map_err(|_| Error::ProcessorUnavailable)?
         .len()
-        > 64 << 10
+        > job.limits.result_metadata_bytes(job.recipe.outputs.len())?
     {
         return Err(Error::InternalError);
     }

@@ -12,7 +12,7 @@ pub fn apply_resource_limits(memory_bytes: u64, cpu_seconds: u64) -> Result<()> 
         };
         let cpu = libc::rlimit {
             rlim_cur: cpu_seconds,
-            rlim_max: cpu_seconds + 1,
+            rlim_max: cpu_seconds.checked_add(1).ok_or(Error::InvalidRequest)?,
         };
         let core = libc::rlimit {
             rlim_cur: 0,

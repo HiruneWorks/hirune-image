@@ -1,7 +1,10 @@
 use crate::container::webp_structure;
 use application::{
     error::{ProcessingError as Error, Result},
-    images::{Encoding, ImageFacts, Limits, ProcessorInfo},
+    images::{
+        Encoding, ImageFacts, Limits, MAX_FRAME_DURATION_MS, MAX_WEBP_DIMENSION,
+        MAX_WEBP_FILE_BYTES, ProcessorInfo,
+    },
 };
 use libwebp_sys as ffi;
 use std::{
@@ -115,8 +118,8 @@ pub fn encode(
 ) -> Result<Vec<u8>> {
     if width == 0
         || height == 0
-        || width > 4096
-        || height > 4096
+        || width > MAX_WEBP_DIMENSION
+        || height > MAX_WEBP_DIMENSION
         || rgba.len() as u64 != u64::from(width) * u64::from(height) * 4
     {
         return Err(Error::InternalError);
@@ -131,7 +134,8 @@ pub fn encode(
     picture.0.use_argb = 1;
     let mut writer = Writer {
         bytes: Vec::new(),
-        maximum: maximum as usize,
+        maximum: usize::try_from(maximum.min(MAX_WEBP_FILE_BYTES).min(isize::MAX as u64))
+            .map_err(|_| Error::OutputLimitsExceeded)?,
         failed: false,
     };
     picture.0.writer = Some(write_chunk);
@@ -163,7 +167,7 @@ impl AnimationMux {
             mux,
             // RIFF, VP8X, and ANIM headers; each full-canvas ANMF adds 24 bytes.
             bytes: 44,
-            maximum,
+            maximum: maximum.min(MAX_WEBP_FILE_BYTES).min(isize::MAX as u64),
         };
         let params = ffi::WebPMuxAnimParams {
             bgcolor: 0,
@@ -177,6 +181,9 @@ impl AnimationMux {
         Ok(owned)
     }
     pub fn add(&mut self, bytes: &[u8], duration: u32) -> Result<()> {
+        if duration == 0 || duration > MAX_FRAME_DURATION_MS {
+            return Err(Error::UnrepresentableAnimation);
+        }
         let mut cursor = 12usize;
         let mut frame_size = 24u64;
         while cursor < bytes.len() {
@@ -262,7 +269,8 @@ pub fn decode_frames(
     limits: &Limits,
     mut consume: impl FnMut(Vec<u8>, u32) -> Result<()>,
 ) -> Result<ImageFacts> {
-    let structure = webp_structure(bytes)?;
+    limits.validate()?;
+    let structure = webp_structure(bytes, limits)?;
     let facts = structure.facts;
     limits.preflight(&facts)?;
     let mut options = unsafe { mem::zeroed() };
@@ -288,7 +296,12 @@ pub fn decode_frames(
     {
         return Err(Error::InvalidImage);
     }
-    let frame_bytes = (u64::from(facts.width) * u64::from(facts.height) * 4) as usize;
+    let frame_bytes = u64::from(facts.width)
+        .checked_mul(u64::from(facts.height))
+        .and_then(|pixels| pixels.checked_mul(4))
+        .and_then(|bytes| usize::try_from(bytes).ok())
+        .filter(|&bytes| bytes <= isize::MAX as usize)
+        .ok_or(Error::ImageLimitsExceeded)?;
     let mut previous = 0;
     for delay in structure.delays {
         if unsafe { ffi::WebPAnimDecoderHasMoreFrames(decoder.0.as_ptr()) } != 1 {

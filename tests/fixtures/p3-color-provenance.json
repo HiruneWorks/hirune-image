@@ -1,0 +1,13 @@
+{
+  "generator": "scripts/generate_color_fixture.py",
+  "pillow": "12.3.0",
+  "littlecms": "2.19",
+  "intent": "perceptual (0)",
+  "size": [
+    8,
+    4
+  ],
+  "profile_sha256": "231752984cd4a5278e1b8d2390fe496767d4511fc81f54e1a5c69ae9ab4c42b5",
+  "rgb_tolerance": 2,
+  "alpha_tolerance": 0
+}

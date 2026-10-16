@@ -85,7 +85,10 @@ pub fn response(
         chunks.push_back(Bytes::from_static(b"\r\n"));
     }
     chunks.push_back(Bytes::from(format!("--{boundary}--\r\n")));
-    let length: usize = chunks.iter().map(Bytes::len).sum();
+    let length = chunks
+        .iter()
+        .try_fold(0usize, |total, chunk| total.checked_add(chunk.len()))
+        .ok_or(Error::OutputLimitsExceeded)?;
     let state = Arc::new(Mutex::new(DeliveryState {
         chunks,
         lease: Some(prepared.lease),
@@ -103,7 +106,12 @@ pub fn response(
         loop {
             let until = {
                 let state = state.lock().expect("delivery mutex");
-                deadline.min(state.last_progress + Duration::from_millis(idle_ms))
+                deadline.min(
+                    state
+                        .last_progress
+                        .checked_add(Duration::from_millis(idle_ms))
+                        .unwrap_or(deadline),
+                )
             };
             tokio::select! {_=finished.cancelled()=>return,_=shutdown.cancelled()=>{},_=tokio::time::sleep_until(until)=>{}}
             let mut state = state.lock().expect("delivery mutex");

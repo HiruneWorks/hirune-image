@@ -43,3 +43,5 @@ docker compose -f deploy/compose.yml -f compose/compose.local.yml up --build -d
 ```
 
 Run `just test-container` for local acceptance. The production profile itself pulls a published image; only the local override contains source-build configuration.
+
+All application budgets and container resources are configurable. See [operator budgets](../docs/operations.md) and the [larger profile](../.envs/.example/large.env). Pass `--env-file .envs/.example/large.env` before `-f` to apply that Compose profile; confirm with `docker compose ... config` and the running capabilities endpoint.

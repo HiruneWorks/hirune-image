@@ -1,6 +1,6 @@
 use application::{
     error::{ProcessingError as Error, Result},
-    images::ImageFacts,
+    images::{ImageFacts, Limits},
 };
 use image::metadata::Orientation;
 use libwebp_sys as ffi;
@@ -15,7 +15,7 @@ pub struct WebpStructure<'a> {
 fn le24(data: &[u8]) -> u32 {
     u32::from_le_bytes([data[0], data[1], data[2], 0])
 }
-pub fn webp_structure(data: &[u8]) -> Result<WebpStructure<'_>> {
+pub fn webp_structure<'a>(data: &'a [u8], limits: &Limits) -> Result<WebpStructure<'a>> {
     if data.len() < 12
         || &data[..4] != b"RIFF"
         || &data[8..12] != b"WEBP"
@@ -27,6 +27,7 @@ pub fn webp_structure(data: &[u8]) -> Result<WebpStructure<'_>> {
     let (mut cursor, mut delays, mut loops, mut icc, mut exif, mut metadata) =
         (12, Vec::new(), None, None, None, false);
     let mut dimensions = None;
+    let mut scanned_duration = 0u32;
     while cursor < data.len() {
         let header = data.get(cursor..cursor + 8).ok_or(Error::InvalidImage)?;
         let length =
@@ -50,10 +51,17 @@ pub fn webp_structure(data: &[u8]) -> Result<WebpStructure<'_>> {
                 loops = Some(u16::from_le_bytes([body[4], body[5]]));
             }
             b"ANMF" => {
-                if body.len() < 16 || delays.len() >= 120 {
+                if body.len() < 16 || delays.len() >= limits.frames as usize {
                     return Err(Error::ImageLimitsExceeded);
                 }
-                delays.push(le24(&body[12..15]));
+                let delay = le24(&body[12..15]);
+                scanned_duration = scanned_duration
+                    .checked_add(delay)
+                    .ok_or(Error::ImageLimitsExceeded)?;
+                if scanned_duration > limits.duration_ms {
+                    return Err(Error::ImageLimitsExceeded);
+                }
+                delays.push(delay);
             }
             b"ICCP" => {
                 metadata = true;
@@ -145,7 +153,7 @@ fn skip_subblocks(data: &[u8], cursor: &mut usize) -> Result<()> {
         }
     }
 }
-pub fn gif_structure(data: &[u8]) -> Result<GifStructure> {
+pub fn gif_structure(data: &[u8], limits: &Limits) -> Result<GifStructure> {
     if data.len() < 13 || !matches!(&data[..6], b"GIF87a" | b"GIF89a") {
         return Err(Error::InvalidImage);
     }
@@ -158,6 +166,7 @@ pub fn gif_structure(data: &[u8]) -> Result<GifStructure> {
             0
         };
     let (mut delays, mut pending_delay, mut loops) = (Vec::new(), 0, None);
+    let mut scanned_duration = 0u32;
     loop {
         let kind = *data.get(cursor).ok_or(Error::InvalidImage)?;
         cursor += 1;
@@ -223,10 +232,16 @@ pub fn gif_structure(data: &[u8]) -> Result<GifStructure> {
                 }
                 cursor = cursor.checked_add(1).ok_or(Error::InvalidImage)?;
                 skip_subblocks(data, &mut cursor)?;
-                if delays.len() >= 120 {
+                if delays.len() >= limits.frames as usize {
                     return Err(Error::ImageLimitsExceeded);
                 }
                 delays.push(pending_delay);
+                scanned_duration = scanned_duration
+                    .checked_add(pending_delay)
+                    .ok_or(Error::ImageLimitsExceeded)?;
+                if delays.len() > 1 && scanned_duration > limits.duration_ms {
+                    return Err(Error::ImageLimitsExceeded);
+                }
                 pending_delay = 0;
             }
             _ => return Err(Error::InvalidImage),

@@ -1,6 +1,6 @@
 use application::{
     error::ProcessingError,
-    images::{JobInput, JobResult},
+    images::{JobInput, JobResult, Limits},
 };
 use std::{fs, path::PathBuf};
 fn main() {
@@ -10,9 +10,29 @@ fn main() {
 }
 fn run() -> Result<(), ProcessingError> {
     let arguments: Vec<_> = std::env::args_os().skip(1).collect();
-    if arguments.len() == 1 && arguments[0] == "--probe" {
+    let (mode, directory, limits_json) = match arguments.as_slice() {
+        [mode, flag, limits] if mode == "--probe" && flag == "--limits" => (mode, None, limits),
+        [mode, directory, flag, limits] if mode == "--job" && flag == "--limits" => {
+            (mode, Some(PathBuf::from(directory)), limits)
+        }
+        _ => return Err(ProcessingError::InvalidRequest),
+    };
+    let limits_json = limits_json
+        .to_str()
+        .ok_or(ProcessingError::InvalidRequest)?;
+    if limits_json.len() > 8192 {
+        return Err(ProcessingError::InvalidRequest);
+    }
+    let limits: Limits =
+        serde_json::from_str(limits_json).map_err(|_| ProcessingError::InvalidRequest)?;
+    limits.validate()?;
+    // Trusted supervisor settings fence allocations before reading request-derived job metadata.
+    image_codec::sandbox::apply_resource_limits(
+        limits.child_memory_bytes,
+        limits.child_cpu_seconds,
+    )?;
+    if mode == "--probe" {
         // Probe both modes and the actual native libraries before accepting traffic.
-        image_codec::sandbox::apply_resource_limits(768 << 20, 5)?;
         print!(
             "{}",
             serde_json::to_string(&image_codec::probe()?)
@@ -20,36 +40,32 @@ fn run() -> Result<(), ProcessingError> {
         );
         return Ok(());
     }
-    if arguments.len() != 2 || arguments[0] != "--job" {
-        return Err(ProcessingError::InvalidRequest);
-    }
-    let directory = PathBuf::from(&arguments[1]);
+    let directory = directory.ok_or(ProcessingError::InvalidRequest)?;
     let path = directory.join("job.json");
     if fs::metadata(&path)
         .map_err(|_| ProcessingError::InvalidRequest)?
         .len()
-        > 64 << 10
+        > limits.job_metadata_bytes()?
     {
         return Err(ProcessingError::InvalidRequest);
     }
     let job: JobInput =
         serde_json::from_slice(&fs::read(path).map_err(|_| ProcessingError::InvalidRequest)?)
             .map_err(|_| ProcessingError::InvalidRequest)?;
-    job.limits.validate()?;
-    image_codec::sandbox::apply_resource_limits(
-        job.limits.child_memory_bytes,
-        job.limits.deadline_ms.div_ceil(1000),
-    )?;
+    if job.limits != limits {
+        return Err(ProcessingError::InvalidRequest);
+    }
     let result = match image_codec::process_job(&directory, &job) {
         Ok(manifest) => JobResult::Success {
             manifest: Box::new(manifest),
         },
         Err(error) => JobResult::Failure { error },
     };
-    fs::write(
-        directory.join("result.json"),
-        serde_json::to_vec(&result).map_err(|_| ProcessingError::InternalError)?,
-    )
-    .map_err(|_| ProcessingError::InternalError)?;
+    let metadata = serde_json::to_vec(&result).map_err(|_| ProcessingError::InternalError)?;
+    if metadata.len() as u64 > limits.result_metadata_bytes(job.recipe.outputs.len())? {
+        return Err(ProcessingError::InternalError);
+    }
+    fs::write(directory.join("result.json"), metadata)
+        .map_err(|_| ProcessingError::InternalError)?;
     Ok(())
 }

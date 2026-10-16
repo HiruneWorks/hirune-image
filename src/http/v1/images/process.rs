@@ -35,7 +35,9 @@ pub async fn process_image(
         .clone()
         .try_acquire_owned()
         .map_err(|_| failure(Error::ProcessorOverloaded))?;
-    let deadline = Instant::now() + Duration::from_millis(app.settings.limits.deadline_ms);
+    let deadline = Instant::now()
+        .checked_add(Duration::from_millis(app.settings.limits.deadline_ms))
+        .ok_or_else(|| failure(Error::InternalError))?;
     let directory = tempfile::Builder::new()
         .prefix("hirune-image-")
         .tempdir_in(&app.settings.temp_root)

@@ -90,3 +90,20 @@ fn every_budget_applies_at_its_boundary_and_checked_arithmetic_rejects_overflow(
     assert_eq!(inside_dimensions(1, 8192, 4096, 4096), (1, 4096));
     assert_eq!(inside_dimensions(40, 20, 100, 100), (40, 20));
 }
+
+#[test]
+fn inside_geometry_invariants_cover_extreme_aspect_ratios_and_u32_products() {
+    let mut seed = 0x5eedu32;
+    for _ in 0..10000 {
+        let mut next = || {
+            seed = seed.wrapping_mul(1664525).wrapping_add(1013904223);
+            seed.max(1)
+        };
+        let (w, h, mw, mh) = (next(), next(), next(), next());
+        let (rw, rh) = inside_dimensions(w, h, mw, mh);
+        assert!(rw >= 1 && rh >= 1 && rw <= w && rh <= h && rw <= mw && rh <= mh);
+        assert_eq!(inside_dimensions(rw, rh, mw, mh), (rw, rh));
+        let aspect_error = (u64::from(rw) * u64::from(h)).abs_diff(u64::from(rh) * u64::from(w));
+        assert!(aspect_error <= u64::from(w.max(h)));
+    }
+}

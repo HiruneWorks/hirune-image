@@ -83,6 +83,12 @@ gif.workspace = true
 sha2.workspace = true
 hex.workspace = true
 
+[[bin]]
+name = "resource_test_worker"
+path = "tests/support/resource_worker.rs"
+test = false
+doc = false
+
 [profile.dev]
 debug = 1
 

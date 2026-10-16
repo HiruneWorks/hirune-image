@@ -5,6 +5,7 @@ COPY .cargo .cargo
 COPY crates crates
 COPY src src
 COPY xtask xtask
+COPY tests/support/resource_worker.rs tests/support/resource_worker.rs
 ARG HIRUNE_BUILD_ID=development
 ENV HIRUNE_BUILD_ID=$HIRUNE_BUILD_ID
 RUN cargo build --locked --release --bin api --bin image_worker

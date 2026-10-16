@@ -53,7 +53,7 @@ def http_checks(base):
                     + source + f"\r\n--{boundary}\r\nContent-Disposition: form-data; name=\"recipe\"\r\nContent-Type: application/json\r\n\r\n".encode()
                     + raw_recipe + f"\r\n--{boundary}--\r\n".encode())
             with request(base, "/v1/images/process", body, f"multipart/form-data; boundary={boundary}") as response:
-                verify(response.read(), source, raw_recipe)
+                verify(response.read(), source, raw_recipe, capability)
     with request(base, "/health/live") as response:
         assert response.status == 204
     return capability
@@ -63,31 +63,49 @@ def main():
         print(json.dumps(http_checks(sys.argv[2])))
         return
     name = "hirune-image-verify-" + uuid.uuid4().hex[:12]
+    profile = os.environ.get("HIRUNE_VERIFY_PROFILE", "default")
+    assert profile in ("default", "large")
+    settings = {}
+    if profile == "large":
+        for line in (ROOT / ".envs/.example/large.env").read_text().splitlines():
+            if line and not line.startswith("#"):
+                key, value = line.split("=", 1)
+                settings[key] = value
+    memory = settings.get("HIRUNE_CONTAINER_MEMORY", "1g")
+    memory_bytes = int(memory[:-1]) * {"g": 1 << 30, "m": 1 << 20}[memory[-1]]
+    tmpfs = settings.get("HIRUNE_TMPFS_SIZE", "512m")
+    environment = [item for key, value in settings.items() if not key.startswith("HIRUNE_CONTAINER_") and key != "HIRUNE_TMPFS_SIZE" for item in ("--env", f"{key}={value}")]
     if os.environ.get("HIRUNE_SKIP_BUILD") != "1":
         command("docker", "build", "--file", "compose/production/app/Dockerfile", "--tag", IMAGE, ".")
     command("docker", "pull", CLIENT_IMAGE)
     command("docker", "network", "create", "--internal", name)
     try:
         command("docker", "run", "--detach", "--name", name, "--network", name,
-                "--read-only", "--tmpfs", "/tmp:rw,noexec,nosuid,size=512m,mode=1777",
+                "--read-only", "--tmpfs", f"/tmp:rw,noexec,nosuid,size={tmpfs},mode=1777",
                 "--cap-drop", "ALL", "--security-opt", "no-new-privileges:true",
-                "--memory", "1g", "--memory-swap", "1g", "--cpus", "2", "--pids-limit", "64", IMAGE)
+                "--memory", memory, "--memory-swap", memory, "--cpus", settings.get("HIRUNE_CONTAINER_CPUS", "2"), "--pids-limit", settings.get("HIRUNE_CONTAINER_PIDS", "64"), *environment, IMAGE)
         capability = json.loads(command("docker", "run", "--rm", "--network", name, "--read-only",
                       "--mount", f"type=bind,source={ROOT},target=/work,readonly", "--workdir", "/work",
                       "--env", "PYTHONDONTWRITEBYTECODE=1", CLIENT_IMAGE,
                       "python", "scripts/verify_container.py", "--client", f"http://{name}:8080", capture=True))
         expected_build = os.environ.get("HIRUNE_EXPECT_BUILD_ID")
+        if profile == "large":
+            assert capability["limits"]["output_bytes"] == int(settings["HIRUNE_OUTPUT_BYTES"])
+            assert capability["limits"]["working_bytes"] == int(settings["HIRUNE_WORKING_BYTES"])
+            assert capability["limits"]["child_memory_bytes"] == int(settings["HIRUNE_CHILD_MEMORY_BYTES"])
+            assert capability["limits"]["child_cpu_seconds"] == int(settings["HIRUNE_CHILD_CPU_SECONDS"])
+            assert capability["limits"]["outputs"] == int(settings["HIRUNE_OUTPUTS"])
         if expected_build:
             assert capability["processor"]["build_id"].split(":", 1)[0] == expected_build
         uid = command("docker", "exec", name, "id", "-u", capture=True).strip()
         assert uid != "0"
         assert command("docker", "exec", name, "sh", "-c", "find /tmp -mindepth 1 -maxdepth 1 | wc -l", capture=True).strip() == "0"
         peak = int(command("docker", "exec", name, "cat", "/sys/fs/cgroup/memory.peak", capture=True))
-        assert peak < 1 << 30
+        assert peak < memory_bytes
         state = json.loads(command("docker", "inspect", name, capture=True))[0]["State"]
         assert state["Running"] and not state["OOMKilled"]
-        print(json.dumps({"result": "PASS", "http_cases": 8, "uid": uid,
-                          "cgroup_memory_peak_bytes": peak, "container_limit_bytes": 1 << 30,
+        print(json.dumps({"result": "PASS", "profile": profile, "http_cases": 8, "uid": uid,
+                          "cgroup_memory_peak_bytes": peak, "container_limit_bytes": memory_bytes,
                           "processor": capability["processor"]}, indent=2))
     finally:
         subprocess.run(["docker", "rm", "--force", name], check=False, stdout=subprocess.DEVNULL)

@@ -1,5 +1,7 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 mod container;
+#[cfg(test)]
+mod container_tests;
 mod normalize;
 mod pipeline;
 mod resize;
