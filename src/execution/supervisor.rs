@@ -48,8 +48,8 @@ pub async fn run_job(
         }
         .instrument(span),
     );
-    // A timed-out file operation stays owned by the supervisor until it completes.
-    // Returning the HTTP error does not return its permit early.
+    // The supervisor keeps ownership of submitted file operations until they finish.
+    // Returning an HTTP timeout does not release the permit early.
     let result = tokio::select! {
         result=receiver=>result.map_err(|_|Error::ProcessorUnavailable)?,
         _=tokio::time::sleep_until(deadline)=>Err(Error::ProcessingTimeout),

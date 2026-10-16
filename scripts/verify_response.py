@@ -1,4 +1,4 @@
-"""Independent v1 multipart binding/structure verifier; codec decoding remains server-side."""
+"""Check v1 multipart bindings and structure independently. The worker performs codec decoding."""
 import argparse
 from email.parser import BytesParser
 import email.policy

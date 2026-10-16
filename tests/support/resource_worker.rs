@@ -1,5 +1,5 @@
 #![forbid(unsafe_code)]
-// Test-only executable: omitted from the production image's explicit COPY list.
+// This executable supports tests. The production image's explicit COPY list excludes it.
 use application::images::{JobInput, JobResult, Limits};
 fn main() {
     let args: Vec<_> = std::env::args().collect();
@@ -14,7 +14,7 @@ fn main() {
     let job: JobInput =
         serde_json::from_slice(&std::fs::read(directory.join("job.json")).unwrap()).unwrap();
     std::fs::write(directory.join("child.pid"), std::process::id().to_string()).unwrap();
-    // Give the parent enough time to observe the PID before deliberately exhausting the fence.
+    // Wait briefly so the parent can read the PID before the child exhausts its limit.
     if job.recipe.outputs[0].id == "memory" || job.recipe.outputs[0].id == "cpu" {
         std::thread::sleep(std::time::Duration::from_millis(200));
     }
@@ -27,7 +27,7 @@ fn main() {
             {
                 std::process::exit(77);
             }
-            // Without an effective AS fence this path must return success, so the test fails.
+            // If allocation succeeds, return a normal response. The test must then fail.
             write_result(directory, &job);
         }
         "cpu" => loop {

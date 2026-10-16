@@ -672,7 +672,7 @@
       "get": {
         "responses": {
           "204": {
-            "description": "Process alive"
+            "description": "The API process is running."
           }
         }
       }
@@ -681,10 +681,10 @@
       "get": {
         "responses": {
           "204": {
-            "description": "Ready"
+            "description": "The service is ready."
           },
           "503": {
-            "description": "Shutting down or unavailable"
+            "description": "The service is shutting down or unavailable."
           }
         }
       }
@@ -700,7 +700,7 @@
                 }
               }
             },
-            "description": "Effective limits, pipeline policy and native codec versions"
+            "description": "The response describes active limits, pipeline policy, and native codec versions."
           }
         }
       }
@@ -747,7 +747,7 @@
                 }
               }
             },
-            "description": "JSON manifest first; binary WebP parts follow recipe order. Each part has Content-ID and Content-Length. All outputs are verified before response headers."
+            "description": "The JSON manifest is the first part. WebP parts follow in recipe order. Each part has Content-ID and Content-Length. The service verifies every output before sending response headers."
           },
           "400": {
             "content": {
@@ -757,7 +757,7 @@
                 }
               }
             },
-            "description": "Invalid request or recipe"
+            "description": "The request or recipe is invalid."
           },
           "413": {
             "content": {
@@ -767,7 +767,7 @@
                 }
               }
             },
-            "description": "Byte/pixel/frame/output limit exceeded"
+            "description": "The request exceeds a byte, pixel, frame, duration, or output limit."
           },
           "415": {
             "content": {
@@ -777,7 +777,7 @@
                 }
               }
             },
-            "description": "Unsupported format"
+            "description": "The image format is unsupported."
           },
           "422": {
             "content": {
@@ -787,7 +787,7 @@
                 }
               }
             },
-            "description": "Invalid image or unsupported color/animation"
+            "description": "The image is invalid, or its color or animation is unsupported."
           },
           "500": {
             "content": {
@@ -797,7 +797,7 @@
                 }
               }
             },
-            "description": "Internal error"
+            "description": "An internal error occurs."
           },
           "503": {
             "content": {
@@ -807,7 +807,7 @@
                 }
               }
             },
-            "description": "Overloaded or unavailable; Retry-After: 1"
+            "description": "The processor is busy or unavailable. The response includes Retry-After: 1."
           },
           "504": {
             "content": {
@@ -817,7 +817,7 @@
                 }
               }
             },
-            "description": "Deadline exceeded before headers"
+            "description": "A timeout occurs before response headers."
           }
         }
       }

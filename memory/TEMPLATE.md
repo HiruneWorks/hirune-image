@@ -6,6 +6,8 @@
 
 ## Validation
 
-Record exact checks and material limits. Separate local, container, remote CI, deployment and caller integration.
+Name each check and its result. State the environment and material limits.
+Record local tests, container tests, remote CI, deployment, and caller integration separately.
+Use the [technical writing guide](../docs/writing.md). Keep dates, versions, commands, hashes, and measurements exact.
 
 ## Remaining work

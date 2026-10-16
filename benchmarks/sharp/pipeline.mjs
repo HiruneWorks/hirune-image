@@ -25,7 +25,7 @@ export async function processImage(source, rawRecipe) {
   const metadata = await sharp(source, { animated: true }).metadata();
   if (!["jpeg", "png", "gif", "webp"].includes(metadata.format)) throw new Error("unsupported benchmark source");
   const sourceFacts = facts(metadata);
-  // One source pixel decode. Metadata inspection above does not decode compressed pixels.
+  // Decode source pixels once. The metadata inspection above reads headers without decoding pixels.
   const decode = sharp(source, { animated: true }).autoOrient().ensureAlpha();
   if (metadata.icc) decode.withIccProfile("srgb", { attach: false });
   else decode.toColourspace("srgb");
@@ -45,7 +45,7 @@ export async function processImage(source, rawRecipe) {
       .webp({ lossless: encoding.mode === "lossless", quality: encoding.quality ?? 75, effort: encoding.effort,
         alphaQuality: 100, exact: true, ...(pages > 1 ? { loop: sourceFacts.loop_count, delay: metadata.delay } : {}) }).toBuffer();
     const actual = await sharp(buffer, { animated: true }).metadata();
-    // Match Hirune's full output pixel decode verification, beyond metadata/hash checks.
+    // Decode all output pixels for verification, as Hirune does. Metadata and hash checks are separate.
     await sharp(buffer, { animated: true }).raw().toBuffer();
     const outputFacts = facts(actual);
     if (outputFacts.width !== width || outputFacts.height !== height || outputFacts.duration_ms !== sourceFacts.duration_ms || outputFacts.loop_count !== sourceFacts.loop_count) throw new Error("output verification failed: " + JSON.stringify({ sourceFacts, outputFacts, expected: [width, height], raw: info }));

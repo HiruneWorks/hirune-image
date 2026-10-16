@@ -1,4 +1,4 @@
-"""Compare Hirune HTTP and a self-contained Node/Sharp baseline under matching Docker resources."""
+"""Compare Hirune and the independent Node/Sharp HTTP baseline with the same Docker resource limits."""
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import hashlib

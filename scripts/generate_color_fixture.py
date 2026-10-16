@@ -1,4 +1,4 @@
-"""Reproduce an independent LittleCMS golden; not required by normal tests."""
+"""Generate independent reference pixels with LittleCMS. Normal tests use the committed files."""
 from pathlib import Path
 import hashlib
 import io

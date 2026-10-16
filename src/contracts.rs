@@ -57,23 +57,32 @@ pub fn openapi_document() -> Value {
     component::<ErrorEnvelope>("Error", &mut schemas);
     component::<Capabilities>("Capabilities", &mut schemas);
     let mut responses = Map::new();
-    responses.insert("200".into(),json!({"description":"JSON manifest first; binary WebP parts follow recipe order. Each part has Content-ID and Content-Length. All outputs are verified before response headers.","content":{"multipart/related":{"schema":{"type":"string","format":"binary"}}}}));
+    responses.insert("200".into(),json!({"description":"The JSON manifest is the first part. WebP parts follow in recipe order. Each part has Content-ID and Content-Length. The service verifies every output before sending response headers.","content":{"multipart/related":{"schema":{"type":"string","format":"binary"}}}}));
     for (status, description) in [
-        ("400", "Invalid request or recipe"),
-        ("413", "Byte/pixel/frame/output limit exceeded"),
-        ("415", "Unsupported format"),
-        ("422", "Invalid image or unsupported color/animation"),
-        ("503", "Overloaded or unavailable; Retry-After: 1"),
-        ("504", "Deadline exceeded before headers"),
-        ("500", "Internal error"),
+        ("400", "The request or recipe is invalid."),
+        (
+            "413",
+            "The request exceeds a byte, pixel, frame, duration, or output limit.",
+        ),
+        ("415", "The image format is unsupported."),
+        (
+            "422",
+            "The image is invalid, or its color or animation is unsupported.",
+        ),
+        (
+            "503",
+            "The processor is busy or unavailable. The response includes Retry-After: 1.",
+        ),
+        ("504", "A timeout occurs before response headers."),
+        ("500", "An internal error occurs."),
     ] {
         responses.insert(status.into(),json!({"description":description,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Error"}}}}));
     }
     json!({"openapi":"3.1.0","info":{"title":"Hirune Image","version":env!("CARGO_PKG_VERSION")},
         "paths":{
-            "/health/live":{"get":{"responses":{"204":{"description":"Process alive"}}}},
-            "/health/ready":{"get":{"responses":{"204":{"description":"Ready"},"503":{"description":"Shutting down or unavailable"}}}},
-            "/v1/capabilities":{"get":{"responses":{"200":{"description":"Effective limits, pipeline policy and native codec versions","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Capabilities"}}}}}}},
+            "/health/live":{"get":{"responses":{"204":{"description":"The API process is running."}}}},
+            "/health/ready":{"get":{"responses":{"204":{"description":"The service is ready."},"503":{"description":"The service is shutting down or unavailable."}}}},
+            "/v1/capabilities":{"get":{"responses":{"200":{"description":"The response describes active limits, pipeline policy, and native codec versions.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Capabilities"}}}}}}},
             "/v1/images/process":{"post":{"operationId":"processImage","requestBody":{"required":true,"content":{"multipart/form-data":{"schema":{"type":"object","additionalProperties":false,"required":["file","recipe"],"properties":{"file":{"type":"string","format":"binary"},"recipe":{"$ref":"#/components/schemas/Recipe"}}},"encoding":{"recipe":{"contentType":"application/json"}}}}},"responses":responses}}
         },"components":{"schemas":schemas}})
 }

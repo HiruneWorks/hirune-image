@@ -1,9 +1,23 @@
 # Requirements
 
-Hirune Image is a standalone Rust/Axum image microservice adapted from a complete copy of Hirune Axum Kit. Preserve responsibility-based layout, explicit types, thin handlers, documentation, and test conventions.
+Hirune Image is a standalone Rust/Axum image microservice.
+It starts from a complete copy of Hirune Axum Kit.
+Preserve the template's layout by responsibility, explicit types, thin handlers, documents, and test conventions.
 
-Accept bytes and a bounded recipe; return validated WebP variants and technical facts synchronously. Callers own authorization, durable retries, publication, and storage. No database, Cedar, accounts, mail, persistent queue, URL fetching, file-path API, video, or FFmpeg.
+Accept image bytes and a recipe within configured limits.
+Return validated WebP outputs and technical facts in the same HTTP request.
+The caller owns authorization, durable retries, publication, and storage.
+The service has no database, Cedar, accounts, mail, or persistent queue.
+It accepts no URL or file path as an image input. It does not process video or use FFmpeg.
 
-Inputs: JPEG, static 8-bit PNG, GIF, static/animated WebP. Outputs: lossy/lossless WebP; inside resize without enlargement; operator-bounded variants (default four); preserve/first_frame/reject policies. Apply EXIF orientation and supported RGB ICC before stripping metadata. Explicitly reject unsupported color information. Operators may raise resource budgets within codec/representation limits.
+Accept JPEG, static PNG up to 8-bit depth, GIF, and static or animated WebP.
+Produce lossy or lossless WebP. Resize with `inside` fit and no enlargement.
+The operator sets the maximum output count; the default is four.
+Support the `preserve`, `first_frame`, and `reject` animation policies.
+Apply EXIF orientation and supported RGB ICC profiles before removing metadata.
+Reject unsupported color information explicitly.
+Operators can raise resource budgets within codec and numeric representation limits.
 
-The [behavior contract](behavior/image-processing.md) fixes wire behavior, limits, and exclusions. Development budgets are not measured production capacity. Local, container, remote CI, and caller integration have separate acceptance boundaries.
+The [behavior contract](behavior/image-processing.md) defines the wire format, limits, and exclusions.
+Development defaults do not establish production capacity.
+Record local tests, container tests, remote CI, and caller integration as separate results.

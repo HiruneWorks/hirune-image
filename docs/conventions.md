@@ -1,11 +1,27 @@
 # Conventions
 
-Use explicit descriptive names and direct implementations. Each file owns one responsibility. Module indexes only declare or re-export modules. Comments briefly explain invariants in English.
+Use explicit names and direct implementations. Give each file one responsibility.
+Module index files declare modules or export names. Code comments explain invariants in English.
 
-The root crate composes configuration, bootstrap, HTTP, process supervision, and lifecycle. Versioned handlers and exclusive DTOs live in src/http/v1/<feature>/; routes.rs owns URL/method composition. Application services remain unversioned and HTTP-free. Native bindings and unsafe ownership live in crates/image-codec.
+For technical documents and comments: **Write this 80% of the way to ASD-STE100.**
+Follow [the writing guide](writing.md). Use short sentences, active verbs, and consistent terms.
+Keep identifiers, conditions, commands, and measured values exact.
 
-Closed sets use enums. Unknown and duplicate fields are errors. DTO validation does not replace service validation. Public errors contain fixed codes/messages, never native diagnostics or submitted data.
+The root crate connects configuration, startup, HTTP, process supervision, and shutdown.
+Put versioned handlers and their DTOs in `src/http/v1/<feature>/`.
+Declare URL and method mappings in `routes.rs`.
+Application services have no HTTP dependency or API version.
+Put native bindings and unsafe ownership code in `crates/image-codec`.
 
-Settings are explicit. .envs/ holds examples/ignored settings; compose/ holds image/local configuration; deploy/ holds runtime wiring. Use locked Cargo and just/xtask. Tests use the production router and actual child. Keep schemas, OpenAPI, examples, docs, and behavior aligned.
+Use enums for closed sets of values. Reject unknown and duplicate fields.
+Validate both DTOs and application service inputs.
+Public errors contain fixed codes and messages. Keep native diagnostics and submitted data out of public errors.
 
-Preserve unrelated work. Make coherent local commits; no push/publication/deployment without authorization. Record verification and limitations in memory/.
+Declare settings explicitly. Put examples and ignored local settings in `.envs/`.
+Put image build and local container configuration in `compose/`. Put deployment configuration in `deploy/`.
+Use locked Cargo dependencies and the `just` or `xtask` commands.
+Tests use the production router and an actual child process.
+Update schemas, OpenAPI, examples, documents, and behavior together.
+
+Preserve unrelated work. Make coherent local commits.
+Push, publish, or deploy only with authorization. Record checks and their limits in `memory/`.

@@ -340,7 +340,7 @@ pub fn validate_png(data: &[u8]) -> Result<bool> {
     if !end_seen || !header_seen {
         return Err(Error::InvalidImage);
     }
-    // Unprofiled custom PNG transfer/chromaticity is not silently interpreted as sRGB.
+    // Reject custom PNG transfer functions or chromaticity without a profile. Do not assume sRGB.
     if !icc && !srgb && (chroma || gamma.is_some_and(|g| g != 45455)) {
         return Err(Error::UnsupportedColorProfile);
     }

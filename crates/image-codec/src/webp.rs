@@ -16,7 +16,7 @@ pub fn processor_info() -> ProcessorInfo {
     fn version(v: i32) -> String {
         format!("{}.{}.{}", v >> 16, (v >> 8) & 255, v & 255)
     }
-    // Version queries have no input pointers or codec allocations.
+    // Version queries use no input pointers and allocate no codec storage.
     unsafe {
         ProcessorInfo {
             version: env!("CARGO_PKG_VERSION").into(),
@@ -71,7 +71,7 @@ struct Writer {
     failed: bool,
 }
 extern "C" fn write_chunk(data: *const u8, length: usize, picture: *const ffi::WebPPicture) -> i32 {
-    // libwebp invokes this synchronously while picture and its Writer remain alive.
+    // libwebp calls this synchronously. The picture and its Writer remain alive until it returns.
     let writer = unsafe { &mut *((*picture).custom_ptr as *mut Writer) };
     let Some(total) = writer.bytes.len().checked_add(length) else {
         writer.failed = true;
@@ -140,7 +140,7 @@ pub fn encode(
     };
     picture.0.writer = Some(write_chunk);
     picture.0.custom_ptr = (&mut writer as *mut Writer).cast();
-    // Import copies bounded RGBA into picture-owned storage, freed by Picture.
+    // Import copies the bounded RGBA data into picture storage. Picture frees that storage on drop.
     if unsafe { ffi::WebPPictureImportRGBA(&mut picture.0, rgba.as_ptr(), (width * 4) as i32) } != 1
     {
         return Err(Error::ImageLimitsExceeded);
@@ -165,7 +165,7 @@ impl AnimationMux {
         let mux = NonNull::new(unsafe { ffi::WebPMuxNew() }).ok_or(Error::ProcessorUnavailable)?;
         let owned = Self {
             mux,
-            // RIFF, VP8X, and ANIM headers; each full-canvas ANMF adds 24 bytes.
+            // RIFF, VP8X, and ANIM headers use 44 bytes. Each full-canvas ANMF adds 24 bytes before image chunks.
             bytes: 44,
             maximum: maximum.min(MAX_WEBP_FILE_BYTES).min(isize::MAX as u64),
         };
@@ -226,7 +226,7 @@ impl AnimationMux {
             blend_method: ffi::WEBP_MUX_NO_BLEND,
             pad: [0; 1],
         };
-        // copy_data=1 detaches the mux frame from the temporary encoded buffer.
+        // With copy_data=1, the mux owns a copy of the frame bytes. The temporary buffer can be dropped.
         if unsafe { ffi::WebPMuxPushFrame(self.mux.as_ptr(), &frame, 1) } != ffi::WEBP_MUX_OK {
             return Err(Error::InternalError);
         }
@@ -283,7 +283,7 @@ pub fn decode_frames(
         bytes: bytes.as_ptr(),
         size: bytes.len(),
     };
-    // Header geometry/frame budgets were checked before native canvas allocation.
+    // The checks above enforce dimensions and frame budgets before the native decoder allocates a canvas.
     let decoder = Decoder(
         NonNull::new(unsafe { ffi::WebPAnimDecoderNew(&data, &options) })
             .ok_or(Error::InvalidImage)?,

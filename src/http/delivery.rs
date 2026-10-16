@@ -101,7 +101,7 @@ pub fn response(
         state: state.clone(),
         finished: finished.clone(),
     };
-    // This watchdog owns the lease even when a transport stops polling the body.
+    // The watchdog retains the lease even if the transport stops polling the body.
     tokio::spawn(async move {
         loop {
             let until = {
@@ -115,7 +115,7 @@ pub fn response(
             };
             tokio::select! {_=finished.cancelled()=>return,_=shutdown.cancelled()=>{},_=tokio::time::sleep_until(until)=>{}}
             let mut state = state.lock().expect("delivery mutex");
-            // Completion can win while the watchdog waits for the delivery lock.
+            // The response can finish while the watchdog waits for this lock.
             if finished.is_cancelled() {
                 return;
             }

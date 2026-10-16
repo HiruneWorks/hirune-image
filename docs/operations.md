@@ -1,39 +1,92 @@
 # Operator budgets
 
-`GET /v1/capabilities` returns the active operator `limits` and separate immutable `codec_limits`. Defaults are starting budgets, and may be raised or lowered. Generated JSON Schema describes the protocol and codec representation; it is independent of deployment settings. Callers should discover active budgets before preparing a recipe. Invalid, zero, overflowing or inconsistent budgets fail startup. The startup probe runs inside the configured native fence.
+Read `GET /v1/capabilities` before preparing a recipe.
+Its `limits` object contains the active operator budgets. Its `codec_limits` object contains the fixed codec limits.
+Operators can raise or lower the defaults.
+Generated JSON Schema describes the protocol and numeric representation, independent of deployment settings.
 
-Every field in `Limits` has a matching environment variable in [config](../src/config.rs). Values ending in `_BYTES` are integer bytes; `_MS` are integer milliseconds. Examples:
+Invalid, zero, overflowing, or inconsistent budgets prevent startup.
+The startup codec probe runs inside the configured native resource limits.
+Every field in `Limits` has an environment variable in [config](../src/config.rs).
+Values ending in `_BYTES` use integer bytes. Values ending in `_MS` use integer milliseconds.
 
 | Setting | Purpose | Default |
 | --- | --- | --- |
-| `HIRUNE_OUTPUTS` | Maximum variants in one recipe | 4 |
-| `HIRUNE_OUTPUT_BYTES` | Sum of encoded WebP bytes across variants | 33554432 |
-| `HIRUNE_OUTPUT_DIMENSION` | Maximum requested output side | 4096 |
-| `HIRUNE_WORKING_BYTES` | Conservative live-pixel plan: 20 bytes per source canvas pixel | 268435456 |
-| `HIRUNE_DECODED_BYTES` | Cumulative decoded RGBA across all source frames | 268435456 |
-| `HIRUNE_SPOOL_BYTES` | Cumulative RGBA frame files per request | 268435456 |
+| `HIRUNE_OUTPUTS` | Maximum outputs in one recipe | 4 |
+| `HIRUNE_OUTPUT_BYTES` | Total encoded WebP bytes across outputs | 33554432 |
+| `HIRUNE_OUTPUT_DIMENSION` | Maximum requested output side in pixels | 4096 |
+| `HIRUNE_WORKING_BYTES` | Working pixel plan: 20 bytes per source canvas pixel | 268435456 |
+| `HIRUNE_DECODED_BYTES` | Total decoded RGBA bytes across source frames | 268435456 |
+| `HIRUNE_SPOOL_BYTES` | Total RGBA frame file bytes for one request | 268435456 |
 | `HIRUNE_CHILD_MEMORY_BYTES` | Linux child virtual address space (`RLIMIT_AS`) | 805306368 |
-| `HIRUNE_CHILD_CPU_SECONDS` | Linux child consumed CPU seconds (`RLIMIT_CPU`) | 60 |
-| `HIRUNE_CONCURRENCY` | Admitted requests including upload, processing and delivery | 1 |
-| `HIRUNE_DEADLINE_MS` | Absolute wall time through server-side delivery | 60000 |
+| `HIRUNE_CHILD_CPU_SECONDS` | Linux child CPU seconds (`RLIMIT_CPU`) | 60 |
+| `HIRUNE_CONCURRENCY` | Admitted requests, from upload through delivery | 1 |
+| `HIRUNE_DEADLINE_MS` | Absolute wall time through delivery on the server | 60000 |
 
-The request envelope must fit `source_bytes + recipe_bytes + 1024`; actual multipart overhead also counts. Raising the output count may require raising recipe, output, and deadline budgets. Job/result control files scale with configured recipe bytes and actual output count, with checked sizes on both ends.
+Set the request envelope budget to at least `source_bytes + recipe_bytes + 1024`.
+Actual multipart overhead also counts toward the envelope.
+When raising the output count, check recipe, output-byte, and deadline budgets too.
+Job and result control file limits grow with recipe bytes and output count.
+The writer and reader both check these sizes.
 
-Fixed limits: WebP side 16383, individual WebP file 4294967294 bytes, frame delay 16777215 ms, cycle duration 2147483647 ms (decoder timestamp range), positive animation delays, RGB input policy, effort 0–6, no enlargement. Aggregate output bytes may exceed the individual RIFF file cap. Concurrency is bounded by the semaphore API representation, not a four-request policy.
+## Fixed limits
+
+| Limit | Value |
+| --- | --- |
+| WebP side length | 16383 pixels |
+| One WebP file | 4294967294 bytes |
+| One frame delay | 16777215 ms |
+| One cycle duration | 2147483647 ms, limited by decoder timestamps |
+| Encoder effort | 0 through 6 |
+
+Animation frame delays must be positive. The RGB input policy and no-enlargement policy also remain fixed.
+The output-byte sum can exceed the limit for one RIFF file.
+The semaphore API's numeric representation limits concurrency. There is no fixed four-request policy.
 
 ## Memory and temporary storage
 
-The worker decodes the source pixels once and stores RGBA frame files in a per-request temporary directory. Variants are encoded sequentially. `HIRUNE_TEMP_ROOT` chooses that filesystem. The Compose profile mounts `/tmp` as tmpfs, which **uses container RAM**. A disk-backed directory is also possible. This is not an extra in-process RAM cache.
+The worker decodes the source pixels once and stores RGBA frame files in a temporary request directory.
+It encodes outputs in sequence.
+Set `HIRUNE_TEMP_ROOT` to choose the filesystem for that directory.
+The Compose profile mounts `/tmp` as tmpfs. **tmpfs uses container RAM.**
+Operators can also use a disk-backed directory. The spool is temporary file storage, not a separate in-process RAM cache.
 
-Pixel planning is not a heap or RSS measurement. `RLIMIT_AS` constrains each child's virtual address space, including libraries and native allocations; it is not the Docker memory limit. The parent also holds upload and output buffers. tmpfs pages, parent buffers, concurrent workers and delivery buffers all count toward the container's cgroup memory. Container memory must leave room for all of them; multiplying the pixel budget alone is insufficient. Overly small native limits can prevent startup; overly small cgroup limits can kill the service.
+The working pixel plan does not measure heap memory or resident memory (RSS).
+`RLIMIT_AS` limits each child's virtual address space, including libraries and native allocations.
+Docker enforces a separate memory limit for the full container.
+The API process also holds upload and output buffers.
+tmpfs pages, API buffers, concurrent workers, and delivery buffers all count toward the container's cgroup memory.
 
-Compose settings `HIRUNE_CONTAINER_MEMORY`, `HIRUNE_TMPFS_SIZE`, `HIRUNE_CONTAINER_CPUS`, and `HIRUNE_CONTAINER_PIDS` configure the enclosing container. The [larger example](../.envs/.example/large.env) sets eight outputs, 128MiB aggregate output, 1GiB pixel/spool budgets, a 2GiB child AS fence, and a 4GiB container. It is an example, not a measured capacity guarantee:
+Allow space for all these resources when sizing the container. Do not multiply only the pixel budget.
+A native limit that is too small can prevent startup.
+A container limit that is too small can cause the service process to be killed.
+
+## Container settings and larger example
+
+Use these Compose settings to configure the enclosing container:
+
+- `HIRUNE_CONTAINER_MEMORY`: container memory limit.
+- `HIRUNE_TMPFS_SIZE`: maximum tmpfs size.
+- `HIRUNE_CONTAINER_CPUS`: CPU quota.
+- `HIRUNE_CONTAINER_PIDS`: process count limit.
+
+The [larger example](../.envs/.example/large.env) uses eight outputs and a 128 MiB output-byte sum.
+It sets 1 GiB pixel and spool budgets, a 2 GiB child address-space limit, and a 4 GiB container limit.
+These are example settings, not a measured capacity guarantee.
+From the repository root, inspect the configuration, then start the service:
 
 ```sh
 docker compose --env-file .envs/.example/large.env -f deploy/compose.yml config
 docker compose --env-file .envs/.example/large.env -f deploy/compose.yml up -d
 ```
 
-Inspect effective values through capabilities and measure the intended workload. Raising Docker memory does not raise application budgets, and raising application budgets does not raise Docker memory. Windows has functional deadline/process tests; native AS/CPU enforcement requires Linux.
+Read capabilities to confirm the active values. Measure the intended workload before choosing production budgets.
+Changing Docker memory does not change application budgets. Changing application budgets does not change Docker memory.
+Windows supports functional deadline and process tests. Verify native address-space and CPU enforcement on Linux.
 
-`just test-container` verifies the default profile. Setting `HIRUNE_VERIFY_PROFILE=large` selects the larger example for the same fixture checks; CI verifies both profiles against the exact release candidate. This confirms configuration/startup/functional behavior, not capacity at the maximum budgets.
+## Verify a profile
+
+Run `just test-container` to check the default profile.
+Set `HIRUNE_VERIFY_PROFILE=large` to run the same fixture checks with the larger example.
+CI checks both profiles against the exact release candidate.
+These checks verify configuration, startup, and fixture behavior. They do not establish capacity at the maximum budgets.

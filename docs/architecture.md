@@ -1,13 +1,41 @@
 # Architecture
 
-Hirune Image is a stateless synchronous service. The root crate owns configuration, bootstrap, router construction, request supervision, and executable lifecycle. The application crate owns HTTP-free recipes, facts, validation, planning, budgets, and typed failures. The image-codec crate owns decode/color/resize/encode/verification and all unsafe bindings. Internal crates are source boundaries, not independently published packages.
+Hirune Image is a stateless service. Each processing request returns its outputs synchronously.
+The root crate owns configuration, startup, routes, request supervision, and shutdown.
+The application crate owns recipes, facts, validation, planning, budgets, and typed errors. It has no HTTP dependency.
+The image-codec crate owns decoding, color conversion, resizing, encoding, verification, and all unsafe bindings.
+The crates separate source responsibilities. They are not published as independent packages.
 
-An accepted request owns one admission permit from before body collection through completion or cancellation. Bounded multipart parsing produces source bytes and a typed recipe. A supervisor owns the request directory, permit, local file writes, and child. HTTP cancellation signals the supervisor; the supervisor retains resources until outstanding file I/O finishes and the child is killed/reaped.
+Before collecting the body, an accepted request acquires one admission permit.
+The permit reserves capacity until the response completes or cancellation cleanup finishes.
+Multipart parsing enforces byte limits and produces source bytes and a typed recipe.
+The supervisor owns the request directory, permit, file writes, and child process.
+HTTP cancellation signals the supervisor.
+The supervisor waits for pending file operations to finish and for the stopped child to exit before it releases resources.
 
-The child validates structural headers before pixel allocation, decodes the source once, normalizes frames, and writes bounded RGBA frame files in its request directory. It then reads these files for each variant sequentially. This avoids holding every raw frame or four native encoders in memory. Spool files are local scratch data, not durable jobs or external storage. tmpfs consumes container memory.
+The worker checks image headers before allocating pixel buffers.
+It decodes the source pixels once, normalizes the frames, and writes RGBA frame files within the spool budget.
+It reads those files to encode each output in sequence.
+It does not need to hold every raw frame or run several encoders in memory at once.
+The frame files are temporary data for that request. They are not durable jobs or external storage.
+When the directory uses tmpfs, these files consume container memory.
 
-Each WebP frame uses an output-bounded native writer with explicit method, lossless/quality, exact alpha, and disabled codec threads. Animated outputs use full-canvas, no-blend frames in a low-level mux, retaining duplicate frames and their timing. Output bytes are structurally inspected and fully decoded in the isolated child before any success headers.
+The native writer enforces the output byte limit for each WebP frame.
+The encoder sets the method, compression mode, and quality explicitly.
+Native config uses `exact=1` and `alpha_quality=100`. Codec threads are disabled.
+The animation mux uses complete canvas frames with no blending. It retains duplicate frames and their timing.
+The worker checks the output structure and fully decodes each output before the API sends success headers.
 
-The parent verifies the result binding, output order, geometry, lengths, hashes, and aggregate budgets. Delivery owns the permit and directory. Its watchdog can close the underlying TCP socket independently of body polling, discard buffered output, clean up, and release admission. Chunks handed to Hyper have independent bounded allocations. A body EOF is a server-side completion boundary, not acknowledgement that the caller consumed all bytes.
+The API process checks source and recipe bindings, output order, dimensions, lengths, hashes, and total output bytes.
+Response delivery owns the permit and request directory.
+Its watchdog can close the TCP socket even when Hyper stops polling the response body.
+After it discards pending output, the watchdog cleans the directory and releases the permit.
+Each image-data chunk passed to Hyper has its own allocation of at most 64 KiB.
+The manifest is sent as one chunk. Its size depends on the output count and metadata budget.
+End of body marks completion on the server. It does not prove that the caller received all bytes.
 
-Health endpoints bypass image admission. Shutdown stops readiness, closes active transport, signals supervisors, and drains permits after child cleanup. Deployment owns private network access and container limits. No caller URL/path, credentials, durable queue, or storage authority is accepted.
+Health endpoints do not need an image admission permit.
+During shutdown, the API stops readiness, closes active connections, and signals supervisors.
+It waits for permits to return after child cleanup.
+The deployment controls private network access and container limits.
+The API accepts image bytes and recipes. It accepts no caller URL, file path, credentials, durable job, or storage authority.

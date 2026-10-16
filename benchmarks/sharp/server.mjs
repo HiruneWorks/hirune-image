@@ -1,4 +1,4 @@
-// Trusted-fixture performance baseline only. This is not a production image service.
+// Use this service only with trusted benchmark fixtures. It is not a production image service.
 import http from "node:http";
 import { randomUUID } from "node:crypto";
 import { multipart, processImage, processor } from "./pipeline.mjs";

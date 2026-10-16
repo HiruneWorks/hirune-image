@@ -1,8 +1,17 @@
 # Local benchmark evidence: 2026-10-16
 
-Standalone Sharp 0.35.5 / libvips 8.18.7 / WebP 1.6.0 / Node 24.22.0 versus Hirune 0.1.0 / WebP 1.5.0. No Smol dependency. See [method](../../../docs/benchmarks.md) and [environment](environment.json).
+This run compared Sharp 0.35.5, libvips 8.18.7, WebP 1.6.0, and Node 24.22.0 with Hirune 0.1.0 and WebP 1.5.0.
+The benchmark had no Smol dependency. See the [method](../../../docs/benchmarks.md) and [environment](environment.json).
 
-Each row uses 20 measured requests after three warmups, with two CPUs and 1GiB memory per service. All 480 measured requests and 72 warmups passed source/recipe/output binding, requested geometry and animation cycle/loop checks. Tables show HTTP p50/p95 in milliseconds and fresh-cgroup peak memory in MiB; CPU, bytes and throughput remain in the raw JSON. Synthetic PNG patterns and small handoff animation/ICC fixtures are not a representative production corpus. Resize filters and generated pixels differ, so neither perceptual quality nor compression efficiency is held equal.
+Each row uses 20 measured requests after three warmups. Each service had two CPUs and 1 GiB of container memory.
+All 480 measured requests and 72 warmups passed binding, requested-dimension, cycle-duration, and loop-count checks.
+Binding checks covered the source, recipe, and outputs.
+The tables show HTTP p50 and p95 in milliseconds, plus peak memory in a new cgroup for each scenario.
+Memory values use MiB. Raw JSON records CPU usage, byte counts, and throughput.
+
+The inputs were synthetic PNG patterns and small animation and ICC fixtures from the handoff.
+They do not represent a production image corpus.
+The resize filters produce different pixels. The run does not hold perceptual quality or compression efficiency equal.
 
 ## Lossy, quality 85 / effort 4 / concurrency 1
 
@@ -37,12 +46,23 @@ Each row uses 20 measured requests after three warmups, with two CPUs and 1GiB m
 
 [Raw sharp-concurrency2 report](sharp-concurrency2.json).
 
-Sharp is faster on the single-output opaque PNG (44.74 ms versus 55.67 ms), and the four-output opaque lossy case is close. Hirune is faster on the tested alpha, animation, ICC and lossless cases, with lower cgroup peaks here. These results do not establish a universal winner.
+Sharp was faster on the opaque PNG with one output: 44.74 ms versus 55.67 ms.
+The opaque lossy case with four outputs was close.
+Hirune was faster on these alpha, animation, ICC, and lossless fixtures. Its cgroup memory peaks were lower in this run.
+These results do not establish a universal winner.
 
 ## Criterion components
 
-The [Windows Criterion estimates](criterion-windows.json) cover decode, orientation, linear area resize and lossy/lossless encode. This short development run validates the benchmark configuration; use a quiet, fixed host and longer sampling for a regression baseline. It is separate from the Linux Docker comparison.
+The [Windows Criterion estimates](criterion-windows.json) cover decoding, orientation, area resize in linear light, and lossy or lossless encoding.
+This short development run checked that the benchmark configuration works.
+Use a quiet, fixed host and longer sampling to establish a regression baseline.
+These measurements are separate from the Linux Docker comparison.
 
 ## Functional verification
 
-Local Windows workspace checks passed (31 tests, followed by the new fixture-integrity test: 32). Linux `cargo xtask check` passed 33 tests including actual AS/CPU exhaustion, PID disappearance and next-request recovery. Both production-restriction Docker profiles passed eight fixture HTTP cases each. The independent Sharp image passed its three component tests before these measurements. Remote CI and deployment are separate evidence.
+Local Windows workspace checks passed 31 tests. The later fixture-integrity test also passed, for a total of 32.
+Linux `cargo xtask check` passed 33 tests.
+These included address-space and CPU exhaustion, child PID disappearance, and recovery for the next request.
+The default and larger Docker profiles each passed eight fixture HTTP cases under production restrictions.
+The independent Sharp image passed its three component tests before measurement.
+Remote CI and deployment remain separate evidence.

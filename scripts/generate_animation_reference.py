@@ -1,4 +1,4 @@
-"""Scalar area integration from hand-authored composited RGBA fixtures, without Rust codecs."""
+"""Calculate reference pixels from manual composited RGBA fixtures with a Python area calculation."""
 import json
 import math
 from pathlib import Path

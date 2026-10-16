@@ -1,4 +1,4 @@
-"""Build and verify a private, resource-limited local Linux image. No publication."""
+"""Build and check a private local Linux image with resource limits. Do not publish it."""
 import json
 import os
 from pathlib import Path

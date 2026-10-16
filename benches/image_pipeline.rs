@@ -17,7 +17,7 @@ fn pipeline(c: &mut Criterion) {
     let limits = Limits::default();
     let mut group = c.benchmark_group("image_pipeline");
     group.throughput(Throughput::Elements(1024 * 768));
-    // Input generation is outside timing. Output allocation/drop remains in iter measurements.
+    // Prepare input before timing. The iter measurements include output allocation and drop.
     group.bench_function("decode_png_rgba", |b| {
         b.iter(|| {
             black_box(

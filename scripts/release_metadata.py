@@ -1,4 +1,4 @@
-"""Resolve the container release version and reject mismatched Git tags."""
+"""Read the container release version. Reject a Git tag that does not match it."""
 import argparse
 from pathlib import Path
 import re

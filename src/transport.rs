@@ -46,7 +46,7 @@ impl Connection {
     }
     fn close_socket(&self, discard_pending_writes: bool) {
         if let Some(socket) = self.inner.socket.lock().expect("socket mutex").take() {
-            // Abort paths discard kernel-queued bytes; normal completion must drain them.
+            // On abort, discard queued kernel writes. On normal close, let them drain.
             if discard_pending_writes
                 && let Err(error) = socket2::SockRef::from(&socket).set_linger(Some(Duration::ZERO))
             {

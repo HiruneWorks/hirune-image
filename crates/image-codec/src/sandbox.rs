@@ -5,7 +5,7 @@ use application::error::Result;
 pub fn apply_resource_limits(memory_bytes: u64, cpu_seconds: u64) -> Result<()> {
     #[cfg(target_os = "linux")]
     {
-        // The child has not started Tokio or threads; restrict its own process only.
+        // These limits affect this child only. It has not started Tokio or other threads.
         let memory = libc::rlimit {
             rlim_cur: memory_bytes,
             rlim_max: memory_bytes,

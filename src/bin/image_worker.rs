@@ -26,13 +26,13 @@ fn run() -> Result<(), ProcessingError> {
     let limits: Limits =
         serde_json::from_str(limits_json).map_err(|_| ProcessingError::InvalidRequest)?;
     limits.validate()?;
-    // Trusted supervisor settings fence allocations before reading request-derived job metadata.
+    // Apply the supervisor's trusted limits before reading job metadata derived from the request.
     image_codec::sandbox::apply_resource_limits(
         limits.child_memory_bytes,
         limits.child_cpu_seconds,
     )?;
     if mode == "--probe" {
-        // Probe both modes and the actual native libraries before accepting traffic.
+        // Check both encoding modes and the actual native libraries before accepting requests.
         print!(
             "{}",
             serde_json::to_string(&image_codec::probe()?)

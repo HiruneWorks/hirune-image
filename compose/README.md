@@ -1,9 +1,15 @@
 # Container configuration
 
-The production image is built from production/app/Dockerfile. Runtime wiring in [deploy](../deploy/README.md) pulls the versioned GHCR image. compose.local.yml overrides it with a source build for local development:
+The production image uses `production/app/Dockerfile`.
+The [deployment configuration](../deploy/README.md) pulls the versioned GHCR image.
+For local development, `compose.local.yml` adds a source build.
+Run this command from the repository root:
 
 ```sh
 docker compose -f deploy/compose.yml -f compose/compose.local.yml up --build -d
 ```
 
-Use `just test-container` for real HTTP checks against the non-root, read-only image with resource limits. CI passes an already built release candidate using `HIRUNE_TEST_IMAGE` and `HIRUNE_SKIP_BUILD=1`, and checks its Git build identity using `HIRUNE_EXPECT_BUILD_ID`.
+Run `just test-container` for actual HTTP checks against the image with production restrictions.
+These include a non-root user, a read-only root filesystem, and resource limits.
+CI sets `HIRUNE_TEST_IMAGE` to its candidate image and `HIRUNE_SKIP_BUILD=1` to reuse that image.
+It sets `HIRUNE_EXPECT_BUILD_ID` to check the image's Git build identity.

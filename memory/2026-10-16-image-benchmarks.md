@@ -1,9 +1,30 @@
 # Independent Sharp comparison and verification
 
-The user explicitly chose an independent Sharp workload because the old Smol repository will be removed. `benchmarks/sharp` contains a locked Sharp 0.35.5 Node wrapper; no Smol checkout/image/runtime is required. The wrapper decodes source pixels once to oriented sRGB RGBA, sequentially resizes/encodes variants, fully decodes generated outputs, hashes bindings and emits the same benchmark wire format. It is trusted-fixture benchmark code, excluded from the production image. It does not duplicate the service's complete adversarial-input or OS-isolation policy.
+The user chose an independent Sharp workload because the old Smol repository will be removed.
+`benchmarks/sharp` contains a Node wrapper with locked Sharp 0.35.5. It needs no Smol checkout, image, or runtime.
+The wrapper decodes source pixels once into oriented sRGB RGBA.
+It resizes and encodes outputs in sequence, fully decodes each output, hashes bindings, and emits the benchmark wire format.
+The production image excludes this trusted-fixture benchmark code.
+The wrapper does not implement the service's full policy for hostile input or OS isolation.
 
-Astra reviewed the baseline and found floating scale/floor could turn 22→15 into14; integer geometry and a regression fix this. The harness verifies source/recipe/output hashes, actual WebP structure, independently expected geometry, cycle/loop, and exact Hirune frame counts. Validation is outside batch timing. Failed responses do not count as success. Fresh cgroup CPU is cumulative; memory.peak includes tmpfs and startup. Shared developer hardware, different native versions and resize kernels prevent universal superiority/quality claims.
+Astra found that floating-point scaling and floor could turn 22→15 into 14.
+Integer geometry and a regression test corrected that case.
+The tool checks source, recipe, and output hashes, actual WebP structure, and independently expected dimensions.
+It also checks cycle duration, loops, and exact Hirune frame counts.
+Validation occurs after batch timing. Failed responses do not count as success.
+CPU accumulates in a new cgroup for each scenario. `memory.peak` includes tmpfs and startup.
+The run used shared developer hardware, different native versions, and different resize filters.
+Those conditions do not support a universal performance or quality claim.
 
-Recorded results under `benchmarks/results/2026-10-16`: 480 measured requests plus72 warmups, all successful. Sharp is faster on the single opaque lossy PNG; four opaque outputs are close. Hirune is faster on these alpha, animation, ICC and lossless fixtures, with lower measured peaks. This is a synthetic/local comparison, not production acceptance. Criterion's five short Windows component measurements validate configuration separately.
+The results in `benchmarks/results/2026-10-16` contain 480 measured requests and 72 warmups. All succeeded.
+Sharp was faster on the opaque lossy PNG with one output. Four opaque outputs were close.
+Hirune was faster on these alpha, animation, ICC, and lossless fixtures, with lower memory peaks in this run.
+This synthetic local comparison does not establish production acceptance.
+Five short Windows Criterion measurements separately checked the component benchmark configuration.
 
-Local checks: Windows workspace format/clippy/schema suite31 tests plus the later fixture integrity regression1; Linux `cargo xtask check`33 tests; independent Sharp Docker build3 tests; production-restriction default8 and larger-profile8 actual HTTP cases. Both larger budgets and container settings are configurable. The CI workflow checks both profiles before any version-tag publication. No release tag, registry publication or deployment was performed in this work.
+Windows workspace checks passed formatting, clippy, schemas, and 31 tests. The later fixture-integrity test also passed.
+Linux `cargo xtask check` passed 33 tests. The Sharp Docker build passed three tests.
+The default and larger profiles each passed eight actual HTTP cases under production restrictions.
+Operators can configure both larger application budgets and container settings.
+CI checks both profiles before any version-tag publication.
+This work created no release tag and performed no registry publication or deployment.
