@@ -7,7 +7,7 @@ The service needs no database or object storage.
 
 ## Run a published image
 
-First, confirm that the `v0.2.0` release workflow succeeded.
+First, confirm that the `v0.2.1` release workflow succeeded.
 Then run these commands from the repository root to pull and start its image:
 
 ```sh
@@ -15,7 +15,7 @@ docker compose -f deploy/compose.yml pull
 docker compose -f deploy/compose.yml up -d
 ```
 
-The default image is `ghcr.io/hiruneworks/hirune-image:0.2.0`.
+The default image is `ghcr.io/hiruneworks/hirune-image:0.2.1`.
 Set `HIRUNE_IMAGE` to use another published version or the digest recorded in the release workflow summary.
 For exact image identity, prefer `ghcr.io/hiruneworks/hirune-image@sha256:...`.
 
@@ -65,19 +65,19 @@ It uses the workflow's automatic `GITHUB_TOKEN`; no extra publishing secret is r
 This follows [GitHub's GHCR authentication model](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) and [Docker's image transfer workflow](https://docs.docker.com/build/ci/github-actions/share-image-jobs/).
 The workflow summary records the published registry digest.
 
-For version `0.2.0`, select the intended `main` commit after the workflow change has landed.
+For version `0.2.1`, select the intended `main` commit after the version change has landed.
 Run these commands from the repository root:
 
 ```sh
 git switch main
 git pull --ff-only
-git tag -a v0.2.0 -m "Release 0.2.0"
-git push origin v0.2.0
+git tag -a v0.2.1 -m "Release 0.2.1"
+git push origin v0.2.1
 ```
 
 The tag must be exactly `v` followed by `workspace.package.version` from `Cargo.toml`.
 The version must also be a valid Docker tag. Cargo build metadata with `+` is rejected.
-The Git tag `v0.2.0` publishes the image tag `:0.2.0`.
+The Git tag `v0.2.1` publishes the image tag `:0.2.1`.
 The workflow does not publish a `latest` alias or an ARM image.
 Branch pushes, pull requests, and `workflow_dispatch` run checks without publishing an image.
 

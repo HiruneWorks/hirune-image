@@ -66,7 +66,7 @@ checksum = "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470"
 
 [[package]]
 name = "application"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "hex",
  "schemars",
@@ -797,7 +797,7 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "hirune-image"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "anyhow",
  "application",
@@ -1065,7 +1065,7 @@ dependencies = [
 
 [[package]]
 name = "image-codec"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "application",
  "crc32fast",
@@ -2880,7 +2880,7 @@ checksum = "3ad82d2a33cdc9674dc7465672f271e096168fcdbe0f799d9e6db8c5892679dc"
 
 [[package]]
 name = "xtask"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "anyhow",
  "serde_json",

@@ -1,5 +1,7 @@
 # Verification milestones
 
+- [2026-10-17: version 0.2.1](2026-10-17-version-0.2.1.md): prepare a patch version for the writing changes after the published 0.2.0 tag.
+
 - [2026-10-17: technical writing](2026-10-17-technical-writing.md): writing guide, revised documents and comments, and checks that preserve contracts and historical evidence.
 
 - [2026-10-16: version 0.2.0](2026-10-16-version-0.2.0.md): align workspace, lockfile, OpenAPI and container release metadata after the 0.1.0 tag.

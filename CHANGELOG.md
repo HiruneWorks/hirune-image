@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1
+
+- Add a practical ASD-STE100 writing guide for specifications, runbooks, technical documents, and code comments.
+- Clarify existing documents and OpenAPI descriptions. Preserve API behavior, resource limits, commands, and historical measurements.
+
 ## 0.2.0
 
 - Let operators raise or lower resource budgets. Report fixed codec limits separately.
