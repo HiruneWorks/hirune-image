@@ -165,7 +165,7 @@ def main():
     name = "image-bench-" + uuid.uuid4().hex[:12]
     report = {"schema_version": 1, "host": platform.platform(), "docker": json.loads(run("docker", "info", "--format", "{{json .}}"))["ServerVersion"],
               "hirune_commit": run("git", "rev-parse", "HEAD").strip(), "hirune_dirty": bool(run("git", "status", "--porcelain").strip()),
-              "cpus": args.cpus, "memory": args.memory, "tmpfs": "512m", "cpu_scope": "startup/warmup/measurement/client startup; service cgroup only", "results": []}
+              "cpus": args.cpus, "memory": args.memory, "tmpfs": "512m", "cpu_scope": "fresh service cgroup cumulative CPU from startup through warmup, measurement and validation", "results": []}
     run("docker", "network", "create", "--internal", name)
     try:
         for case in args.cases:
@@ -174,9 +174,8 @@ def main():
                 environment = ["HIRUNE_CONCURRENCY=" + str(args.concurrency)] if provider == "hirune" else ["REQUEST_CONCURRENCY=" + str(args.concurrency), "SHARP_CONCURRENCY=1", "VIPS_CONCURRENCY=1"]
                 run("docker", "run", "-d", "--name", name, "--network", name, "--read-only", "--tmpfs", "/tmp:rw,noexec,nosuid,size=512m,mode=1777", "--cap-drop", "ALL", "--security-opt", "no-new-privileges:true", "--memory", args.memory, "--memory-swap", args.memory, "--cpus", args.cpus, "--pids-limit", "64", *[item for value in environment for item in ("-e", value)], image)
                 try:
-                    before = cpu_usage(name)
                     result = json.loads(run("docker", "run", "--rm", "--network", name, "--read-only", "--mount", f"type=bind,source={ROOT},target=/work,readonly", "-w", "/work", "-e", "PYTHONDONTWRITEBYTECODE=1", CLIENT, "python", "scripts/benchmark_services.py", "--client", "--base", f"http://{name}:8080", "--provider", provider, "--case", case, "--iterations", str(args.iterations), "--warmup", str(args.warmup), "--concurrency", str(args.concurrency), "--quality", str(args.quality), "--effort", str(args.effort), "--mode", args.mode))
-                    result["cgroup_cpu_seconds"] = (cpu_usage(name) - before) / 1e6
+                    result["cgroup_cpu_seconds"] = cpu_usage(name) / 1e6
                     result["cgroup_memory_peak_bytes"] = int(run("docker", "exec", name, "cat", "/sys/fs/cgroup/memory.peak"))
                     result["image_id"] = run("docker", "image", "inspect", image, "--format", "{{.Id}}").strip()
                     report["results"].append(result)
