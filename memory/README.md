@@ -1,5 +1,7 @@
 # Verification milestones
 
+- [2026-10-16: independent Sharp benchmarks](2026-10-16-image-benchmarks.md): self-contained baseline, recorded local measurements and functional verification boundaries.
+
 - [2026-10-16: operator budgets](2026-10-16-operator-budgets.md): configurable capacity, native/IPC fences and independent regression coverage.
 
 - [2026-10-16: image service implementation](2026-10-16-image-service.md): template import, image contracts, native worker isolation, Astra review and local/container evidence.

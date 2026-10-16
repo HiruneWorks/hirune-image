@@ -8,6 +8,8 @@ Use two layers: Criterion for Rust pipeline changes and a Docker HTTP comparison
 
 The manual `Benchmarks` workflow runs Criterion and saves reports. Normal CI compiles/clippy-checks benchmarks without a flaky speed gate.
 
+See the [2026-10-16 local results](../benchmarks/results/2026-10-16/README.md) for measurements and their limits.
+
 ## Sharp service comparison
 
 ```sh

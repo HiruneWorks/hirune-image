@@ -1,0 +1,15 @@
+{
+  "cpu": "AMD Ryzen 7 8845HS",
+  "docker": "28.3.3",
+  "architecture": "x86_64",
+  "os": "Docker Desktop / Windows / WSL2",
+  "kernel": "6.18.33.2-microsoft-standard-WSL2",
+  "docker_vcpus": 4,
+  "docker_memory_bytes": 16771555328,
+  "service_cpu_quota": 2,
+  "service_memory_bytes": 1073741824,
+  "service_tmpfs_bytes": 536870912,
+  "hirune_runtime_build_commit": "0f4487ff90ecd0d66f00193311706cf1ece91465",
+  "harness_commit": "cb5b950afa64dbbd36e17232dde3c7a769c4b44e",
+  "note": "Runtime source is unchanged by subsequent fixture-integrity and CPU-reporting commits; image IDs and actual build fingerprints are in each report. Shared developer machine, not an isolated benchmark host."
+}

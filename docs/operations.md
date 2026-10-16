@@ -35,3 +35,5 @@ docker compose --env-file .envs/.example/large.env -f deploy/compose.yml up -d
 ```
 
 Inspect effective values through capabilities and measure the intended workload. Raising Docker memory does not raise application budgets, and raising application budgets does not raise Docker memory. Windows has functional deadline/process tests; native AS/CPU enforcement requires Linux.
+
+`just test-container` verifies the default profile. Setting `HIRUNE_VERIFY_PROFILE=large` selects the larger example for the same fixture checks; CI verifies both profiles against the exact release candidate. This confirms configuration/startup/functional behavior, not capacity at the maximum budgets.

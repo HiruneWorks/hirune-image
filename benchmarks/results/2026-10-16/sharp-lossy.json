@@ -1,0 +1,1741 @@
+{
+  "schema_version": 1,
+  "host": "Windows-11-10.0.26200-SP0",
+  "docker": "28.3.3",
+  "hirune_commit": "cb5b950afa64dbbd36e17232dde3c7a769c4b44e",
+  "hirune_dirty": false,
+  "cpus": "2",
+  "memory": "1g",
+  "tmpfs": "512m",
+  "cpu_scope": "fresh service cgroup cumulative CPU from startup through warmup, measurement and validation",
+  "results": [
+    {
+      "provider": "hirune",
+      "case": "opaque/1",
+      "mode": "lossy",
+      "iterations": 20,
+      "warmup": 3,
+      "concurrency": 1,
+      "quality": 85,
+      "effort": 4,
+      "source_sha256": "47846b7ec4141636d0e7b9adcb376c0965329d5f082375cfa70c98ca16803a55",
+      "source_bytes": 646781,
+      "successes": 20,
+      "errors": [],
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 55.67312600032892,
+        "p95": 80.86135299527086
+      },
+      "successful_requests_per_second": 17.196999044240272,
+      "batch_seconds": 1.1629936100216582,
+      "output_facts": [
+        {
+          "id": "size_512",
+          "bytes": 10690,
+          "width": 512,
+          "height": 384,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        }
+      ],
+      "response_bytes_mean": 11915,
+      "service_info": {
+        "contract_version": 1,
+        "processor": {
+          "version": "0.1.0",
+          "build_id": "0f4487ff90ecd0d66f00193311706cf1ece91465:b7b38cc34685a9b4f0857d1988078a177ceefe365b478372266e94fc244cd527",
+          "pipeline_version": "1-linear-premultiplied-area-full-canvas",
+          "image": "0.25.10",
+          "gif": "0.14.2",
+          "libwebp_encoder": "1.5.0",
+          "libwebp_decoder": "1.5.0",
+          "libwebp_demux": "1.5.0",
+          "libwebp_mux": "1.5.0",
+          "color_engine": "moxcms/0.9.1"
+        },
+        "limits": {
+          "source_bytes": 33554432,
+          "request_bytes": 34603008,
+          "recipe_bytes": 16384,
+          "input_dimension": 8192,
+          "canvas_pixels": 40000000,
+          "frames": 120,
+          "total_frame_pixels": 100000000,
+          "decoded_bytes": 268435456,
+          "working_bytes": 268435456,
+          "spool_bytes": 268435456,
+          "duration_ms": 60000,
+          "outputs": 4,
+          "output_bytes": 33554432,
+          "output_dimension": 4096,
+          "concurrency": 1,
+          "deadline_ms": 60000,
+          "idle_ms": 10000,
+          "child_memory_bytes": 805306368,
+          "child_cpu_seconds": 60
+        },
+        "codec_limits": {
+          "webp_dimension": 16383,
+          "webp_file_bytes": 4294967294,
+          "frame_duration_ms": 16777215,
+          "cycle_duration_ms": 2147483647
+        },
+        "input_formats": [
+          "jpeg",
+          "png",
+          "gif",
+          "webp"
+        ],
+        "output_format": "webp",
+        "encoding_modes": [
+          "lossy",
+          "lossless"
+        ],
+        "animation_policies": [
+          "preserve",
+          "first_frame",
+          "reject"
+        ],
+        "resize_fit": "inside",
+        "allow_upscale": false,
+        "zero_delay_policy": "reject_animated_zero_delay",
+        "color_policy": "rgb_icc_to_srgb; unprofiled_srgb; reject_custom_png_color_and_cmyk",
+        "native_resource_fence": "rlimit_as_and_cpu"
+      },
+      "cgroup_cpu_seconds": 1.359615,
+      "cgroup_memory_peak_bytes": 12861440,
+      "image_id": "sha256:3bf7def62bde6bd234952732d4970ea845837006cd5402ba37c84fdea99eddd3"
+    },
+    {
+      "provider": "sharp",
+      "case": "opaque/1",
+      "mode": "lossy",
+      "iterations": 20,
+      "warmup": 3,
+      "concurrency": 1,
+      "quality": 85,
+      "effort": 4,
+      "source_sha256": "47846b7ec4141636d0e7b9adcb376c0965329d5f082375cfa70c98ca16803a55",
+      "source_bytes": 646781,
+      "successes": 20,
+      "errors": [],
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 44.74031251447741,
+        "p95": 53.59209299786016
+      },
+      "successful_requests_per_second": 21.80682662261501,
+      "batch_seconds": 0.9171439910132904,
+      "output_facts": [
+        {
+          "id": "size_512",
+          "bytes": 10794,
+          "width": 512,
+          "height": 384,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        }
+      ],
+      "response_bytes_mean": 12357,
+      "service_info": {
+        "processor": {
+          "name": "standalone-sharp-benchmark",
+          "node": "v24.22.0",
+          "versions": {
+            "aom": "3.15.1",
+            "archive": "3.8.9",
+            "cairo": "1.18.6",
+            "cgif": "0.5.4",
+            "exif": "0.6.26",
+            "expat": "2.8.5",
+            "ffi": "3.8.0",
+            "fontconfig": "2.18.3",
+            "freetype": "2.14.3",
+            "fribidi": "1.0.17",
+            "glib": "2.90.0",
+            "harfbuzz": "14.5.0",
+            "heif": "1.23.5",
+            "highway": "1.4.0",
+            "imagequant": "2.4.1",
+            "lcms": "2.19.1",
+            "mozjpeg": "0826579",
+            "pango": "1.58.2",
+            "pixman": "0.46.4",
+            "png": "1.6.58",
+            "proxy-libintl": "0.5",
+            "rsvg": "2.63.2",
+            "tiff": "4.7.2",
+            "uhdr": "2.0.2",
+            "vips": "8.18.7",
+            "webp": "1.6.0",
+            "xml2": "2.15.4",
+            "zlib-ng": "2.3.3",
+            "sharp": "0.35.5"
+          },
+          "native_concurrency": 1,
+          "cache": {
+            "memory": {
+              "current": 0,
+              "high": 0,
+              "max": 0
+            },
+            "files": {
+              "current": 0,
+              "max": 0
+            },
+            "items": {
+              "current": 0,
+              "max": 0
+            }
+          }
+        },
+        "concurrency": 1
+      },
+      "cgroup_cpu_seconds": 2.719632,
+      "cgroup_memory_peak_bytes": 87449600,
+      "image_id": "sha256:dfd62c5c5b9036f8b1ed18c2a9b879f1dd099abf8eb8b108a69f28b83d0e39ff"
+    },
+    {
+      "provider": "hirune",
+      "case": "opaque/4",
+      "mode": "lossy",
+      "iterations": 20,
+      "warmup": 3,
+      "concurrency": 1,
+      "quality": 85,
+      "effort": 4,
+      "source_sha256": "47846b7ec4141636d0e7b9adcb376c0965329d5f082375cfa70c98ca16803a55",
+      "source_bytes": 646781,
+      "successes": 20,
+      "errors": [],
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 68.02496350428555,
+        "p95": 75.05078602116555
+      },
+      "successful_requests_per_second": 14.461676141207903,
+      "batch_seconds": 1.3829655570152681,
+      "output_facts": [
+        {
+          "id": "size_512",
+          "bytes": 10690,
+          "width": 512,
+          "height": 384,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_256",
+          "bytes": 4300,
+          "width": 256,
+          "height": 192,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_128",
+          "bytes": 1440,
+          "width": 128,
+          "height": 96,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_64",
+          "bytes": 922,
+          "width": 64,
+          "height": 48,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        }
+      ],
+      "response_bytes_mean": 19588,
+      "service_info": {
+        "contract_version": 1,
+        "processor": {
+          "version": "0.1.0",
+          "build_id": "0f4487ff90ecd0d66f00193311706cf1ece91465:b7b38cc34685a9b4f0857d1988078a177ceefe365b478372266e94fc244cd527",
+          "pipeline_version": "1-linear-premultiplied-area-full-canvas",
+          "image": "0.25.10",
+          "gif": "0.14.2",
+          "libwebp_encoder": "1.5.0",
+          "libwebp_decoder": "1.5.0",
+          "libwebp_demux": "1.5.0",
+          "libwebp_mux": "1.5.0",
+          "color_engine": "moxcms/0.9.1"
+        },
+        "limits": {
+          "source_bytes": 33554432,
+          "request_bytes": 34603008,
+          "recipe_bytes": 16384,
+          "input_dimension": 8192,
+          "canvas_pixels": 40000000,
+          "frames": 120,
+          "total_frame_pixels": 100000000,
+          "decoded_bytes": 268435456,
+          "working_bytes": 268435456,
+          "spool_bytes": 268435456,
+          "duration_ms": 60000,
+          "outputs": 4,
+          "output_bytes": 33554432,
+          "output_dimension": 4096,
+          "concurrency": 1,
+          "deadline_ms": 60000,
+          "idle_ms": 10000,
+          "child_memory_bytes": 805306368,
+          "child_cpu_seconds": 60
+        },
+        "codec_limits": {
+          "webp_dimension": 16383,
+          "webp_file_bytes": 4294967294,
+          "frame_duration_ms": 16777215,
+          "cycle_duration_ms": 2147483647
+        },
+        "input_formats": [
+          "jpeg",
+          "png",
+          "gif",
+          "webp"
+        ],
+        "output_format": "webp",
+        "encoding_modes": [
+          "lossy",
+          "lossless"
+        ],
+        "animation_policies": [
+          "preserve",
+          "first_frame",
+          "reject"
+        ],
+        "resize_fit": "inside",
+        "allow_upscale": false,
+        "zero_delay_policy": "reject_animated_zero_delay",
+        "color_policy": "rgb_icc_to_srgb; unprofiled_srgb; reject_custom_png_color_and_cmyk",
+        "native_resource_fence": "rlimit_as_and_cpu"
+      },
+      "cgroup_cpu_seconds": 1.618521,
+      "cgroup_memory_peak_bytes": 14344192,
+      "image_id": "sha256:3bf7def62bde6bd234952732d4970ea845837006cd5402ba37c84fdea99eddd3"
+    },
+    {
+      "provider": "sharp",
+      "case": "opaque/4",
+      "mode": "lossy",
+      "iterations": 20,
+      "warmup": 3,
+      "concurrency": 1,
+      "quality": 85,
+      "effort": 4,
+      "source_sha256": "47846b7ec4141636d0e7b9adcb376c0965329d5f082375cfa70c98ca16803a55",
+      "source_bytes": 646781,
+      "successes": 20,
+      "errors": [],
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 67.47313350206241,
+        "p95": 72.90040800580755
+      },
+      "successful_requests_per_second": 14.723736453437137,
+      "batch_seconds": 1.3583508549781982,
+      "output_facts": [
+        {
+          "id": "size_512",
+          "bytes": 10794,
+          "width": 512,
+          "height": 384,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_256",
+          "bytes": 4378,
+          "width": 256,
+          "height": 192,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_128",
+          "bytes": 1618,
+          "width": 128,
+          "height": 96,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_64",
+          "bytes": 798,
+          "width": 64,
+          "height": 48,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        }
+      ],
+      "response_bytes_mean": 20158,
+      "service_info": {
+        "processor": {
+          "name": "standalone-sharp-benchmark",
+          "node": "v24.22.0",
+          "versions": {
+            "aom": "3.15.1",
+            "archive": "3.8.9",
+            "cairo": "1.18.6",
+            "cgif": "0.5.4",
+            "exif": "0.6.26",
+            "expat": "2.8.5",
+            "ffi": "3.8.0",
+            "fontconfig": "2.18.3",
+            "freetype": "2.14.3",
+            "fribidi": "1.0.17",
+            "glib": "2.90.0",
+            "harfbuzz": "14.5.0",
+            "heif": "1.23.5",
+            "highway": "1.4.0",
+            "imagequant": "2.4.1",
+            "lcms": "2.19.1",
+            "mozjpeg": "0826579",
+            "pango": "1.58.2",
+            "pixman": "0.46.4",
+            "png": "1.6.58",
+            "proxy-libintl": "0.5",
+            "rsvg": "2.63.2",
+            "tiff": "4.7.2",
+            "uhdr": "2.0.2",
+            "vips": "8.18.7",
+            "webp": "1.6.0",
+            "xml2": "2.15.4",
+            "zlib-ng": "2.3.3",
+            "sharp": "0.35.5"
+          },
+          "native_concurrency": 1,
+          "cache": {
+            "memory": {
+              "current": 0,
+              "high": 0,
+              "max": 0
+            },
+            "files": {
+              "current": 0,
+              "max": 0
+            },
+            "items": {
+              "current": 0,
+              "max": 0
+            }
+          }
+        },
+        "concurrency": 1
+      },
+      "cgroup_cpu_seconds": 1.99411,
+      "cgroup_memory_peak_bytes": 76869632,
+      "image_id": "sha256:dfd62c5c5b9036f8b1ed18c2a9b879f1dd099abf8eb8b108a69f28b83d0e39ff"
+    },
+    {
+      "provider": "hirune",
+      "case": "alpha/1",
+      "mode": "lossy",
+      "iterations": 20,
+      "warmup": 3,
+      "concurrency": 1,
+      "quality": 85,
+      "effort": 4,
+      "source_sha256": "40f75575859519158c6c2f17c5f25d3bc2ac8dd2053dbfc410ba3d1df523470b",
+      "source_bytes": 779033,
+      "successes": 20,
+      "errors": [],
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 66.3823414943181,
+        "p95": 70.0443230161909
+      },
+      "successful_requests_per_second": 14.97792715981679,
+      "batch_seconds": 1.3352982549986336,
+      "output_facts": [
+        {
+          "id": "size_512",
+          "bytes": 12122,
+          "width": 512,
+          "height": 384,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        }
+      ],
+      "response_bytes_mean": 13347,
+      "service_info": {
+        "contract_version": 1,
+        "processor": {
+          "version": "0.1.0",
+          "build_id": "0f4487ff90ecd0d66f00193311706cf1ece91465:b7b38cc34685a9b4f0857d1988078a177ceefe365b478372266e94fc244cd527",
+          "pipeline_version": "1-linear-premultiplied-area-full-canvas",
+          "image": "0.25.10",
+          "gif": "0.14.2",
+          "libwebp_encoder": "1.5.0",
+          "libwebp_decoder": "1.5.0",
+          "libwebp_demux": "1.5.0",
+          "libwebp_mux": "1.5.0",
+          "color_engine": "moxcms/0.9.1"
+        },
+        "limits": {
+          "source_bytes": 33554432,
+          "request_bytes": 34603008,
+          "recipe_bytes": 16384,
+          "input_dimension": 8192,
+          "canvas_pixels": 40000000,
+          "frames": 120,
+          "total_frame_pixels": 100000000,
+          "decoded_bytes": 268435456,
+          "working_bytes": 268435456,
+          "spool_bytes": 268435456,
+          "duration_ms": 60000,
+          "outputs": 4,
+          "output_bytes": 33554432,
+          "output_dimension": 4096,
+          "concurrency": 1,
+          "deadline_ms": 60000,
+          "idle_ms": 10000,
+          "child_memory_bytes": 805306368,
+          "child_cpu_seconds": 60
+        },
+        "codec_limits": {
+          "webp_dimension": 16383,
+          "webp_file_bytes": 4294967294,
+          "frame_duration_ms": 16777215,
+          "cycle_duration_ms": 2147483647
+        },
+        "input_formats": [
+          "jpeg",
+          "png",
+          "gif",
+          "webp"
+        ],
+        "output_format": "webp",
+        "encoding_modes": [
+          "lossy",
+          "lossless"
+        ],
+        "animation_policies": [
+          "preserve",
+          "first_frame",
+          "reject"
+        ],
+        "resize_fit": "inside",
+        "allow_upscale": false,
+        "zero_delay_policy": "reject_animated_zero_delay",
+        "color_policy": "rgb_icc_to_srgb; unprofiled_srgb; reject_custom_png_color_and_cmyk",
+        "native_resource_fence": "rlimit_as_and_cpu"
+      },
+      "cgroup_cpu_seconds": 1.562455,
+      "cgroup_memory_peak_bytes": 20361216,
+      "image_id": "sha256:3bf7def62bde6bd234952732d4970ea845837006cd5402ba37c84fdea99eddd3"
+    },
+    {
+      "provider": "sharp",
+      "case": "alpha/1",
+      "mode": "lossy",
+      "iterations": 20,
+      "warmup": 3,
+      "concurrency": 1,
+      "quality": 85,
+      "effort": 4,
+      "source_sha256": "40f75575859519158c6c2f17c5f25d3bc2ac8dd2053dbfc410ba3d1df523470b",
+      "source_bytes": 779033,
+      "successes": 20,
+      "errors": [],
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 72.37805299519096,
+        "p95": 75.74167600250803
+      },
+      "successful_requests_per_second": 13.7743029780612,
+      "batch_seconds": 1.4519790970080066,
+      "output_facts": [
+        {
+          "id": "size_512",
+          "bytes": 32144,
+          "width": 512,
+          "height": 384,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        }
+      ],
+      "response_bytes_mean": 33707,
+      "service_info": {
+        "processor": {
+          "name": "standalone-sharp-benchmark",
+          "node": "v24.22.0",
+          "versions": {
+            "aom": "3.15.1",
+            "archive": "3.8.9",
+            "cairo": "1.18.6",
+            "cgif": "0.5.4",
+            "exif": "0.6.26",
+            "expat": "2.8.5",
+            "ffi": "3.8.0",
+            "fontconfig": "2.18.3",
+            "freetype": "2.14.3",
+            "fribidi": "1.0.17",
+            "glib": "2.90.0",
+            "harfbuzz": "14.5.0",
+            "heif": "1.23.5",
+            "highway": "1.4.0",
+            "imagequant": "2.4.1",
+            "lcms": "2.19.1",
+            "mozjpeg": "0826579",
+            "pango": "1.58.2",
+            "pixman": "0.46.4",
+            "png": "1.6.58",
+            "proxy-libintl": "0.5",
+            "rsvg": "2.63.2",
+            "tiff": "4.7.2",
+            "uhdr": "2.0.2",
+            "vips": "8.18.7",
+            "webp": "1.6.0",
+            "xml2": "2.15.4",
+            "zlib-ng": "2.3.3",
+            "sharp": "0.35.5"
+          },
+          "native_concurrency": 1,
+          "cache": {
+            "memory": {
+              "current": 0,
+              "high": 0,
+              "max": 0
+            },
+            "files": {
+              "current": 0,
+              "max": 0
+            },
+            "items": {
+              "current": 0,
+              "max": 0
+            }
+          }
+        },
+        "concurrency": 1
+      },
+      "cgroup_cpu_seconds": 2.055538,
+      "cgroup_memory_peak_bytes": 96239616,
+      "image_id": "sha256:dfd62c5c5b9036f8b1ed18c2a9b879f1dd099abf8eb8b108a69f28b83d0e39ff"
+    },
+    {
+      "provider": "hirune",
+      "case": "alpha/4",
+      "mode": "lossy",
+      "iterations": 20,
+      "warmup": 3,
+      "concurrency": 1,
+      "quality": 85,
+      "effort": 4,
+      "source_sha256": "40f75575859519158c6c2f17c5f25d3bc2ac8dd2053dbfc410ba3d1df523470b",
+      "source_bytes": 779033,
+      "successes": 20,
+      "errors": [],
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 93.80360148497857,
+        "p95": 97.85220300545916
+      },
+      "successful_requests_per_second": 10.654611794610764,
+      "batch_seconds": 1.8771214179869276,
+      "output_facts": [
+        {
+          "id": "size_512",
+          "bytes": 12122,
+          "width": 512,
+          "height": 384,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_256",
+          "bytes": 4816,
+          "width": 256,
+          "height": 192,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_128",
+          "bytes": 1744,
+          "width": 128,
+          "height": 96,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_64",
+          "bytes": 912,
+          "width": 64,
+          "height": 48,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        }
+      ],
+      "response_bytes_mean": 21830,
+      "service_info": {
+        "contract_version": 1,
+        "processor": {
+          "version": "0.1.0",
+          "build_id": "0f4487ff90ecd0d66f00193311706cf1ece91465:b7b38cc34685a9b4f0857d1988078a177ceefe365b478372266e94fc244cd527",
+          "pipeline_version": "1-linear-premultiplied-area-full-canvas",
+          "image": "0.25.10",
+          "gif": "0.14.2",
+          "libwebp_encoder": "1.5.0",
+          "libwebp_decoder": "1.5.0",
+          "libwebp_demux": "1.5.0",
+          "libwebp_mux": "1.5.0",
+          "color_engine": "moxcms/0.9.1"
+        },
+        "limits": {
+          "source_bytes": 33554432,
+          "request_bytes": 34603008,
+          "recipe_bytes": 16384,
+          "input_dimension": 8192,
+          "canvas_pixels": 40000000,
+          "frames": 120,
+          "total_frame_pixels": 100000000,
+          "decoded_bytes": 268435456,
+          "working_bytes": 268435456,
+          "spool_bytes": 268435456,
+          "duration_ms": 60000,
+          "outputs": 4,
+          "output_bytes": 33554432,
+          "output_dimension": 4096,
+          "concurrency": 1,
+          "deadline_ms": 60000,
+          "idle_ms": 10000,
+          "child_memory_bytes": 805306368,
+          "child_cpu_seconds": 60
+        },
+        "codec_limits": {
+          "webp_dimension": 16383,
+          "webp_file_bytes": 4294967294,
+          "frame_duration_ms": 16777215,
+          "cycle_duration_ms": 2147483647
+        },
+        "input_formats": [
+          "jpeg",
+          "png",
+          "gif",
+          "webp"
+        ],
+        "output_format": "webp",
+        "encoding_modes": [
+          "lossy",
+          "lossless"
+        ],
+        "animation_policies": [
+          "preserve",
+          "first_frame",
+          "reject"
+        ],
+        "resize_fit": "inside",
+        "allow_upscale": false,
+        "zero_delay_policy": "reject_animated_zero_delay",
+        "color_policy": "rgb_icc_to_srgb; unprofiled_srgb; reject_custom_png_color_and_cmyk",
+        "native_resource_fence": "rlimit_as_and_cpu"
+      },
+      "cgroup_cpu_seconds": 2.189127,
+      "cgroup_memory_peak_bytes": 19038208,
+      "image_id": "sha256:3bf7def62bde6bd234952732d4970ea845837006cd5402ba37c84fdea99eddd3"
+    },
+    {
+      "provider": "sharp",
+      "case": "alpha/4",
+      "mode": "lossy",
+      "iterations": 20,
+      "warmup": 3,
+      "concurrency": 1,
+      "quality": 85,
+      "effort": 4,
+      "source_sha256": "40f75575859519158c6c2f17c5f25d3bc2ac8dd2053dbfc410ba3d1df523470b",
+      "source_bytes": 779033,
+      "successes": 20,
+      "errors": [],
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 116.03924848895986,
+        "p95": 118.94200698588975
+      },
+      "successful_requests_per_second": 8.63165752279505,
+      "batch_seconds": 2.317052078025881,
+      "output_facts": [
+        {
+          "id": "size_512",
+          "bytes": 32144,
+          "width": 512,
+          "height": 384,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_256",
+          "bytes": 6512,
+          "width": 256,
+          "height": 192,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_128",
+          "bytes": 2648,
+          "width": 128,
+          "height": 96,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_64",
+          "bytes": 1142,
+          "width": 64,
+          "height": 48,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        }
+      ],
+      "response_bytes_mean": 45018,
+      "service_info": {
+        "processor": {
+          "name": "standalone-sharp-benchmark",
+          "node": "v24.22.0",
+          "versions": {
+            "aom": "3.15.1",
+            "archive": "3.8.9",
+            "cairo": "1.18.6",
+            "cgif": "0.5.4",
+            "exif": "0.6.26",
+            "expat": "2.8.5",
+            "ffi": "3.8.0",
+            "fontconfig": "2.18.3",
+            "freetype": "2.14.3",
+            "fribidi": "1.0.17",
+            "glib": "2.90.0",
+            "harfbuzz": "14.5.0",
+            "heif": "1.23.5",
+            "highway": "1.4.0",
+            "imagequant": "2.4.1",
+            "lcms": "2.19.1",
+            "mozjpeg": "0826579",
+            "pango": "1.58.2",
+            "pixman": "0.46.4",
+            "png": "1.6.58",
+            "proxy-libintl": "0.5",
+            "rsvg": "2.63.2",
+            "tiff": "4.7.2",
+            "uhdr": "2.0.2",
+            "vips": "8.18.7",
+            "webp": "1.6.0",
+            "xml2": "2.15.4",
+            "zlib-ng": "2.3.3",
+            "sharp": "0.35.5"
+          },
+          "native_concurrency": 1,
+          "cache": {
+            "memory": {
+              "current": 0,
+              "high": 0,
+              "max": 0
+            },
+            "files": {
+              "current": 0,
+              "max": 0
+            },
+            "items": {
+              "current": 0,
+              "max": 0
+            }
+          }
+        },
+        "concurrency": 1
+      },
+      "cgroup_cpu_seconds": 3.106597,
+      "cgroup_memory_peak_bytes": 84983808,
+      "image_id": "sha256:dfd62c5c5b9036f8b1ed18c2a9b879f1dd099abf8eb8b108a69f28b83d0e39ff"
+    },
+    {
+      "provider": "hirune",
+      "case": "animation/1",
+      "mode": "lossy",
+      "iterations": 20,
+      "warmup": 3,
+      "concurrency": 1,
+      "quality": 85,
+      "effort": 4,
+      "source_sha256": "1a88dcf23b980e6f8b4866dc2bce6b8d10f1bf3549f536cc7b7f887e0e7d0e59",
+      "source_bytes": 807,
+      "successes": 20,
+      "errors": [],
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 5.4313570144586265,
+        "p95": 8.818453003186733
+      },
+      "successful_requests_per_second": 168.01724954305337,
+      "batch_seconds": 0.11903539698687382,
+      "output_facts": [
+        {
+          "id": "size_512",
+          "bytes": 1006,
+          "width": 64,
+          "height": 32,
+          "frame_count": 3,
+          "duration_ms": 1100,
+          "loop_count": 2
+        }
+      ],
+      "response_bytes_mean": 2227,
+      "service_info": {
+        "contract_version": 1,
+        "processor": {
+          "version": "0.1.0",
+          "build_id": "0f4487ff90ecd0d66f00193311706cf1ece91465:b7b38cc34685a9b4f0857d1988078a177ceefe365b478372266e94fc244cd527",
+          "pipeline_version": "1-linear-premultiplied-area-full-canvas",
+          "image": "0.25.10",
+          "gif": "0.14.2",
+          "libwebp_encoder": "1.5.0",
+          "libwebp_decoder": "1.5.0",
+          "libwebp_demux": "1.5.0",
+          "libwebp_mux": "1.5.0",
+          "color_engine": "moxcms/0.9.1"
+        },
+        "limits": {
+          "source_bytes": 33554432,
+          "request_bytes": 34603008,
+          "recipe_bytes": 16384,
+          "input_dimension": 8192,
+          "canvas_pixels": 40000000,
+          "frames": 120,
+          "total_frame_pixels": 100000000,
+          "decoded_bytes": 268435456,
+          "working_bytes": 268435456,
+          "spool_bytes": 268435456,
+          "duration_ms": 60000,
+          "outputs": 4,
+          "output_bytes": 33554432,
+          "output_dimension": 4096,
+          "concurrency": 1,
+          "deadline_ms": 60000,
+          "idle_ms": 10000,
+          "child_memory_bytes": 805306368,
+          "child_cpu_seconds": 60
+        },
+        "codec_limits": {
+          "webp_dimension": 16383,
+          "webp_file_bytes": 4294967294,
+          "frame_duration_ms": 16777215,
+          "cycle_duration_ms": 2147483647
+        },
+        "input_formats": [
+          "jpeg",
+          "png",
+          "gif",
+          "webp"
+        ],
+        "output_format": "webp",
+        "encoding_modes": [
+          "lossy",
+          "lossless"
+        ],
+        "animation_policies": [
+          "preserve",
+          "first_frame",
+          "reject"
+        ],
+        "resize_fit": "inside",
+        "allow_upscale": false,
+        "zero_delay_policy": "reject_animated_zero_delay",
+        "color_policy": "rgb_icc_to_srgb; unprofiled_srgb; reject_custom_png_color_and_cmyk",
+        "native_resource_fence": "rlimit_as_and_cpu"
+      },
+      "cgroup_cpu_seconds": 0.152379,
+      "cgroup_memory_peak_bytes": 4616192,
+      "image_id": "sha256:3bf7def62bde6bd234952732d4970ea845837006cd5402ba37c84fdea99eddd3"
+    },
+    {
+      "provider": "sharp",
+      "case": "animation/1",
+      "mode": "lossy",
+      "iterations": 20,
+      "warmup": 3,
+      "concurrency": 1,
+      "quality": 85,
+      "effort": 4,
+      "source_sha256": "1a88dcf23b980e6f8b4866dc2bce6b8d10f1bf3549f536cc7b7f887e0e7d0e59",
+      "source_bytes": 807,
+      "successes": 20,
+      "errors": [],
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 7.037039496935904,
+        "p95": 7.726765004917979
+      },
+      "successful_requests_per_second": 141.37533946106325,
+      "batch_seconds": 0.14146738799172454,
+      "output_facts": [
+        {
+          "id": "size_512",
+          "bytes": 1740,
+          "width": 64,
+          "height": 32,
+          "frame_count": 3,
+          "duration_ms": 1100,
+          "loop_count": 2
+        }
+      ],
+      "response_bytes_mean": 3299,
+      "service_info": {
+        "processor": {
+          "name": "standalone-sharp-benchmark",
+          "node": "v24.22.0",
+          "versions": {
+            "aom": "3.15.1",
+            "archive": "3.8.9",
+            "cairo": "1.18.6",
+            "cgif": "0.5.4",
+            "exif": "0.6.26",
+            "expat": "2.8.5",
+            "ffi": "3.8.0",
+            "fontconfig": "2.18.3",
+            "freetype": "2.14.3",
+            "fribidi": "1.0.17",
+            "glib": "2.90.0",
+            "harfbuzz": "14.5.0",
+            "heif": "1.23.5",
+            "highway": "1.4.0",
+            "imagequant": "2.4.1",
+            "lcms": "2.19.1",
+            "mozjpeg": "0826579",
+            "pango": "1.58.2",
+            "pixman": "0.46.4",
+            "png": "1.6.58",
+            "proxy-libintl": "0.5",
+            "rsvg": "2.63.2",
+            "tiff": "4.7.2",
+            "uhdr": "2.0.2",
+            "vips": "8.18.7",
+            "webp": "1.6.0",
+            "xml2": "2.15.4",
+            "zlib-ng": "2.3.3",
+            "sharp": "0.35.5"
+          },
+          "native_concurrency": 1,
+          "cache": {
+            "memory": {
+              "current": 0,
+              "high": 0,
+              "max": 0
+            },
+            "files": {
+              "current": 0,
+              "max": 0
+            },
+            "items": {
+              "current": 0,
+              "max": 0
+            }
+          }
+        },
+        "concurrency": 1
+      },
+      "cgroup_cpu_seconds": 0.33902,
+      "cgroup_memory_peak_bytes": 35725312,
+      "image_id": "sha256:dfd62c5c5b9036f8b1ed18c2a9b879f1dd099abf8eb8b108a69f28b83d0e39ff"
+    },
+    {
+      "provider": "hirune",
+      "case": "animation/4",
+      "mode": "lossy",
+      "iterations": 20,
+      "warmup": 3,
+      "concurrency": 1,
+      "quality": 85,
+      "effort": 4,
+      "source_sha256": "1a88dcf23b980e6f8b4866dc2bce6b8d10f1bf3549f536cc7b7f887e0e7d0e59",
+      "source_bytes": 807,
+      "successes": 20,
+      "errors": [],
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 8.744552003918216,
+        "p95": 10.60662599047646
+      },
+      "successful_requests_per_second": 110.23346532053013,
+      "batch_seconds": 0.181433106015902,
+      "output_facts": [
+        {
+          "id": "size_512",
+          "bytes": 1006,
+          "width": 64,
+          "height": 32,
+          "frame_count": 3,
+          "duration_ms": 1100,
+          "loop_count": 2
+        },
+        {
+          "id": "size_256",
+          "bytes": 1006,
+          "width": 64,
+          "height": 32,
+          "frame_count": 3,
+          "duration_ms": 1100,
+          "loop_count": 2
+        },
+        {
+          "id": "size_128",
+          "bytes": 1006,
+          "width": 64,
+          "height": 32,
+          "frame_count": 3,
+          "duration_ms": 1100,
+          "loop_count": 2
+        },
+        {
+          "id": "size_64",
+          "bytes": 1006,
+          "width": 64,
+          "height": 32,
+          "frame_count": 3,
+          "duration_ms": 1100,
+          "loop_count": 2
+        }
+      ],
+      "response_bytes_mean": 6264,
+      "service_info": {
+        "contract_version": 1,
+        "processor": {
+          "version": "0.1.0",
+          "build_id": "0f4487ff90ecd0d66f00193311706cf1ece91465:b7b38cc34685a9b4f0857d1988078a177ceefe365b478372266e94fc244cd527",
+          "pipeline_version": "1-linear-premultiplied-area-full-canvas",
+          "image": "0.25.10",
+          "gif": "0.14.2",
+          "libwebp_encoder": "1.5.0",
+          "libwebp_decoder": "1.5.0",
+          "libwebp_demux": "1.5.0",
+          "libwebp_mux": "1.5.0",
+          "color_engine": "moxcms/0.9.1"
+        },
+        "limits": {
+          "source_bytes": 33554432,
+          "request_bytes": 34603008,
+          "recipe_bytes": 16384,
+          "input_dimension": 8192,
+          "canvas_pixels": 40000000,
+          "frames": 120,
+          "total_frame_pixels": 100000000,
+          "decoded_bytes": 268435456,
+          "working_bytes": 268435456,
+          "spool_bytes": 268435456,
+          "duration_ms": 60000,
+          "outputs": 4,
+          "output_bytes": 33554432,
+          "output_dimension": 4096,
+          "concurrency": 1,
+          "deadline_ms": 60000,
+          "idle_ms": 10000,
+          "child_memory_bytes": 805306368,
+          "child_cpu_seconds": 60
+        },
+        "codec_limits": {
+          "webp_dimension": 16383,
+          "webp_file_bytes": 4294967294,
+          "frame_duration_ms": 16777215,
+          "cycle_duration_ms": 2147483647
+        },
+        "input_formats": [
+          "jpeg",
+          "png",
+          "gif",
+          "webp"
+        ],
+        "output_format": "webp",
+        "encoding_modes": [
+          "lossy",
+          "lossless"
+        ],
+        "animation_policies": [
+          "preserve",
+          "first_frame",
+          "reject"
+        ],
+        "resize_fit": "inside",
+        "allow_upscale": false,
+        "zero_delay_policy": "reject_animated_zero_delay",
+        "color_policy": "rgb_icc_to_srgb; unprofiled_srgb; reject_custom_png_color_and_cmyk",
+        "native_resource_fence": "rlimit_as_and_cpu"
+      },
+      "cgroup_cpu_seconds": 0.229524,
+      "cgroup_memory_peak_bytes": 4087808,
+      "image_id": "sha256:3bf7def62bde6bd234952732d4970ea845837006cd5402ba37c84fdea99eddd3"
+    },
+    {
+      "provider": "sharp",
+      "case": "animation/4",
+      "mode": "lossy",
+      "iterations": 20,
+      "warmup": 3,
+      "concurrency": 1,
+      "quality": 85,
+      "effort": 4,
+      "source_sha256": "1a88dcf23b980e6f8b4866dc2bce6b8d10f1bf3549f536cc7b7f887e0e7d0e59",
+      "source_bytes": 807,
+      "successes": 20,
+      "errors": [],
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 19.505418997141533,
+        "p95": 26.483495981665328
+      },
+      "successful_requests_per_second": 47.19139025161136,
+      "batch_seconds": 0.4238061200012453,
+      "output_facts": [
+        {
+          "id": "size_512",
+          "bytes": 1740,
+          "width": 64,
+          "height": 32,
+          "frame_count": 3,
+          "duration_ms": 1100,
+          "loop_count": 2
+        },
+        {
+          "id": "size_256",
+          "bytes": 1740,
+          "width": 64,
+          "height": 32,
+          "frame_count": 3,
+          "duration_ms": 1100,
+          "loop_count": 2
+        },
+        {
+          "id": "size_128",
+          "bytes": 1740,
+          "width": 64,
+          "height": 32,
+          "frame_count": 3,
+          "duration_ms": 1100,
+          "loop_count": 2
+        },
+        {
+          "id": "size_64",
+          "bytes": 1740,
+          "width": 64,
+          "height": 32,
+          "frame_count": 3,
+          "duration_ms": 1100,
+          "loop_count": 2
+        }
+      ],
+      "response_bytes_mean": 9534,
+      "service_info": {
+        "processor": {
+          "name": "standalone-sharp-benchmark",
+          "node": "v24.22.0",
+          "versions": {
+            "aom": "3.15.1",
+            "archive": "3.8.9",
+            "cairo": "1.18.6",
+            "cgif": "0.5.4",
+            "exif": "0.6.26",
+            "expat": "2.8.5",
+            "ffi": "3.8.0",
+            "fontconfig": "2.18.3",
+            "freetype": "2.14.3",
+            "fribidi": "1.0.17",
+            "glib": "2.90.0",
+            "harfbuzz": "14.5.0",
+            "heif": "1.23.5",
+            "highway": "1.4.0",
+            "imagequant": "2.4.1",
+            "lcms": "2.19.1",
+            "mozjpeg": "0826579",
+            "pango": "1.58.2",
+            "pixman": "0.46.4",
+            "png": "1.6.58",
+            "proxy-libintl": "0.5",
+            "rsvg": "2.63.2",
+            "tiff": "4.7.2",
+            "uhdr": "2.0.2",
+            "vips": "8.18.7",
+            "webp": "1.6.0",
+            "xml2": "2.15.4",
+            "zlib-ng": "2.3.3",
+            "sharp": "0.35.5"
+          },
+          "native_concurrency": 1,
+          "cache": {
+            "memory": {
+              "current": 0,
+              "high": 0,
+              "max": 0
+            },
+            "files": {
+              "current": 0,
+              "max": 0
+            },
+            "items": {
+              "current": 0,
+              "max": 0
+            }
+          }
+        },
+        "concurrency": 1
+      },
+      "cgroup_cpu_seconds": 0.670322,
+      "cgroup_memory_peak_bytes": 40091648,
+      "image_id": "sha256:dfd62c5c5b9036f8b1ed18c2a9b879f1dd099abf8eb8b108a69f28b83d0e39ff"
+    },
+    {
+      "provider": "hirune",
+      "case": "icc/1",
+      "mode": "lossy",
+      "iterations": 20,
+      "warmup": 3,
+      "concurrency": 1,
+      "quality": 85,
+      "effort": 4,
+      "source_sha256": "e3fe961cef3f666572190e223209d604cb07eaff834bfef9d59caf32f5bed8bf",
+      "source_bytes": 3629,
+      "successes": 20,
+      "errors": [],
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 5.163899506442249,
+        "p95": 7.917674985947087
+      },
+      "successful_requests_per_second": 168.1823484125691,
+      "batch_seconds": 0.11891854400164448,
+      "output_facts": [
+        {
+          "id": "size_512",
+          "bytes": 334,
+          "width": 40,
+          "height": 84,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        }
+      ],
+      "response_bytes_mean": 1549,
+      "service_info": {
+        "contract_version": 1,
+        "processor": {
+          "version": "0.1.0",
+          "build_id": "0f4487ff90ecd0d66f00193311706cf1ece91465:b7b38cc34685a9b4f0857d1988078a177ceefe365b478372266e94fc244cd527",
+          "pipeline_version": "1-linear-premultiplied-area-full-canvas",
+          "image": "0.25.10",
+          "gif": "0.14.2",
+          "libwebp_encoder": "1.5.0",
+          "libwebp_decoder": "1.5.0",
+          "libwebp_demux": "1.5.0",
+          "libwebp_mux": "1.5.0",
+          "color_engine": "moxcms/0.9.1"
+        },
+        "limits": {
+          "source_bytes": 33554432,
+          "request_bytes": 34603008,
+          "recipe_bytes": 16384,
+          "input_dimension": 8192,
+          "canvas_pixels": 40000000,
+          "frames": 120,
+          "total_frame_pixels": 100000000,
+          "decoded_bytes": 268435456,
+          "working_bytes": 268435456,
+          "spool_bytes": 268435456,
+          "duration_ms": 60000,
+          "outputs": 4,
+          "output_bytes": 33554432,
+          "output_dimension": 4096,
+          "concurrency": 1,
+          "deadline_ms": 60000,
+          "idle_ms": 10000,
+          "child_memory_bytes": 805306368,
+          "child_cpu_seconds": 60
+        },
+        "codec_limits": {
+          "webp_dimension": 16383,
+          "webp_file_bytes": 4294967294,
+          "frame_duration_ms": 16777215,
+          "cycle_duration_ms": 2147483647
+        },
+        "input_formats": [
+          "jpeg",
+          "png",
+          "gif",
+          "webp"
+        ],
+        "output_format": "webp",
+        "encoding_modes": [
+          "lossy",
+          "lossless"
+        ],
+        "animation_policies": [
+          "preserve",
+          "first_frame",
+          "reject"
+        ],
+        "resize_fit": "inside",
+        "allow_upscale": false,
+        "zero_delay_policy": "reject_animated_zero_delay",
+        "color_policy": "rgb_icc_to_srgb; unprofiled_srgb; reject_custom_png_color_and_cmyk",
+        "native_resource_fence": "rlimit_as_and_cpu"
+      },
+      "cgroup_cpu_seconds": 0.144838,
+      "cgroup_memory_peak_bytes": 3821568,
+      "image_id": "sha256:3bf7def62bde6bd234952732d4970ea845837006cd5402ba37c84fdea99eddd3"
+    },
+    {
+      "provider": "sharp",
+      "case": "icc/1",
+      "mode": "lossy",
+      "iterations": 20,
+      "warmup": 3,
+      "concurrency": 1,
+      "quality": 85,
+      "effort": 4,
+      "source_sha256": "e3fe961cef3f666572190e223209d604cb07eaff834bfef9d59caf32f5bed8bf",
+      "source_bytes": 3629,
+      "successes": 20,
+      "errors": [],
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 10.558266483712941,
+        "p95": 13.44851398607716
+      },
+      "successful_requests_per_second": 90.6131955759581,
+      "batch_seconds": 0.2207184050057549,
+      "output_facts": [
+        {
+          "id": "size_512",
+          "bytes": 338,
+          "width": 40,
+          "height": 84,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        }
+      ],
+      "response_bytes_mean": 1891,
+      "service_info": {
+        "processor": {
+          "name": "standalone-sharp-benchmark",
+          "node": "v24.22.0",
+          "versions": {
+            "aom": "3.15.1",
+            "archive": "3.8.9",
+            "cairo": "1.18.6",
+            "cgif": "0.5.4",
+            "exif": "0.6.26",
+            "expat": "2.8.5",
+            "ffi": "3.8.0",
+            "fontconfig": "2.18.3",
+            "freetype": "2.14.3",
+            "fribidi": "1.0.17",
+            "glib": "2.90.0",
+            "harfbuzz": "14.5.0",
+            "heif": "1.23.5",
+            "highway": "1.4.0",
+            "imagequant": "2.4.1",
+            "lcms": "2.19.1",
+            "mozjpeg": "0826579",
+            "pango": "1.58.2",
+            "pixman": "0.46.4",
+            "png": "1.6.58",
+            "proxy-libintl": "0.5",
+            "rsvg": "2.63.2",
+            "tiff": "4.7.2",
+            "uhdr": "2.0.2",
+            "vips": "8.18.7",
+            "webp": "1.6.0",
+            "xml2": "2.15.4",
+            "zlib-ng": "2.3.3",
+            "sharp": "0.35.5"
+          },
+          "native_concurrency": 1,
+          "cache": {
+            "memory": {
+              "current": 0,
+              "high": 0,
+              "max": 0
+            },
+            "files": {
+              "current": 0,
+              "max": 0
+            },
+            "items": {
+              "current": 0,
+              "max": 0
+            }
+          }
+        },
+        "concurrency": 1
+      },
+      "cgroup_cpu_seconds": 0.421278,
+      "cgroup_memory_peak_bytes": 34312192,
+      "image_id": "sha256:dfd62c5c5b9036f8b1ed18c2a9b879f1dd099abf8eb8b108a69f28b83d0e39ff"
+    },
+    {
+      "provider": "hirune",
+      "case": "icc/4",
+      "mode": "lossy",
+      "iterations": 20,
+      "warmup": 3,
+      "concurrency": 1,
+      "quality": 85,
+      "effort": 4,
+      "source_sha256": "e3fe961cef3f666572190e223209d604cb07eaff834bfef9d59caf32f5bed8bf",
+      "source_bytes": 3629,
+      "successes": 20,
+      "errors": [],
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 6.875166509416886,
+        "p95": 9.812119009438902
+      },
+      "successful_requests_per_second": 137.3201530014331,
+      "batch_seconds": 0.14564504599547945,
+      "output_facts": [
+        {
+          "id": "size_512",
+          "bytes": 334,
+          "width": 40,
+          "height": 84,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_256",
+          "bytes": 334,
+          "width": 40,
+          "height": 84,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_128",
+          "bytes": 334,
+          "width": 40,
+          "height": 84,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_64",
+          "bytes": 204,
+          "width": 30,
+          "height": 64,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        }
+      ],
+      "response_bytes_mean": 3425,
+      "service_info": {
+        "contract_version": 1,
+        "processor": {
+          "version": "0.1.0",
+          "build_id": "0f4487ff90ecd0d66f00193311706cf1ece91465:b7b38cc34685a9b4f0857d1988078a177ceefe365b478372266e94fc244cd527",
+          "pipeline_version": "1-linear-premultiplied-area-full-canvas",
+          "image": "0.25.10",
+          "gif": "0.14.2",
+          "libwebp_encoder": "1.5.0",
+          "libwebp_decoder": "1.5.0",
+          "libwebp_demux": "1.5.0",
+          "libwebp_mux": "1.5.0",
+          "color_engine": "moxcms/0.9.1"
+        },
+        "limits": {
+          "source_bytes": 33554432,
+          "request_bytes": 34603008,
+          "recipe_bytes": 16384,
+          "input_dimension": 8192,
+          "canvas_pixels": 40000000,
+          "frames": 120,
+          "total_frame_pixels": 100000000,
+          "decoded_bytes": 268435456,
+          "working_bytes": 268435456,
+          "spool_bytes": 268435456,
+          "duration_ms": 60000,
+          "outputs": 4,
+          "output_bytes": 33554432,
+          "output_dimension": 4096,
+          "concurrency": 1,
+          "deadline_ms": 60000,
+          "idle_ms": 10000,
+          "child_memory_bytes": 805306368,
+          "child_cpu_seconds": 60
+        },
+        "codec_limits": {
+          "webp_dimension": 16383,
+          "webp_file_bytes": 4294967294,
+          "frame_duration_ms": 16777215,
+          "cycle_duration_ms": 2147483647
+        },
+        "input_formats": [
+          "jpeg",
+          "png",
+          "gif",
+          "webp"
+        ],
+        "output_format": "webp",
+        "encoding_modes": [
+          "lossy",
+          "lossless"
+        ],
+        "animation_policies": [
+          "preserve",
+          "first_frame",
+          "reject"
+        ],
+        "resize_fit": "inside",
+        "allow_upscale": false,
+        "zero_delay_policy": "reject_animated_zero_delay",
+        "color_policy": "rgb_icc_to_srgb; unprofiled_srgb; reject_custom_png_color_and_cmyk",
+        "native_resource_fence": "rlimit_as_and_cpu"
+      },
+      "cgroup_cpu_seconds": 0.159613,
+      "cgroup_memory_peak_bytes": 4345856,
+      "image_id": "sha256:3bf7def62bde6bd234952732d4970ea845837006cd5402ba37c84fdea99eddd3"
+    },
+    {
+      "provider": "sharp",
+      "case": "icc/4",
+      "mode": "lossy",
+      "iterations": 20,
+      "warmup": 3,
+      "concurrency": 1,
+      "quality": 85,
+      "effort": 4,
+      "source_sha256": "e3fe961cef3f666572190e223209d604cb07eaff834bfef9d59caf32f5bed8bf",
+      "source_bytes": 3629,
+      "successes": 20,
+      "errors": [],
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 20.187722984701395,
+        "p95": 23.005802009720355
+      },
+      "successful_requests_per_second": 49.034858648387186,
+      "batch_seconds": 0.407873103977181,
+      "output_facts": [
+        {
+          "id": "size_512",
+          "bytes": 338,
+          "width": 40,
+          "height": 84,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_256",
+          "bytes": 338,
+          "width": 40,
+          "height": 84,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_128",
+          "bytes": 338,
+          "width": 40,
+          "height": 84,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        },
+        {
+          "id": "size_64",
+          "bytes": 234,
+          "width": 30,
+          "height": 64,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1
+        }
+      ],
+      "response_bytes_mean": 3801,
+      "service_info": {
+        "processor": {
+          "name": "standalone-sharp-benchmark",
+          "node": "v24.22.0",
+          "versions": {
+            "aom": "3.15.1",
+            "archive": "3.8.9",
+            "cairo": "1.18.6",
+            "cgif": "0.5.4",
+            "exif": "0.6.26",
+            "expat": "2.8.5",
+            "ffi": "3.8.0",
+            "fontconfig": "2.18.3",
+            "freetype": "2.14.3",
+            "fribidi": "1.0.17",
+            "glib": "2.90.0",
+            "harfbuzz": "14.5.0",
+            "heif": "1.23.5",
+            "highway": "1.4.0",
+            "imagequant": "2.4.1",
+            "lcms": "2.19.1",
+            "mozjpeg": "0826579",
+            "pango": "1.58.2",
+            "pixman": "0.46.4",
+            "png": "1.6.58",
+            "proxy-libintl": "0.5",
+            "rsvg": "2.63.2",
+            "tiff": "4.7.2",
+            "uhdr": "2.0.2",
+            "vips": "8.18.7",
+            "webp": "1.6.0",
+            "xml2": "2.15.4",
+            "zlib-ng": "2.3.3",
+            "sharp": "0.35.5"
+          },
+          "native_concurrency": 1,
+          "cache": {
+            "memory": {
+              "current": 0,
+              "high": 0,
+              "max": 0
+            },
+            "files": {
+              "current": 0,
+              "max": 0
+            },
+            "items": {
+              "current": 0,
+              "max": 0
+            }
+          }
+        },
+        "concurrency": 1
+      },
+      "cgroup_cpu_seconds": 0.663997,
+      "cgroup_memory_peak_bytes": 37601280,
+      "image_id": "sha256:dfd62c5c5b9036f8b1ed18c2a9b879f1dd099abf8eb8b108a69f28b83d0e39ff"
+    }
+  ]
+}
