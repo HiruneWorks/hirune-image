@@ -29,7 +29,7 @@ pub fn processor_info() -> ProcessorInfo {
             libwebp_decoder: version(ffi::WebPGetDecoderVersion()),
             libwebp_demux: version(ffi::WebPGetDemuxVersion()),
             libwebp_mux: version(ffi::WebPGetMuxVersion()),
-            color_engine: "moxcms/0.8.1".into(),
+            color_engine: "moxcms/0.9.1".into(),
         }
     }
 }
