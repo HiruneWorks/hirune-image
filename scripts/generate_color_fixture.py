@@ -14,4 +14,4 @@ image.save(root / "p3-color.png", icc_profile=profile)
 converted = ImageCms.profileToProfile(image, ImageCms.ImageCmsProfile(io.BytesIO(profile)), ImageCms.createProfile("sRGB"), renderingIntent=0, outputMode="RGBA")
 (root / "p3-color-expected.rgba").write_bytes(converted.tobytes())
 provenance = {"generator": "scripts/generate_color_fixture.py", "pillow": __version__, "littlecms": ImageCms.core.littlecms_version, "intent": "perceptual (0)", "size": [8, 4], "profile_sha256": hashlib.sha256(profile).hexdigest(), "rgb_tolerance": 2, "alpha_tolerance": 0}
-(root / "p3-color-provenance.json").write_text(json.dumps(provenance, indent=2) + "\n", encoding="utf-8")
+(root / "p3-color-provenance.json").write_text(json.dumps(provenance, indent=2) + "\n", encoding="utf-8", newline="\n")

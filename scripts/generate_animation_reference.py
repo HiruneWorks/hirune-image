@@ -30,4 +30,4 @@ for frame in range(4):
             rgb = [math.fsum(linear(p[c]) * p[3] / 255 * w for p, w in weights) / alpha if alpha else 0 for c in range(3)]
             output.extend([max(0, min(255, math.floor(srgb(v) * 255 + .5))) for v in rgb] + [math.floor(alpha / (width * height / target_width / target_height) * 255 + .5)])
     (ROOT / f"disposal-small-expected-{frame}.rgba").write_bytes(output)
-(ROOT / "disposal-small-provenance.json").write_text(json.dumps({"generator": "scripts/generate_animation_reference.py", "source": "manual disposal-expected-*.rgba", "size": [4, 3], "rgb_tolerance": 1, "alpha_tolerance": 0}, indent=2) + "\n", encoding="utf-8")
+(ROOT / "disposal-small-provenance.json").write_text(json.dumps({"generator": "scripts/generate_animation_reference.py", "source": "manual disposal-expected-*.rgba", "size": [4, 3], "rgb_tolerance": 1, "alpha_tolerance": 0}, indent=2) + "\n", encoding="utf-8", newline="\n")
