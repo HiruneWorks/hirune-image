@@ -1,26 +1,23 @@
-use kit::{bootstrap::bootstrap, config::Settings, http::build_router, observability, runtime};
-use tokio::net::TcpListener;
+use hirune_image::{
+    bootstrap::bootstrap, config::Settings, http::build_router, observability, runtime,
+};
 use tokio_util::sync::CancellationToken;
-
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    observability::initialize()?;
     let settings = Settings::from_environment()?;
-    let _telemetry = observability::initialize(&settings.observability)?;
-    let app = bootstrap(&settings).await?;
-    let listener = TcpListener::bind(settings.http.bind_address).await?;
-    tracing::info!(address=%listener.local_addr()?, "API listening");
+    let app = bootstrap(settings).await?;
+    let listener = tokio::net::TcpListener::bind(app.settings.bind).await?;
+    tracing::info!(address=%listener.local_addr()?,"API listening");
     let shutdown = CancellationToken::new();
-    let watcher = tokio::spawn({
+    let watch = tokio::spawn({
         let shutdown = shutdown.clone();
-        let app = app.clone();
         async move {
             let _ = runtime::shutdown_signal().await;
-            app.begin_shutdown();
             shutdown.cancel();
         }
     });
-    let result = runtime::serve(listener, build_router(app.clone(), settings.http), shutdown).await;
-    watcher.abort();
-    app.close().await?;
+    let result = runtime::serve(listener, build_router(app.clone()), app, shutdown).await;
+    watch.abort();
     result
 }

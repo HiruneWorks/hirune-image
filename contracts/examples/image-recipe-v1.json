@@ -1,0 +1,33 @@
+{
+  "contract_version": 1,
+  "animation_policy": "preserve",
+  "outputs": [
+    {
+      "id": "presentation",
+      "resize": {
+        "fit": "inside",
+        "max_width": 4096,
+        "max_height": 4096
+      },
+      "encoding": {
+        "format": "webp",
+        "mode": "lossy",
+        "quality": 85,
+        "effort": 4
+      }
+    },
+    {
+      "id": "thumbnail",
+      "resize": {
+        "fit": "inside",
+        "max_width": 512,
+        "max_height": 512
+      },
+      "encoding": {
+        "format": "webp",
+        "mode": "lossless",
+        "effort": 4
+      }
+    }
+  ]
+}

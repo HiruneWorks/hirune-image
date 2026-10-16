@@ -1,0 +1,21 @@
+[package]
+name = "image-codec"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+application.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+image.workspace = true
+gif.workspace = true
+libwebp-sys2.workspace = true
+moxcms.workspace = true
+libc.workspace = true
+crc32fast = "1.5.0"
+
+[build-dependencies]
+sha2.workspace = true

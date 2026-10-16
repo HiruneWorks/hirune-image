@@ -1,0 +1,55 @@
+{
+  "$defs": {
+    "ErrorDescription": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ProcessingError"
+        },
+        "message": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "request_id"
+      ],
+      "type": "object"
+    },
+    "ProcessingError": {
+      "enum": [
+        "invalid_request",
+        "invalid_recipe",
+        "request_too_large",
+        "image_limits_exceeded",
+        "output_limits_exceeded",
+        "unsupported_format",
+        "invalid_image",
+        "unsupported_color_profile",
+        "animation_not_allowed",
+        "unrepresentable_animation",
+        "processor_overloaded",
+        "processor_unavailable",
+        "processing_timeout",
+        "internal_error"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "error": {
+      "$ref": "#/$defs/ErrorDescription"
+    }
+  },
+  "required": [
+    "error"
+  ],
+  "title": "ErrorEnvelope",
+  "type": "object"
+}

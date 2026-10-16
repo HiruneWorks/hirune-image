@@ -1,0 +1,231 @@
+{
+  "$defs": {
+    "MediaType": {
+      "enum": [
+        "image/webp"
+      ],
+      "type": "string"
+    },
+    "OutputFacts": {
+      "properties": {
+        "byte_size": {
+          "format": "uint64",
+          "maximum": 33554432,
+          "minimum": 12,
+          "type": "integer"
+        },
+        "duration_ms": {
+          "format": "uint32",
+          "maximum": 60000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "frame_count": {
+          "format": "uint32",
+          "maximum": 120,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "height": {
+          "format": "uint32",
+          "maximum": 8192,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,31}$",
+          "type": "string"
+        },
+        "loop_count": {
+          "format": "uint16",
+          "maximum": 65535,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "media_type": {
+          "$ref": "#/$defs/MediaType"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "width": {
+          "format": "uint32",
+          "maximum": 8192,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "media_type",
+        "byte_size",
+        "sha256",
+        "width",
+        "height",
+        "frame_count",
+        "duration_ms",
+        "loop_count"
+      ],
+      "type": "object"
+    },
+    "ProcessorInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "build_id": {
+          "type": "string"
+        },
+        "color_engine": {
+          "type": "string"
+        },
+        "gif": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "libwebp_decoder": {
+          "type": "string"
+        },
+        "libwebp_demux": {
+          "type": "string"
+        },
+        "libwebp_encoder": {
+          "type": "string"
+        },
+        "libwebp_mux": {
+          "type": "string"
+        },
+        "pipeline_version": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "build_id",
+        "pipeline_version",
+        "image",
+        "gif",
+        "libwebp_encoder",
+        "libwebp_decoder",
+        "libwebp_demux",
+        "libwebp_mux",
+        "color_engine"
+      ],
+      "type": "object"
+    },
+    "SourceFacts": {
+      "properties": {
+        "byte_size": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "duration_ms": {
+          "format": "uint32",
+          "maximum": 60000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "format": {
+          "$ref": "#/$defs/SourceFormat"
+        },
+        "frame_count": {
+          "format": "uint32",
+          "maximum": 120,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "height": {
+          "format": "uint32",
+          "maximum": 8192,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "loop_count": {
+          "format": "uint16",
+          "maximum": 65535,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "orientation": {
+          "format": "uint8",
+          "maximum": 255,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "width": {
+          "format": "uint32",
+          "maximum": 8192,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "format",
+        "byte_size",
+        "orientation",
+        "width",
+        "height",
+        "frame_count",
+        "duration_ms",
+        "loop_count"
+      ],
+      "type": "object"
+    },
+    "SourceFormat": {
+      "enum": [
+        "jpeg",
+        "png",
+        "gif",
+        "webp"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "format": "uint32",
+      "maximum": 1,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "outputs": {
+      "items": {
+        "$ref": "#/$defs/OutputFacts"
+      },
+      "maxItems": 4,
+      "minItems": 1,
+      "type": "array"
+    },
+    "processor": {
+      "$ref": "#/$defs/ProcessorInfo"
+    },
+    "recipe_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/SourceFacts"
+    },
+    "source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "contract_version",
+    "processor",
+    "source_sha256",
+    "recipe_sha256",
+    "source",
+    "outputs"
+  ],
+  "title": "Manifest",
+  "type": "object"
+}

@@ -8,8 +8,3 @@ publish = false
 [dependencies]
 anyhow.workspace = true
 serde_json.workspace = true
-tempfile.workspace = true
-uuid.workspace = true
-auth-core.workspace = true
-base64.workspace = true
-dotenvy = "0.15.7"

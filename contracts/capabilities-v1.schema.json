@@ -1,0 +1,240 @@
+{
+  "$defs": {
+    "Limits": {
+      "additionalProperties": false,
+      "properties": {
+        "canvas_pixels": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "child_memory_bytes": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "concurrency": {
+          "format": "uint",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "deadline_ms": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "decoded_bytes": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "duration_ms": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "frames": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "idle_ms": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "input_dimension": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "output_bytes": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "output_dimension": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "outputs": {
+          "format": "uint",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "recipe_bytes": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "request_bytes": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "source_bytes": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "spool_bytes": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "total_frame_pixels": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "working_bytes": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "source_bytes",
+        "request_bytes",
+        "recipe_bytes",
+        "input_dimension",
+        "canvas_pixels",
+        "frames",
+        "total_frame_pixels",
+        "decoded_bytes",
+        "working_bytes",
+        "spool_bytes",
+        "duration_ms",
+        "outputs",
+        "output_bytes",
+        "output_dimension",
+        "concurrency",
+        "deadline_ms",
+        "idle_ms",
+        "child_memory_bytes"
+      ],
+      "type": "object"
+    },
+    "ProcessorInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "build_id": {
+          "type": "string"
+        },
+        "color_engine": {
+          "type": "string"
+        },
+        "gif": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "libwebp_decoder": {
+          "type": "string"
+        },
+        "libwebp_demux": {
+          "type": "string"
+        },
+        "libwebp_encoder": {
+          "type": "string"
+        },
+        "libwebp_mux": {
+          "type": "string"
+        },
+        "pipeline_version": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "build_id",
+        "pipeline_version",
+        "image",
+        "gif",
+        "libwebp_encoder",
+        "libwebp_decoder",
+        "libwebp_demux",
+        "libwebp_mux",
+        "color_engine"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "allow_upscale": {
+      "type": "boolean"
+    },
+    "animation_policies": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array"
+    },
+    "color_policy": {
+      "type": "string"
+    },
+    "contract_version": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "encoding_modes": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 2,
+      "minItems": 2,
+      "type": "array"
+    },
+    "input_formats": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 4,
+      "minItems": 4,
+      "type": "array"
+    },
+    "limits": {
+      "$ref": "#/$defs/Limits"
+    },
+    "native_resource_fence": {
+      "type": "string"
+    },
+    "output_format": {
+      "type": "string"
+    },
+    "processor": {
+      "$ref": "#/$defs/ProcessorInfo"
+    },
+    "resize_fit": {
+      "type": "string"
+    },
+    "zero_delay_policy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "contract_version",
+    "processor",
+    "limits",
+    "input_formats",
+    "output_format",
+    "encoding_modes",
+    "animation_policies",
+    "resize_fit",
+    "allow_upscale",
+    "zero_delay_policy",
+    "color_policy",
+    "native_resource_fence"
+  ],
+  "title": "Capabilities",
+  "type": "object"
+}

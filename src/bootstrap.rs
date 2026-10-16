@@ -1,109 +1,60 @@
-use crate::config::{DatabaseSettings, Settings};
-use application::{
-    api_access::ApiAccessService,
-    authorization::Authorization,
-    files::FileService,
-    identity::{IdentityService, oidc::OidcService},
-    notifications::NotificationService,
-    organizations::OrganizationService,
-    posts::PostService,
-    profiles::ProfileService,
+use crate::config::Settings;
+use application::images::ProcessorInfo;
+use std::sync::{
+    Arc,
+    atomic::{AtomicBool, Ordering},
 };
-use jobs::PostgresQueue;
-use mail::Mailer;
-use sea_orm::{ConnectOptions, Database, DatabaseConnection};
-use std::{
-    sync::{
-        Arc,
-        atomic::{AtomicBool, Ordering},
-    },
-    time::Duration,
-};
-
+use tokio::{process::Command, sync::Semaphore};
+use tokio_util::sync::CancellationToken;
 #[derive(Clone)]
 pub struct Application {
-    pub api_access: ApiAccessService,
-    pub identity: IdentityService,
-    pub organizations: OrganizationService,
-    pub files: FileService,
-    pub profiles: ProfileService,
-    pub posts: PostService,
-    pub notifications: NotificationService,
-    pub oidc: OidcService,
-    pub queue: PostgresQueue,
-    pub mailer: Mailer,
-    database: DatabaseConnection,
-    accepting_requests: Arc<AtomicBool>,
+    pub settings: Arc<Settings>,
+    pub permits: Arc<Semaphore>,
+    pub processor: ProcessorInfo,
+    pub shutdown: CancellationToken,
+    ready: Arc<AtomicBool>,
 }
-
-pub async fn connect_database(settings: &DatabaseSettings) -> anyhow::Result<DatabaseConnection> {
-    let mut options = ConnectOptions::new(settings.url.expose());
-    options
-        .max_connections(settings.max_connections)
-        .min_connections(1)
-        .connect_timeout(Duration::from_secs(5))
-        .acquire_timeout(Duration::from_secs(5))
-        .sqlx_logging(false)
-        .sqlx_slow_statements_logging_settings(
-            tracing::log::LevelFilter::Off,
-            Duration::from_secs(1),
-        );
-    Ok(Database::connect(options).await?)
-}
-
-pub async fn bootstrap(settings: &Settings) -> anyhow::Result<Application> {
-    let database = connect_database(&settings.database).await?;
-    migration::require_current_schema(&database).await?;
-    let authorization = Arc::new(Authorization::new()?);
-    let identity =
-        IdentityService::new(database.clone(), settings.identity.clone(), authorization).await?;
-    let oidc = OidcService::discover(identity.clone(), settings.oidc.clone()).await?;
-    let organizations = OrganizationService::new(identity.clone());
-    let api_access = ApiAccessService::new(identity.clone(), organizations.clone());
-    let files = FileService::new(
-        identity.clone(),
-        organizations.clone(),
-        settings.files.clone(),
-    )?;
-    let mailer = Mailer::new(&settings.smtp)?;
-    let profiles = ProfileService::new(
-        identity.clone(),
-        organizations.clone(),
-        settings.profile_search.clone(),
-    )?;
-    let notifications = NotificationService::new(identity.clone(), settings.fcm.clone())?;
-    let posts = PostService::new(
-        identity.clone(),
-        organizations.clone(),
-        files.clone(),
-        notifications.clone(),
-        settings.post_search.clone(),
-    )?;
+pub async fn bootstrap(settings: Settings) -> anyhow::Result<Application> {
+    settings.limits.validate()?;
+    anyhow::ensure!(
+        settings.worker.is_file(),
+        "image worker executable is missing"
+    );
+    std::fs::create_dir_all(&settings.temp_root)?;
+    tempfile::tempfile_in(&settings.temp_root)?;
+    let mut command = Command::new(&settings.worker);
+    command.arg("--probe").env_clear().kill_on_drop(true);
+    let output =
+        tokio::time::timeout(std::time::Duration::from_secs(10), command.output()).await??;
+    anyhow::ensure!(
+        output.status.success() && output.stdout.len() <= 4096,
+        "codec probe failed"
+    );
+    let processor = serde_json::from_slice(&output.stdout)?;
     Ok(Application {
-        api_access,
-        identity,
-        organizations,
-        files,
-        profiles,
-        posts,
-        notifications,
-        oidc,
-        queue: PostgresQueue::new(database.clone()),
-        mailer,
-        database,
-        accepting_requests: Arc::new(AtomicBool::new(true)),
+        permits: Arc::new(Semaphore::new(settings.limits.concurrency)),
+        settings: Arc::new(settings),
+        processor,
+        shutdown: CancellationToken::new(),
+        ready: Arc::new(AtomicBool::new(true)),
     })
 }
-
 impl Application {
-    pub async fn is_ready(&self) -> bool {
-        self.accepting_requests.load(Ordering::Acquire) && self.database.ping().await.is_ok()
+    pub fn is_ready(&self) -> bool {
+        self.ready.load(Ordering::Acquire)
     }
     pub fn begin_shutdown(&self) {
-        self.accepting_requests.store(false, Ordering::Release);
+        self.ready.store(false, Ordering::Release);
+        self.shutdown.cancel();
     }
-    pub async fn close(&self) -> anyhow::Result<()> {
-        self.database.close_by_ref().await?;
-        Ok(())
+    pub async fn drain(&self) {
+        if let Ok(permit) = self
+            .permits
+            .clone()
+            .acquire_many_owned(self.settings.limits.concurrency as u32)
+            .await
+        {
+            drop(permit)
+        }
     }
 }

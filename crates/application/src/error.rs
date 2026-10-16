@@ -1,42 +1,38 @@
-#[derive(Debug, thiserror::Error)]
-pub enum ApplicationError {
-    #[error("invalid input: {0}")]
-    InvalidInput(&'static str),
-    #[error("authentication required")]
-    Unauthenticated,
-    #[error("access denied")]
-    Forbidden,
-    #[error("resource not found")]
-    NotFound,
-    #[error("conflicting state")]
-    Conflict,
-    #[error("too many attempts")]
-    RateLimited,
-    #[error("API client request rate exceeded")]
-    ApiRateLimited { retry_after_seconds: u64 },
-    #[error("API client monthly quota exceeded")]
-    ApiQuotaExceeded { retry_after_seconds: u64 },
-    #[error("external service unavailable")]
-    ExternalUnavailable,
-    #[error("integration unavailable")]
-    IntegrationUnavailable,
-    #[error("file is too large")]
-    FileTooLarge,
-    #[error("file quota exceeded")]
-    FileQuotaExceeded,
-    #[error("transfer timed out")]
-    TransferTimeout,
-    #[error("storage unavailable")]
-    Storage(#[from] sea_orm::DbErr),
-    #[error("job registration failed")]
-    Job(#[from] jobs::JobError),
-    #[error("internal operation failed")]
-    Internal(#[source] anyhow::Error),
-}
-pub type ApplicationResult<T> = Result<T, ApplicationError>;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 
-impl ApplicationError {
-    pub fn internal(error: impl Into<anyhow::Error>) -> Self {
-        Self::Internal(error.into())
-    }
+#[derive(
+    Clone, Copy, Debug, Deserialize, Serialize, JsonSchema, PartialEq, Eq, thiserror::Error,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ProcessingError {
+    #[error("The request is invalid.")]
+    InvalidRequest,
+    #[error("The recipe is invalid.")]
+    InvalidRecipe,
+    #[error("The request exceeds the byte limit.")]
+    RequestTooLarge,
+    #[error("The image exceeds processing limits.")]
+    ImageLimitsExceeded,
+    #[error("The outputs exceed processing limits.")]
+    OutputLimitsExceeded,
+    #[error("The image format is unsupported.")]
+    UnsupportedFormat,
+    #[error("The image is invalid.")]
+    InvalidImage,
+    #[error("The color profile is unsupported.")]
+    UnsupportedColorProfile,
+    #[error("Animation is not allowed.")]
+    AnimationNotAllowed,
+    #[error("The animation cannot be represented.")]
+    UnrepresentableAnimation,
+    #[error("The processor is busy.")]
+    ProcessorOverloaded,
+    #[error("The processor is unavailable.")]
+    ProcessorUnavailable,
+    #[error("Processing timed out.")]
+    ProcessingTimeout,
+    #[error("An internal error occurred.")]
+    InternalError,
 }
+pub type Result<T> = std::result::Result<T, ProcessingError>;

@@ -1,0 +1,160 @@
+{
+  "$defs": {
+    "AnimationPolicy": {
+      "enum": [
+        "preserve",
+        "first_frame",
+        "reject"
+      ],
+      "type": "string"
+    },
+    "EncodingInput": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "effort": {
+              "format": "uint8",
+              "maximum": 6,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "format": {
+              "$ref": "#/$defs/OutputFormat"
+            },
+            "mode": {
+              "const": "lossy",
+              "type": "string"
+            },
+            "quality": {
+              "format": "uint8",
+              "maximum": 100,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "mode",
+            "format",
+            "quality",
+            "effort"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "effort": {
+              "format": "uint8",
+              "maximum": 6,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "format": {
+              "$ref": "#/$defs/OutputFormat"
+            },
+            "mode": {
+              "const": "lossless",
+              "type": "string"
+            }
+          },
+          "required": [
+            "mode",
+            "format",
+            "effort"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "OutputFormat": {
+      "enum": [
+        "webp"
+      ],
+      "type": "string"
+    },
+    "OutputInput": {
+      "additionalProperties": false,
+      "properties": {
+        "encoding": {
+          "$ref": "#/$defs/EncodingInput"
+        },
+        "id": {
+          "maxLength": 32,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]{0,31}$",
+          "type": "string"
+        },
+        "resize": {
+          "$ref": "#/$defs/ResizeInput"
+        }
+      },
+      "required": [
+        "id",
+        "resize",
+        "encoding"
+      ],
+      "type": "object"
+    },
+    "ResizeFit": {
+      "enum": [
+        "inside"
+      ],
+      "type": "string"
+    },
+    "ResizeInput": {
+      "additionalProperties": false,
+      "properties": {
+        "fit": {
+          "$ref": "#/$defs/ResizeFit"
+        },
+        "max_height": {
+          "format": "uint32",
+          "maximum": 4096,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "max_width": {
+          "format": "uint32",
+          "maximum": 4096,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "fit",
+        "max_width",
+        "max_height"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "animation_policy": {
+      "$ref": "#/$defs/AnimationPolicy"
+    },
+    "contract_version": {
+      "format": "uint32",
+      "maximum": 1,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "outputs": {
+      "items": {
+        "$ref": "#/$defs/OutputInput"
+      },
+      "maxItems": 4,
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "contract_version",
+    "animation_policy",
+    "outputs"
+  ],
+  "title": "RecipeInput",
+  "type": "object"
+}
