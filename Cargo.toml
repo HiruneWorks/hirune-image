@@ -74,6 +74,7 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 
 [dev-dependencies]
+criterion = { version = "0.8.2", features = ["html_reports"] }
 jsonschema = { version = "0.37.1", default-features = false }
 png = "0.18.1"
 crc32fast = "1.5.0"
@@ -82,6 +83,10 @@ image.workspace = true
 gif.workspace = true
 sha2.workspace = true
 hex.workspace = true
+
+[[bench]]
+name = "image_pipeline"
+harness = false
 
 [[bin]]
 name = "resource_test_worker"

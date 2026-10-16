@@ -5,6 +5,7 @@ COPY .cargo .cargo
 COPY crates crates
 COPY src src
 COPY xtask xtask
+COPY benches benches
 COPY tests/support/resource_worker.rs tests/support/resource_worker.rs
 ARG HIRUNE_BUILD_ID=development
 ENV HIRUNE_BUILD_ID=$HIRUNE_BUILD_ID

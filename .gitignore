@@ -33,3 +33,4 @@ deploy/*.env
 logs/
 /*.log
 __pycache__/
+benchmarks/sharp/node_modules/

@@ -1,0 +1,7 @@
+{
+  "name": "hirune-image-sharp-benchmark",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node server.mjs", "test": "node --test pipeline.test.mjs" },
+  "dependencies": { "sharp": "0.35.5" }
+}

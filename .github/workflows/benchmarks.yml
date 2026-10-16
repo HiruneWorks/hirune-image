@@ -1,0 +1,33 @@
+name: Benchmarks
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  criterion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.98.1
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo bench --locked --bench image_pipeline -- --sample-size 20 --measurement-time 2 --warm-up-time 1
+      - uses: actions/upload-artifact@v7
+        with:
+          name: criterion-reports
+          path: target/criterion
+          if-no-files-found: error
+  services:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - run: python3 scripts/benchmark_services.py --iterations 30 --warmup 3
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: sharp-service-comparison
+          path: target/benchmarks/services.json
+          if-no-files-found: warn
