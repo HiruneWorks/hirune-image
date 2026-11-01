@@ -1,5 +1,7 @@
 # 2026-11-02 — Linux container verification
 
+See the [later version 0.3.0 publication record](2026-11-02-version-0.3.0.md) for registry publication and direct pull verification.
+
 ## Changes
 
 Resume Linux verification after Docker Desktop became available.
