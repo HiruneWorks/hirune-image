@@ -1,5 +1,7 @@
 # 2026-11-01 — Streaming image formats and animated variants
 
+See the [later Linux verification record](2026-11-02-linux-container-verification.md) for checks completed after this implementation milestone.
+
 ## Changes
 
 Version 0.3.0 adds APNG, AVIF, HEIC/HEIF, BMP, single-page TIFF, JPEG XL, static SVG, ICO, QOI, and PNM input.

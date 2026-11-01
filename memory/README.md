@@ -1,5 +1,7 @@
 # Verification milestones
 
+- [2026-11-02: Linux container verification](2026-11-02-linux-container-verification.md): Linux workspace and resource-test evidence, runtime profile checks, and accurate HTTP request counts.
+
 - [2026-11-01: streaming image formats](2026-11-01-streaming-image-formats.md): broader input formats, preserved animation, no raw frame spool, Astra review, and local verification limits.
 
 - [2026-10-17: version 0.2.1](2026-10-17-version-0.2.1.md): prepare a patch version for the writing changes after the published 0.2.0 tag.

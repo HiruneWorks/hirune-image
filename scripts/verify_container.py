@@ -40,6 +40,7 @@ def http_checks(base):
     assert capability["limits"]["concurrency"] == 1
     assert capability["animation_policies"] == ["preserve"]
     assert "spool_bytes" not in capability["limits"]
+    http_cases = 0
     for filename in ["finite1.gif", "disposal.gif", "p3-orientation6-gps.jpg", "rust-finite1-lossless.webp",
                      "colors-animated.avif", "colors-animated.jxl", "red-static.avif", "red-static.jxl",
                      "green-alpha.heic", "red-cmyk-icc.jpg", "p3-embedded.svg"]:
@@ -58,9 +59,10 @@ def http_checks(base):
                     + raw_recipe + f"\r\n--{boundary}--\r\n".encode())
             with request(base, "/v1/images/process", body, f"multipart/form-data; boundary={boundary}") as response:
                 verify(response.read(), source, raw_recipe, capability)
+            http_cases += 1
     with request(base, "/health/live") as response:
         assert response.status == 204
-    return capability
+    return {"capability": capability, "http_cases": http_cases}
 
 def main():
     if len(sys.argv) == 3 and sys.argv[1] == "--client":
@@ -88,10 +90,11 @@ def main():
                 "--read-only", "--tmpfs", f"/tmp:rw,noexec,nosuid,size={tmpfs},mode=1777",
                 "--cap-drop", "ALL", "--security-opt", "no-new-privileges:true",
                 "--memory", memory, "--memory-swap", memory, "--cpus", settings.get("HIRUNE_CONTAINER_CPUS", "2"), "--pids-limit", settings.get("HIRUNE_CONTAINER_PIDS", "64"), *environment, IMAGE)
-        capability = json.loads(command("docker", "run", "--rm", "--network", name, "--read-only",
+        verification = json.loads(command("docker", "run", "--rm", "--network", name, "--read-only",
                       "--mount", f"type=bind,source={ROOT},target=/work,readonly", "--workdir", "/work",
                       "--env", "PYTHONDONTWRITEBYTECODE=1", CLIENT_IMAGE,
                       "python", "scripts/verify_container.py", "--client", f"http://{name}:8080", capture=True))
+        capability = verification["capability"]
         expected_build = os.environ.get("HIRUNE_EXPECT_BUILD_ID")
         if profile == "large":
             assert capability["limits"]["output_bytes"] == int(settings["HIRUNE_OUTPUT_BYTES"])
@@ -108,7 +111,7 @@ def main():
         assert peak < memory_bytes
         state = json.loads(command("docker", "inspect", name, capture=True))[0]["State"]
         assert state["Running"] and not state["OOMKilled"]
-        print(json.dumps({"result": "PASS", "profile": profile, "http_cases": 8, "uid": uid,
+        print(json.dumps({"result": "PASS", "profile": profile, "http_cases": verification["http_cases"], "uid": uid,
                           "cgroup_memory_peak_bytes": peak, "container_limit_bytes": memory_bytes,
                           "processor": capability["processor"]}, indent=2))
     finally:
