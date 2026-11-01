@@ -14,7 +14,7 @@ export function insideDimensions(width, height, maxWidth, maxHeight) {
 
 function facts(metadata) {
   const count = metadata.pages ?? 1;
-  return { width: metadata.width, height: metadata.pageHeight ?? metadata.height,
+  return { animated: count > 1, width: metadata.width, height: metadata.pageHeight ?? metadata.height,
     frame_count: count, duration_ms: count > 1 ? metadata.delay.reduce((a, b) => a + b, 0) : 0,
     loop_count: count > 1 ? metadata.loop ?? 1 : 1 };
 }

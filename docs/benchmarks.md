@@ -82,7 +82,9 @@ The client opens fresh urllib connections, so connection setup is part of the me
 The Sharp baseline checks source headers and decodes the source pixels once into oriented sRGB RGBA.
 For each output, it resizes, encodes, and fully decodes the result for verification.
 It then produces SHA-256 bindings, a manifest, and a multipart response.
-Sharp holds decoded pixels in process RAM. Hirune uses a supervised child and temporary RGBA files with byte limits.
+The Sharp baseline holds the decoded RGBA frame stack in process RAM.
+Hirune 0.3.0 uses a supervised child and processes each display frame through all output sizes without RGBA files.
+Older recorded runs used a frame spool. Their results do not measure the current pipeline.
 
 The baseline is a performance tool for trusted fixtures.
 It does not implement the service's full policy for hostile input, admission cancellation, or child process isolation.

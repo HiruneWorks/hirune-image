@@ -38,7 +38,11 @@ def http_checks(base):
         capability = json.load(response)
     assert capability["native_resource_fence"] == "rlimit_as_and_cpu"
     assert capability["limits"]["concurrency"] == 1
-    for filename in ["finite1.gif", "disposal.gif", "p3-orientation6-gps.jpg", "rust-finite1-lossless.webp"]:
+    assert capability["animation_policies"] == ["preserve"]
+    assert "spool_bytes" not in capability["limits"]
+    for filename in ["finite1.gif", "disposal.gif", "p3-orientation6-gps.jpg", "rust-finite1-lossless.webp",
+                     "colors-animated.avif", "colors-animated.jxl", "red-static.avif", "red-static.jxl",
+                     "green-alpha.heic", "red-cmyk-icc.jpg", "p3-embedded.svg"]:
         for mode in ["lossy", "lossless"]:
             encoding = {"format": "webp", "mode": mode, "effort": 0}
             if mode == "lossy":

@@ -1,7 +1,10 @@
 # Hirune Image
 
 Hirune Image is a Rust/Axum image microservice with configurable resource limits.
-Send JPEG, PNG, GIF, or WebP bytes with a typed recipe. The service returns verified lossy or lossless WebP outputs.
+Send common raster images, HEIC/HEIF, AVIF, JPEG XL, or static SVG with a typed recipe.
+The service returns verified lossy or lossless WebP outputs in every requested size.
+It preserves supported animations and processes each frame across all sizes without raw frame files.
+See the [format and color contract](docs/behavior/image-processing.md) for supported variants and explicit exclusions.
 Run a published GHCR image with the [deployment Compose profile](deploy/README.md).
 For development, build the service from source.
 
@@ -34,7 +37,7 @@ Run `just test-container` to verify the Linux image with a non-root user and rea
 Each request has an isolated native worker.
 Temporary files have byte limits. tmpfs consumes deployment memory.
 
-Pushing `v0.2.1` publishes `ghcr.io/hiruneworks/hirune-image:0.2.1` after code and container checks pass.
+Pushing `v0.3.0` publishes `ghcr.io/hiruneworks/hirune-image:0.3.0` after code and container checks pass.
 The tag must match the workspace package version. Publication uses the exact tested `linux/amd64` image.
 Branch pushes, pull requests, and manual checks do not publish images.
 See the [release procedure](deploy/README.md#release-publication).

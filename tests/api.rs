@@ -111,25 +111,10 @@ async fn animated_gif_and_webp_preserve_timing_loops_disposal_and_pixels() {
 async fn animation_policies_and_strict_recipe_rejections() {
     let server = Server::start(Limits::default()).await;
     let source = fixture("finite1.gif");
-    let first = recipe("lossy", "first_frame", &[(16, 16)]);
-    let (manifest, _) = verify(
-        server.process(source.clone(), &first).await,
-        &source,
-        &first,
-    )
-    .await;
-    assert_eq!(manifest.source.image.frame_count, 3);
-    assert_eq!(manifest.outputs[0].image.duration_ms, 0);
-    assert_eq!(manifest.outputs[0].image.loop_count, 1);
-    let reject = recipe("lossless", "reject", &[(16, 16)]);
-    let response = server.process(source.clone(), &reject).await;
-    assert_eq!(response.status(), 422);
-    assert_eq!(
-        response.json::<serde_json::Value>().await.unwrap()["error"]["code"],
-        "animation_not_allowed"
-    );
     let valid = recipe("lossless", "preserve", &[(16, 16)]);
     for invalid in [
+        valid.replace("preserve", "first_frame"),
+        valid.replace("preserve", "reject"),
         valid.replace(
             "\"contract_version\":1",
             "\"contract_version\":1,\"contract_version\":1",
@@ -158,7 +143,7 @@ async fn unsupported_truncated_and_trailing_sources_fail_closed() {
     let server = Server::start(Limits::default()).await;
     let recipe = recipe("lossless", "preserve", &[(32, 32)]);
     assert_eq!(
-        server.process(b"<svg/>".to_vec(), &recipe).await.status(),
+        server.process(b"%PDF-1.7".to_vec(), &recipe).await.status(),
         415
     );
     for mut source in [
@@ -331,13 +316,6 @@ async fn zero_delay_loop_overflow_and_late_webp_corruption_are_rejected() {
     let last = broken.windows(4).rposition(|s| s == b"VP8L").unwrap();
     broken[last + 8] = 0;
     assert_eq!(server.process(broken.clone(), &recipe).await.status(), 422);
-    assert_eq!(
-        server
-            .process(broken, &recipe.replace("preserve", "first_frame"))
-            .await
-            .status(),
-        422
-    );
     server.released().await;
 }
 #[tokio::test]

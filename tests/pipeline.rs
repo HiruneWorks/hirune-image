@@ -12,6 +12,8 @@ fn multiple_outputs_share_one_measured_source_decode() {
     ] {
         let directory = tempfile::tempdir().unwrap();
         std::fs::write(directory.path().join("source"), &source).unwrap();
+        // A directory at the old spool path makes any attempt to write a raw frame fail.
+        std::fs::create_dir(directory.path().join("frame-0.rgba")).unwrap();
         let job = JobInput {
             recipe: Recipe {
                 animation_policy: AnimationPolicy::Preserve,
@@ -35,6 +37,13 @@ fn multiple_outputs_share_one_measured_source_decode() {
             serde_json::from_slice(&std::fs::read(directory.path().join("metrics.json")).unwrap())
                 .unwrap();
         assert_eq!(metrics["source_decoder_starts"], 1);
+        assert_eq!(metrics["raw_frame_spool_bytes"], 0);
+        assert!(directory.path().join("frame-0.rgba").is_dir());
+        assert!(std::fs::read_dir(directory.path()).unwrap().all(|entry| {
+            let entry = entry.unwrap();
+            !entry.file_type().unwrap().is_file()
+                || !entry.file_name().to_string_lossy().ends_with(".rgba")
+        }));
         assert_eq!(metrics["decoded_frames"], manifest.source.image.frame_count);
     }
 }

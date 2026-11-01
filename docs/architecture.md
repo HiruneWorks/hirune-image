@@ -14,17 +14,22 @@ HTTP cancellation signals the supervisor.
 The supervisor waits for pending file operations to finish and for the stopped child to exit before it releases resources.
 
 The worker checks image headers before allocating pixel buffers.
-It decodes the source pixels once, normalizes the frames, and writes RGBA frame files within the spool budget.
-It reads those files to encode each output in sequence.
-It does not need to hold every raw frame or run several encoders in memory at once.
-The frame files are temporary data for that request. They are not durable jobs or external storage.
-When the directory uses tmpfs, these files consume container memory.
+It decodes and normalizes each display frame, then resizes and encodes that frame for every requested output.
+It runs the output encoders in sequence. Each output keeps its compressed chunks in a separate bounded mux.
+The worker releases the display pixels before processing the next frame. It writes no raw RGBA frame files.
+Decoder canvases, reference frames, parsing data, and working buffers still use memory.
+JPEG XL uses an allocation tracker. The worker clears its display render cache between frames.
+HEIC checks every SPS's coded size before conformance cropping, including grid tiles and alpha items.
 
-The native writer enforces the output byte limit for each WebP frame.
-The encoder sets the method, compression mode, and quality explicitly.
-Native config uses `exact=1` and `alpha_quality=100`. Codec threads are disabled.
-The animation mux uses complete canvas frames with no blending. It retains duplicate frames and their timing.
-The worker checks the output structure and fully decodes each output before the API sends success headers.
+The native WebP writer enforces the remaining output byte limit for each encoded frame.
+The Rust mux checks the combined output byte budget before adding each frame.
+It writes complete canvas frames with no blending. It retains duplicate frames and one-frame animations.
+The mux builds the final RIFF buffer directly. It does not assemble a second native copy of the animation.
+Native encoder config uses `exact=1` and `alpha_quality=100`. Codec threads are disabled.
+The worker verifies each completed WebP before it writes the output file.
+The API sends success only after every source frame and every output passes verification.
+Request directories contain only the compressed source, encoded outputs, and control data.
+When the directory uses tmpfs, those files also consume container memory.
 
 The API process checks source and recipe bindings, output order, dimensions, lengths, hashes, and total output bytes.
 Response delivery owns the permit and request directory.

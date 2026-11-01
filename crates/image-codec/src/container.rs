@@ -106,9 +106,6 @@ pub fn webp_structure<'a>(data: &'a [u8], limits: &Limits) -> Result<WebpStructu
         return Err(Error::InvalidImage);
     }
     let frame_count = if animated { delays.len() as u32 } else { 1 };
-    if frame_count == 1 && animated {
-        return Err(Error::UnrepresentableAnimation);
-    }
     let duration_ms = delays
         .iter()
         .try_fold(0u32, |a, b| a.checked_add(*b))
@@ -121,6 +118,7 @@ pub fn webp_structure<'a>(data: &'a [u8], limits: &Limits) -> Result<WebpStructu
     }
     Ok(WebpStructure {
         facts: ImageFacts {
+            animated,
             width: width as u32,
             height: height as u32,
             frame_count,
@@ -250,7 +248,7 @@ pub fn gif_structure(data: &[u8], limits: &Limits) -> Result<GifStructure> {
     if delays.is_empty() {
         return Err(Error::InvalidImage);
     }
-    let animated = delays.len() > 1;
+    let animated = delays.len() > 1 || loops.is_some() || delays.first().is_some_and(|d| *d > 0);
     if animated && delays.contains(&0) {
         return Err(Error::UnrepresentableAnimation);
     }
@@ -263,6 +261,7 @@ pub fn gif_structure(data: &[u8], limits: &Limits) -> Result<GifStructure> {
         .ok_or(Error::ImageLimitsExceeded)?;
     Ok(GifStructure {
         facts: ImageFacts {
+            animated,
             width,
             height,
             frame_count: delays.len() as u32,
@@ -300,13 +299,12 @@ pub fn validate_png(data: &[u8]) -> Result<bool> {
             return Err(Error::InvalidImage);
         }
         match &header[4..8] {
-            b"acTL" => return Err(Error::UnsupportedFormat),
             b"IHDR" => {
                 if cursor != 8 || length != 13 {
                     return Err(Error::InvalidImage);
                 }
                 header_seen = true;
-                if !matches!(body[8], 1 | 2 | 4 | 8) {
+                if !matches!(body[8], 1 | 2 | 4 | 8 | 16) {
                     return Err(Error::UnsupportedColorProfile);
                 }
             }
@@ -396,7 +394,7 @@ pub fn validate_jpeg(data: &[u8]) -> Result<bool> {
             if segment.len() < 6 {
                 return Err(Error::InvalidImage);
             }
-            if segment[0] != 8 || !matches!(segment[5], 1 | 3) {
+            if segment[0] != 8 || !matches!(segment[5], 1 | 3 | 4) {
                 return Err(Error::UnsupportedColorProfile);
             }
         }

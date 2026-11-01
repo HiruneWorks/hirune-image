@@ -28,7 +28,6 @@ impl Settings {
         setting!(total_frame_pixels, "HIRUNE_TOTAL_FRAME_PIXELS");
         setting!(decoded_bytes, "HIRUNE_DECODED_BYTES");
         setting!(working_bytes, "HIRUNE_WORKING_BYTES");
-        setting!(spool_bytes, "HIRUNE_SPOOL_BYTES");
         setting!(duration_ms, "HIRUNE_DURATION_MS");
         setting!(outputs, "HIRUNE_OUTPUTS");
         setting!(output_bytes, "HIRUNE_OUTPUT_BYTES");

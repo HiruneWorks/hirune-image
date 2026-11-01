@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0
+
+- Generate every requested size as each display frame arrives. Remove the full RGBA frame spool.
+- Add APNG, AVIF, HEIC/HEIF, BMP, single-page TIFF, JPEG XL, static SVG, ICO, QOI, and PNM input.
+- Support SDR 16-bit PNG/APNG and CMYK JPEG color normalization.
+- Preserve display frames, alpha, rational timing, finite/infinite loops, and single-frame animation containers.
+- Bound the combined compressed mux size while encoding. Keep final full-output verification.
+- Build the pinned AVIF decoder from hash-checked source archives. Add codec versions to capabilities.
+- Breaking changes: accept only `animation_policy=preserve`, add the `animated` fact, and remove `spool_bytes`/`HIRUNE_SPOOL_BYTES`.
+- Reject unsupported HEIF timed tracks, multipage TIFF, active SVG, HDR, and associated-alpha JPEG XL explicitly.
+
 ## 0.2.1
 
 - Add a practical ASD-STE100 writing guide for specifications, runbooks, technical documents, and code comments.

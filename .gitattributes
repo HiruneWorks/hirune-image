@@ -3,3 +3,8 @@
 *.jpg binary
 *.webp binary
 *.rgba binary
+*.png binary
+*.avif binary
+*.heic binary
+*.heif binary
+*.jxl binary

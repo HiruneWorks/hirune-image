@@ -15,9 +15,8 @@ Values ending in `_BYTES` use integer bytes. Values ending in `_MS` use integer 
 | `HIRUNE_OUTPUTS` | Maximum outputs in one recipe | 4 |
 | `HIRUNE_OUTPUT_BYTES` | Total encoded WebP bytes across outputs | 33554432 |
 | `HIRUNE_OUTPUT_DIMENSION` | Maximum requested output side in pixels | 4096 |
-| `HIRUNE_WORKING_BYTES` | Working pixel plan: 20 bytes per source canvas pixel | 268435456 |
+| `HIRUNE_WORKING_BYTES` | Base working pixel plan; APNG and coded HEIC have additional checks | 268435456 |
 | `HIRUNE_DECODED_BYTES` | Total decoded RGBA bytes across source frames | 268435456 |
-| `HIRUNE_SPOOL_BYTES` | Total RGBA frame file bytes for one request | 268435456 |
 | `HIRUNE_CHILD_MEMORY_BYTES` | Linux child virtual address space (`RLIMIT_AS`) | 805306368 |
 | `HIRUNE_CHILD_CPU_SECONDS` | Linux child CPU seconds (`RLIMIT_CPU`) | 60 |
 | `HIRUNE_CONCURRENCY` | Admitted requests, from upload through delivery | 1 |
@@ -45,17 +44,25 @@ The semaphore API's numeric representation limits concurrency. There is no fixed
 
 ## Memory and temporary storage
 
-The worker decodes the source pixels once and stores RGBA frame files in a temporary request directory.
-It encodes outputs in sequence.
-Set `HIRUNE_TEMP_ROOT` to choose the filesystem for that directory.
+The worker processes each display frame through all requested sizes before it advances.
+It keeps compressed output chunks for every size and writes no raw frame spool.
+`HIRUNE_DECODED_BYTES` limits cumulative work across frames. It is not a live-memory measurement.
+`HIRUNE_WORKING_BYTES` limits the pixel plan and the JPEG XL tracked allocator.
+The base plan uses 20 bytes per display pixel. APNG reserves 48 bytes per display pixel.
+HEIC also checks every coded SPS and the total coded tile/alpha plan before crop.
+Decoder reference and parsing data, temporary encoder buffers, and all compressed outputs still use memory.
+
+Set `HIRUNE_TEMP_ROOT` to choose the request filesystem.
+It stores the compressed input, completed encoded outputs, and control files.
 The Compose profile mounts `/tmp` as tmpfs. **tmpfs uses container RAM.**
-Operators can also use a disk-backed directory. The spool is temporary file storage, not a separate in-process RAM cache.
+Operators can also use a disk-backed directory.
+Version 0.3.0 removed `HIRUNE_SPOOL_BYTES`; it no longer controls any allocation.
 
 The working pixel plan does not measure heap memory or resident memory (RSS).
 `RLIMIT_AS` limits each child's virtual address space, including libraries and native allocations.
 Docker enforces a separate memory limit for the full container.
 The API process also holds upload and output buffers.
-tmpfs pages, API buffers, concurrent workers, and delivery buffers all count toward the container's cgroup memory.
+tmpfs pages, API buffers, compressed muxes, concurrent workers, and delivery buffers all count toward the container's cgroup memory.
 
 Allow space for all these resources when sizing the container. Do not multiply only the pixel budget.
 A native limit that is too small can prevent startup.
@@ -71,7 +78,7 @@ Use these Compose settings to configure the enclosing container:
 - `HIRUNE_CONTAINER_PIDS`: process count limit.
 
 The [larger example](../.envs/.example/large.env) uses eight outputs and a 128 MiB output-byte sum.
-It sets 1 GiB pixel and spool budgets, a 2 GiB child address-space limit, and a 4 GiB container limit.
+It sets 1 GiB decoded-work and working budgets, a 2 GiB child address-space limit, and a 4 GiB container limit.
 These are example settings, not a measured capacity guarantee.
 From the repository root, inspect the configuration, then start the service:
 

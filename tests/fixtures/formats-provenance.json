@@ -1,0 +1,49 @@
+{
+  "generator": "scripts/generate_format_fixtures.py",
+  "pillow": "13.0.0",
+  "pillow_heif": "1.8.1",
+  "ffmpeg": "ffmpeg version 2025-03-13-git-958c46800e-full_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers",
+  "source_colors_rgba": [
+    [
+      255,
+      0,
+      0,
+      255
+    ],
+    [
+      0,
+      255,
+      0,
+      128
+    ],
+    [
+      0,
+      0,
+      255,
+      255
+    ]
+  ],
+  "avif_frame_delays_ms": [
+    100,
+    200,
+    300
+  ],
+  "avif_total_plays": 3,
+  "jxl_frame_delays_ms": [
+    100,
+    100,
+    100
+  ],
+  "jxl_total_plays": 0,
+  "license": "CC0-1.0",
+  "sha256": {
+    "colors-animated.avif": "db187247014944809154093d6762d865811bebdfc54ab030283a8a52f50b88aa",
+    "red-static.avif": "d284ae2f85433b1a7879941ac4484efe8e01ae48baa3d4cdb5a908d5f40afc48",
+    "green-alpha.heic": "87246251fc9a8f1bd25e52a6ad69dc7c072aee96b6e69443be8c266f0c9db3b7",
+    "red-cmyk.jpg": "5540799ba12dd7a87975ad47be7a6b6dba5780972e4080318a0c30fdbd094b6a",
+    "red-cmyk-icc.jpg": "6e9b3ca2261ed714159a8f637e1cc04242bbdddf0947b0090f8a3cf869e04bec",
+    "colors-animated.jxl": "c63907ddb88b12676b9570a6f2e8ee8c79b08ef897843c149b3fad9a883416fe",
+    "red-static.jxl": "32bd479e21e6beb0a724ab86c50afb7a6acaf343dc1cc99818f4a829f6115a6d",
+    "p3-embedded.svg": "8a9784055cab0b49d8ed2b56904bcd28c32f123ba9d920763f2e4b9b2e18f071"
+  }
+}

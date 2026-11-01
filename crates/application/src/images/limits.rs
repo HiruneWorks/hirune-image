@@ -39,7 +39,6 @@ pub struct Limits {
     pub total_frame_pixels: u64,
     pub decoded_bytes: u64,
     pub working_bytes: u64,
-    pub spool_bytes: u64,
     pub duration_ms: u32,
     pub outputs: usize,
     pub output_bytes: u64,
@@ -62,7 +61,6 @@ impl Default for Limits {
             total_frame_pixels: 100_000_000,
             decoded_bytes: 256 << 20,
             working_bytes: 256 << 20,
-            spool_bytes: 256 << 20,
             duration_ms: 60_000,
             outputs: 4,
             output_bytes: 32 << 20,
@@ -84,7 +82,6 @@ impl Limits {
             self.recipe_bytes,
             self.decoded_bytes,
             self.working_bytes,
-            self.spool_bytes,
             self.output_bytes,
             self.child_memory_bytes,
         ];
@@ -163,7 +160,6 @@ impl Limits {
             || facts.frame_count > self.frames
             || total > self.total_frame_pixels
             || bytes > self.decoded_bytes
-            || bytes > self.spool_bytes
             || facts.duration_ms > self.duration_ms
             || pixels
                 .checked_mul(20)
@@ -196,7 +192,6 @@ impl Budget {
         if self.frames > limits.frames
             || self.pixels > limits.total_frame_pixels
             || self.bytes > limits.decoded_bytes
-            || self.bytes > limits.spool_bytes
             || self.duration_ms > limits.duration_ms
         {
             return Err(error);

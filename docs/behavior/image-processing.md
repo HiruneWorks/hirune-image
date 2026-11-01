@@ -48,47 +48,61 @@ Different builds or pipeline versions can produce different encoded bytes.
 
 ## Image and color policy
 
-The service accepts JPEG, PNG, GIF, and WebP.
-PNG supports valid depths up to 8 bits, including palette and grayscale expansion.
-It rejects SVG, APNG, AVIF, HEIC, HDR, 16-bit PNG, and CMYK JPEG.
+The service accepts JPEG, PNG/APNG, GIF, WebP, AVIF, HEIC/HEIF, BMP, TIFF, JPEG XL, SVG, ICO, QOI, and PNM.
+It detects each format from its bytes. HEIC/HEIF support uses the HEVC still-image codec.
+PNG and APNG support valid depths through 16 bits, including palette and grayscale expansion.
+TIFF supports one page. ICO selects the largest supported icon representation.
+GIF, APNG, WebP, AVIF, and JPEG XL support animation.
 
-Before removing metadata, the worker applies EXIF orientation 1 through 8 to the pixels.
-It converts supported embedded RGB ICC profiles to sRGB with moxcms.
+The worker applies EXIF orientation and supported RGB ICC profiles before removing metadata.
+It converts supported CICP/NCLX color primaries and transfer functions to sRGB.
+CMYK JPEG uses its ICC profile when present. Adobe CMYK samples are inverted before the ICC transform.
+Without a CMYK profile, the JPEG decoder uses its normal CMYK-to-RGB conversion.
+The worker converts SDR 16-bit samples before quantizing them to 8-bit WebP pixels.
 An ICC profile can be at most 1 MiB. Its declared length must match its actual length.
 PNG metadata decoding has a separate 2 MiB allocation limit.
-The service rejects unsupported or malformed profiles.
-
-The worker treats ordinary images without a profile as sRGB.
-It rejects custom PNG gamma or chromaticity without a supported profile. It also rejects explicit HDR signaling.
+The worker treats ordinary unprofiled RGB images as sRGB.
+It rejects malformed profiles, unsupported custom PNG gamma/chromaticity, explicit PQ/HLG HDR, and floating-point TIFF.
 Resize uses an area filter in linear light with premultiplied alpha.
-Lossless output preserves the normalized and resized pixels. It does not reconstruct the original source file.
+Lossless output preserves the normalized and resized pixels. It does not reconstruct the source file.
 
-## Animation policy
+SVG support uses a static renderer. It includes embedded static JPEG, PNG, GIF, and WebP images.
+The embedded images use the same orientation and color normalization as top-level input.
+The renderer uses installed system fonts. The runtime container includes DejaVu fonts.
+It rejects scripts, SMIL/CSS animation, escaped CSS, foreign objects, external resource references, and XML stylesheet instructions.
+It also rejects animated embedded images and nested embedded SVG. It never flattens them silently.
+SVG rendering uses an 8-bit premultiplied surface. Very low alpha can reduce hidden RGB precision.
 
-Choose `preserve`, `first_frame`, or `reject`.
-The `reject` policy rejects animated input.
-The `preserve` policy keeps complete composited displays, alpha, every frame delay, and the total playback count.
-This includes the final frame's delay.
-The mux writes complete canvas frames and retains identical adjacent frames.
+## Animation preservation
 
-GIF loop values map to WebP as follows:
+Set `animation_policy` to `preserve`. Other values are invalid recipes.
+The service preserves every complete composited display, alpha, frame order, and total playback count.
+It retains the final frame delay and identical adjacent frames. It never substitutes the first frame.
+APNG supports both default images that participate in the animation and separate default poster images.
+The worker decodes and validates a separate poster but does not include it in the animated output.
+APNG applies SOURCE/OVER blending and NONE/BACKGROUND/PREVIOUS disposal at 16-bit precision.
 
-| GIF value | WebP total playback count |
-| --- | --- |
-| Finite repeat count `n` | `n + 1` |
-| No loop extension | 1 |
-| Infinite repeat | 0 |
+GIF repeat count `n` becomes `n+1` total plays. No loop extension means one play; zero means infinite repetition.
+APNG `num_plays`, existing WebP loop counts, and JPEG XL loop counts already describe total plays.
+AVIF finite repetition count `n` becomes `n+1` total plays. An unspecified count means one play.
+Every infinite loop becomes WebP loop count `0`. Values above the WebP field range return an error.
 
-The service rejects a loop count that overflows the WebP field. It retains existing WebP loop counts.
-`duration_ms` describes one cycle, without repeats.
-Animated input with a zero frame delay is rejected as unrepresentable.
-An animated WebP container with one frame is also rejected.
-The service preserves positive short delays numerically. Browsers can apply their own playback rules.
+GIF and WebP retain their integer millisecond delays.
+APNG, AVIF, and JPEG XL round cumulative rational time to the nearest millisecond.
+Each output delay is the difference between two rounded timestamps. This bounds cumulative rounding drift.
+A zero or unrepresentable output delay returns `unrepresentable_animation`; no frame is dropped or merged.
+`duration_ms` describes one complete cycle without repeats.
+An animated container with one display frame retains its animation flag, duration, and loops.
 
-A static image has `frame_count=1`, `duration_ms=0`, and `loop_count=1`.
-A one-frame GIF counts as a static image.
-For `first_frame`, the worker still validates and budgets the full source. Only the output becomes static.
-Source dimensions describe pixels before orientation. Output dimensions describe the corrected pixels.
+HEIF timed tracks, multipage TIFF, and associated-alpha JPEG XL are not supported in this version.
+HEIF timed tracks and unsupported SVG animation return errors instead of static output.
+Multipage TIFF returns `unsupported_format`; associated-alpha JPEG XL returns `unsupported_color_profile`.
+These exclusions require dedicated sequence, page-selection, or original-color unassociation support.
+
+Static images have `animated=false`, `frame_count=1`, `duration_ms=0`, and `loop_count=1`.
+Source dimensions for JPEG/PNG/GIF/WebP describe pixels before EXIF orientation.
+HEIC, AVIF, and JPEG XL source dimensions describe display geometry after container transforms.
+Output dimensions always describe the corrected pixels.
 
 ## Resource budgets
 
@@ -105,8 +119,7 @@ See [operator budgets](../operations.md) for all settings and a larger example.
 | Canvas pixels | 40 million | One source canvas |
 | Frames | 120 | Full source |
 | Total frame pixels | 100 million | Sum across source frames |
-| Decoded RGBA bytes | 256 MiB | Sum across source frames |
-| RGBA spool bytes | 256 MiB | Temporary frame files for one request |
+| Decoded work bytes | 256 MiB | Cumulative RGBA work across source frames |
 | Working pixel budget | 256 MiB | Conservative live-pixel plan |
 | Cycle duration | 60 seconds | One animation cycle |
 | Encoded output bytes | 32 MiB | Sum across outputs |
@@ -118,10 +131,15 @@ See [operator budgets](../operations.md) for all settings and a larger example.
 | Child CPU time | 60 CPU seconds | Linux worker process |
 
 All limits apply together.
-The working plan reserves 20 bytes per canvas pixel. It can reject an image before the canvas limit does.
+The base working plan reserves 20 bytes per canvas pixel. APNG reserves 48 bytes per pixel.
+HEIC also checks 20 bytes per coded tile/alpha pixel, before crop.
+These checks can reject an image before its display canvas limit does.
 The decoded-byte limit also applies before the 100-million-pixel limit at these defaults.
 Native allocations have a separate Linux address-space and CPU limit.
 The pixel plan does not measure total library allocations.
+Decoded work bytes limit cumulative processing work. They do not mean that all raw frames occupy RAM.
+Compressed muxes for all requested sizes remain in memory until the source finishes.
+`HIRUNE_SPOOL_BYTES` and the `spool_bytes` field were removed in version 0.3.0.
 `HIRUNE_CHILD_CPU_SECONDS` sets CPU time independently of the wall deadline.
 
 `GET /v1/capabilities` reports active settings and fixed codec limits.
@@ -157,7 +175,7 @@ It contains no native diagnostics, filenames, source metadata, or image bytes.
 | 400 | `invalid_request`, `invalid_recipe` |
 | 413 | `request_too_large`, `image_limits_exceeded`, `output_limits_exceeded` |
 | 415 | `unsupported_format` |
-| 422 | `invalid_image`, `unsupported_color_profile`, `animation_not_allowed`, `unrepresentable_animation` |
+| 422 | `invalid_image`, `unsupported_color_profile`, `unrepresentable_animation` |
 | 503 | `processor_overloaded`, `processor_unavailable` |
 | 504 | `processing_timeout` |
 | 500 | `internal_error` |

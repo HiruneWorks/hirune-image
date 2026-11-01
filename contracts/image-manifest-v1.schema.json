@@ -8,6 +8,9 @@
     },
     "OutputFacts": {
       "properties": {
+        "animated": {
+          "type": "boolean"
+        },
         "byte_size": {
           "format": "uint64",
           "maximum": 4294967294,
@@ -58,6 +61,7 @@
         "media_type",
         "byte_size",
         "sha256",
+        "animated",
         "width",
         "height",
         "frame_count",
@@ -78,7 +82,19 @@
         "gif": {
           "type": "string"
         },
+        "heic": {
+          "type": "string"
+        },
         "image": {
+          "type": "string"
+        },
+        "jxl": {
+          "type": "string"
+        },
+        "libaom": {
+          "type": "string"
+        },
+        "libavif": {
           "type": "string"
         },
         "libwebp_decoder": {
@@ -96,6 +112,9 @@
         "pipeline_version": {
           "type": "string"
         },
+        "svg": {
+          "type": "string"
+        },
         "version": {
           "type": "string"
         }
@@ -106,6 +125,11 @@
         "pipeline_version",
         "image",
         "gif",
+        "heic",
+        "jxl",
+        "svg",
+        "libavif",
+        "libaom",
         "libwebp_encoder",
         "libwebp_decoder",
         "libwebp_demux",
@@ -116,6 +140,9 @@
     },
     "SourceFacts": {
       "properties": {
+        "animated": {
+          "type": "boolean"
+        },
         "byte_size": {
           "format": "uint64",
           "minimum": 0,
@@ -162,6 +189,7 @@
         "format",
         "byte_size",
         "orientation",
+        "animated",
         "width",
         "height",
         "frame_count",
@@ -174,8 +202,18 @@
       "enum": [
         "jpeg",
         "png",
+        "apng",
         "gif",
-        "webp"
+        "webp",
+        "avif",
+        "heic",
+        "bmp",
+        "tiff",
+        "jxl",
+        "svg",
+        "ico",
+        "qoi",
+        "pnm"
       ],
       "type": "string"
     }

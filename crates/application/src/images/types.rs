@@ -6,16 +6,24 @@ use sha2::{Digest, Sha256};
 #[serde(rename_all = "snake_case")]
 pub enum AnimationPolicy {
     Preserve,
-    FirstFrame,
-    Reject,
 }
 #[derive(Clone, Copy, Debug, Deserialize, Serialize, JsonSchema, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum SourceFormat {
     Jpeg,
     Png,
+    Apng,
     Gif,
     Webp,
+    Avif,
+    Heic,
+    Bmp,
+    Tiff,
+    Jxl,
+    Svg,
+    Ico,
+    Qoi,
+    Pnm,
 }
 #[derive(Clone, Copy, Debug, Deserialize, Serialize, JsonSchema, PartialEq, Eq)]
 pub enum MediaType {
@@ -52,6 +60,7 @@ impl Encoding {
 #[derive(Clone, Debug, Deserialize, Serialize, JsonSchema, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct ImageFacts {
+    pub animated: bool,
     #[schemars(range(min = 1))]
     pub width: u32,
     #[schemars(range(min = 1))]
@@ -90,6 +99,11 @@ pub struct ProcessorInfo {
     pub pipeline_version: String,
     pub image: String,
     pub gif: String,
+    pub heic: String,
+    pub jxl: String,
+    pub svg: String,
+    pub libavif: String,
+    pub libaom: String,
     pub libwebp_encoder: String,
     pub libwebp_decoder: String,
     pub libwebp_demux: String,

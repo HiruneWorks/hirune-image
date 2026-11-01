@@ -2,9 +2,7 @@
   "$defs": {
     "AnimationPolicy": {
       "enum": [
-        "preserve",
-        "first_frame",
-        "reject"
+        "preserve"
       ],
       "type": "string"
     },

@@ -31,7 +31,7 @@ pub fn status(error: ProcessingError) -> StatusCode {
             StatusCode::PAYLOAD_TOO_LARGE
         }
         UnsupportedFormat => StatusCode::UNSUPPORTED_MEDIA_TYPE,
-        InvalidImage | UnsupportedColorProfile | AnimationNotAllowed | UnrepresentableAnimation => {
+        InvalidImage | UnsupportedColorProfile | UnrepresentableAnimation => {
             StatusCode::UNPROCESSABLE_ENTITY
         }
         ProcessorOverloaded | ProcessorUnavailable => StatusCode::SERVICE_UNAVAILABLE,

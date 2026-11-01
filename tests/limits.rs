@@ -5,6 +5,7 @@ use application::{
 #[test]
 fn every_budget_applies_at_its_boundary_and_checked_arithmetic_rejects_overflow() {
     let base = ImageFacts {
+        animated: true,
         width: 4,
         height: 4,
         frame_count: 2,
@@ -22,10 +23,6 @@ fn every_budget_applies_at_its_boundary_and_checked_arithmetic_rejects_overflow(
         },
         Limits {
             decoded_bytes: 128,
-            ..Limits::default()
-        },
-        Limits {
-            spool_bytes: 128,
             ..Limits::default()
         },
         Limits {
@@ -54,10 +51,6 @@ fn every_budget_applies_at_its_boundary_and_checked_arithmetic_rejects_overflow(
         },
         Limits {
             decoded_bytes: 127,
-            ..Limits::default()
-        },
-        Limits {
-            spool_bytes: 127,
             ..Limits::default()
         },
         Limits {

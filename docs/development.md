@@ -1,6 +1,6 @@
 # Development
 
-Install Rust 1.98.1, a C toolchain, `just`, Python 3, and Docker.
+Install Rust 1.98.1, a C/C++ toolchain, CMake, NASM, `just`, Python 3, and Docker.
 Use MSVC as the C toolchain on Windows.
 Python runs the independent response verifier. Docker runs the Linux container checks.
 Run the commands below from the repository root.
@@ -33,3 +33,18 @@ ICC pixel tests use a committed reference generated independently with Pillow an
 Normal tests do not need Pillow.
 Resource tests compile a helper executable. The production image excludes that executable.
 CI runs the Linux resource tests with the workspace suite.
+
+## Native decoder build
+
+The AVIF adapter builds libavif 1.3.0 and decoder-only libaom 3.13.1 from fixed source archives.
+The build checks both SHA-256 values before extraction. It caches archives under `target/native-sources`.
+The first build needs network access. Later builds can reuse that cache.
+The local adapter supports NASM 2 and 3 and stages MSVC multi-configuration outputs explicitly.
+See [adapter provenance](../crates/image-codec/native/avif-sys/README.md).
+HEIC, SVG, JPEG XL, PNG/APNG, TIFF, and the other input wrappers use Rust libraries.
+All native bindings remain under `crates/image-codec`.
+
+The new [format fixtures](../tests/fixtures/formats-provenance.json) are synthetic and committed.
+Normal tests do not need Pillow, pillow-heif, or FFmpeg.
+Only `scripts/generate_format_fixtures.py` uses those tools to regenerate the encoded references.
+The runtime service uses no FFmpeg process.

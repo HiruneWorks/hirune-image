@@ -2,8 +2,7 @@ use crate::container::webp_structure;
 use application::{
     error::{ProcessingError as Error, Result},
     images::{
-        Encoding, ImageFacts, Limits, MAX_FRAME_DURATION_MS, MAX_WEBP_DIMENSION,
-        MAX_WEBP_FILE_BYTES, ProcessorInfo,
+        Encoding, ImageFacts, Limits, MAX_WEBP_DIMENSION, MAX_WEBP_FILE_BYTES, ProcessorInfo,
     },
 };
 use libwebp_sys as ffi;
@@ -25,9 +24,14 @@ pub fn processor_info() -> ProcessorInfo {
                 option_env!("HIRUNE_BUILD_ID").unwrap_or("development"),
                 env!("HIRUNE_SOURCE_FINGERPRINT")
             ),
-            pipeline_version: "1-linear-premultiplied-area-full-canvas".into(),
+            pipeline_version: "2-streaming-variants-linear-area".into(),
             image: "0.25.10".into(),
             gif: "0.14.2".into(),
+            heic: "heic-rs/0.1.4".into(),
+            jxl: "jxl-oxide/0.12.6".into(),
+            svg: "resvg/0.49.0".into(),
+            libavif: jc_libavif_sys::UPSTREAM_LIBAVIF_VERSION.into(),
+            libaom: jc_libavif_sys::UPSTREAM_LIBAOM_VERSION.into(),
             libwebp_encoder: version(ffi::WebPGetEncoderVersion()),
             libwebp_decoder: version(ffi::WebPGetDecoderVersion()),
             libwebp_demux: version(ffi::WebPGetDemuxVersion()),
@@ -155,107 +159,7 @@ pub fn encode(
     Ok(writer.bytes)
 }
 
-pub struct AnimationMux {
-    mux: NonNull<ffi::WebPMux>,
-    bytes: u64,
-    maximum: u64,
-}
-impl AnimationMux {
-    pub fn new(loops: u16, maximum: u64) -> Result<Self> {
-        let mux = NonNull::new(unsafe { ffi::WebPMuxNew() }).ok_or(Error::ProcessorUnavailable)?;
-        let owned = Self {
-            mux,
-            // RIFF, VP8X, and ANIM headers use 44 bytes. Each full-canvas ANMF adds 24 bytes before image chunks.
-            bytes: 44,
-            maximum: maximum.min(MAX_WEBP_FILE_BYTES).min(isize::MAX as u64),
-        };
-        let params = ffi::WebPMuxAnimParams {
-            bgcolor: 0,
-            loop_count: i32::from(loops),
-        };
-        if unsafe { ffi::WebPMuxSetAnimationParams(owned.mux.as_ptr(), &params) }
-            != ffi::WEBP_MUX_OK
-        {
-            return Err(Error::InternalError);
-        }
-        Ok(owned)
-    }
-    pub fn add(&mut self, bytes: &[u8], duration: u32) -> Result<()> {
-        if duration == 0 || duration > MAX_FRAME_DURATION_MS {
-            return Err(Error::UnrepresentableAnimation);
-        }
-        let mut cursor = 12usize;
-        let mut frame_size = 24u64;
-        while cursor < bytes.len() {
-            let header = bytes.get(cursor..cursor + 8).ok_or(Error::InternalError)?;
-            let size =
-                u32::from_le_bytes(header[4..8].try_into().map_err(|_| Error::InternalError)?)
-                    as usize;
-            let chunk_size = size
-                .checked_add(8 + size % 2)
-                .ok_or(Error::OutputLimitsExceeded)?;
-            if matches!(&header[..4], b"VP8 " | b"VP8L" | b"ALPH") {
-                frame_size = frame_size
-                    .checked_add(chunk_size as u64)
-                    .ok_or(Error::OutputLimitsExceeded)?;
-            }
-            cursor = cursor
-                .checked_add(chunk_size)
-                .ok_or(Error::OutputLimitsExceeded)?;
-            if cursor > bytes.len() {
-                return Err(Error::InternalError);
-            }
-        }
-        self.bytes = self
-            .bytes
-            .checked_add(frame_size)
-            .ok_or(Error::OutputLimitsExceeded)?;
-        if self.bytes > self.maximum {
-            return Err(Error::OutputLimitsExceeded);
-        }
-        let frame = ffi::WebPMuxFrameInfo {
-            bitstream: ffi::WebPData {
-                bytes: bytes.as_ptr(),
-                size: bytes.len(),
-            },
-            x_offset: 0,
-            y_offset: 0,
-            duration: duration as i32,
-            id: ffi::WEBP_CHUNK_ANMF,
-            dispose_method: ffi::WEBP_MUX_DISPOSE_NONE,
-            blend_method: ffi::WEBP_MUX_NO_BLEND,
-            pad: [0; 1],
-        };
-        // With copy_data=1, the mux owns a copy of the frame bytes. The temporary buffer can be dropped.
-        if unsafe { ffi::WebPMuxPushFrame(self.mux.as_ptr(), &frame, 1) } != ffi::WEBP_MUX_OK {
-            return Err(Error::InternalError);
-        }
-        Ok(())
-    }
-    pub fn finish(self) -> Result<Vec<u8>> {
-        let mut data = ffi::WebPData {
-            bytes: ptr::null(),
-            size: 0,
-        };
-        if unsafe { ffi::WebPMuxAssemble(self.mux.as_ptr(), &mut data) } != ffi::WEBP_MUX_OK {
-            return Err(Error::ProcessorUnavailable);
-        }
-        let result = if data.bytes.is_null() || data.size < 12 {
-            Err(Error::InternalError)
-        } else if data.size as u64 > self.maximum {
-            Err(Error::OutputLimitsExceeded)
-        } else {
-            Ok(unsafe { std::slice::from_raw_parts(data.bytes, data.size) }.to_vec())
-        };
-        unsafe { ffi::WebPDataClear(&mut data) };
-        result
-    }
-}
-impl Drop for AnimationMux {
-    fn drop(&mut self) {
-        unsafe { ffi::WebPMuxDelete(self.mux.as_ptr()) }
-    }
-}
+pub use crate::animation::AnimationMux;
 
 struct Decoder(NonNull<ffi::WebPAnimDecoder>);
 impl Drop for Decoder {
@@ -315,8 +219,7 @@ pub fn decode_frames(
         {
             return Err(Error::InvalidImage);
         }
-        if facts.frame_count > 1 && (timestamp < previous || (timestamp - previous) as u32 != delay)
-        {
+        if facts.animated && (timestamp < previous || (timestamp - previous) as u32 != delay) {
             return Err(Error::UnrepresentableAnimation);
         }
         previous = timestamp;

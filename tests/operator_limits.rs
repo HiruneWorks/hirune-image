@@ -160,7 +160,6 @@ fn operator_budgets_can_increase_but_overflow_and_codec_caps_cannot() {
     limits.total_frame_pixels *= 2;
     limits.decoded_bytes *= 2;
     limits.working_bytes *= 2;
-    limits.spool_bytes *= 2;
     limits.duration_ms *= 2;
     limits.outputs *= 2;
     limits.output_bytes *= 2;

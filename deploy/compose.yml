@@ -1,6 +1,6 @@
 services:
   image:
-    image: ${HIRUNE_IMAGE:-ghcr.io/hiruneworks/hirune-image:0.2.1}
+    image: ${HIRUNE_IMAGE:-ghcr.io/hiruneworks/hirune-image:0.3.0}
     read_only: true
     user: "65532:65532"
     cap_drop: [ALL]
@@ -21,7 +21,6 @@ services:
       HIRUNE_TOTAL_FRAME_PIXELS: ${HIRUNE_TOTAL_FRAME_PIXELS:-100000000}
       HIRUNE_DECODED_BYTES: ${HIRUNE_DECODED_BYTES:-268435456}
       HIRUNE_WORKING_BYTES: ${HIRUNE_WORKING_BYTES:-268435456}
-      HIRUNE_SPOOL_BYTES: ${HIRUNE_SPOOL_BYTES:-268435456}
       HIRUNE_DURATION_MS: ${HIRUNE_DURATION_MS:-60000}
       HIRUNE_OUTPUTS: ${HIRUNE_OUTPUTS:-4}
       HIRUNE_OUTPUT_BYTES: ${HIRUNE_OUTPUT_BYTES:-33554432}

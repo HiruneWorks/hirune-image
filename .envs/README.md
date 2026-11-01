@@ -26,7 +26,7 @@ See [operator budgets](../docs/operations.md) for memory, tmpfs, and container s
 | `HIRUNE_SOURCE_BYTES`, `HIRUNE_REQUEST_BYTES`, `HIRUNE_RECIPE_BYTES` | Source, full request, and recipe byte limits. |
 | `HIRUNE_INPUT_DIMENSION`, `HIRUNE_CANVAS_PIXELS` | Maximum source side length and canvas pixel count. |
 | `HIRUNE_FRAMES`, `HIRUNE_TOTAL_FRAME_PIXELS` | Frame count and the sum of frame pixels. |
-| `HIRUNE_DECODED_BYTES`, `HIRUNE_WORKING_BYTES`, `HIRUNE_SPOOL_BYTES` | Decoded bytes, working pixel plan, and temporary frame file bytes. |
+| `HIRUNE_DECODED_BYTES`, `HIRUNE_WORKING_BYTES` | Cumulative decoded work and the live pixel plan. No raw frame files are stored. |
 | `HIRUNE_DURATION_MS` | Duration of one animation cycle. |
 | `HIRUNE_OUTPUTS`, `HIRUNE_OUTPUT_BYTES`, `HIRUNE_OUTPUT_DIMENSION` | Output count, total encoded bytes, and maximum requested side length. |
 | `HIRUNE_CONCURRENCY` | Maximum admitted requests. |

@@ -114,11 +114,6 @@
           "minimum": 0,
           "type": "integer"
         },
-        "spool_bytes": {
-          "format": "uint64",
-          "minimum": 0,
-          "type": "integer"
-        },
         "total_frame_pixels": {
           "format": "uint64",
           "minimum": 0,
@@ -140,7 +135,6 @@
         "total_frame_pixels",
         "decoded_bytes",
         "working_bytes",
-        "spool_bytes",
         "duration_ms",
         "outputs",
         "output_bytes",
@@ -165,7 +159,19 @@
         "gif": {
           "type": "string"
         },
+        "heic": {
+          "type": "string"
+        },
         "image": {
+          "type": "string"
+        },
+        "jxl": {
+          "type": "string"
+        },
+        "libaom": {
+          "type": "string"
+        },
+        "libavif": {
           "type": "string"
         },
         "libwebp_decoder": {
@@ -183,6 +189,9 @@
         "pipeline_version": {
           "type": "string"
         },
+        "svg": {
+          "type": "string"
+        },
         "version": {
           "type": "string"
         }
@@ -193,6 +202,11 @@
         "pipeline_version",
         "image",
         "gif",
+        "heic",
+        "jxl",
+        "svg",
+        "libavif",
+        "libaom",
         "libwebp_encoder",
         "libwebp_decoder",
         "libwebp_demux",
@@ -207,12 +221,20 @@
     "allow_upscale": {
       "type": "boolean"
     },
+    "animated_input_formats": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 5,
+      "minItems": 5,
+      "type": "array"
+    },
     "animation_policies": {
       "items": {
         "type": "string"
       },
-      "maxItems": 3,
-      "minItems": 3,
+      "maxItems": 1,
+      "minItems": 1,
       "type": "array"
     },
     "codec_limits": {
@@ -238,8 +260,8 @@
       "items": {
         "type": "string"
       },
-      "maxItems": 4,
-      "minItems": 4,
+      "maxItems": 14,
+      "minItems": 14,
       "type": "array"
     },
     "limits": {
@@ -257,6 +279,9 @@
     "resize_fit": {
       "type": "string"
     },
+    "timing_policy": {
+      "type": "string"
+    },
     "zero_delay_policy": {
       "type": "string"
     }
@@ -267,12 +292,14 @@
     "limits",
     "codec_limits",
     "input_formats",
+    "animated_input_formats",
     "output_format",
     "encoding_modes",
     "animation_policies",
     "resize_fit",
     "allow_upscale",
     "zero_delay_policy",
+    "timing_policy",
     "color_policy",
     "native_resource_fence"
   ],

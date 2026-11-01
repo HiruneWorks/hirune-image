@@ -38,6 +38,10 @@ jobs:
           toolchain: 1.98.1
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+      - name: Install image decoder build tools and fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cmake nasm pkg-config fonts-dejavu-core
       - uses: extractions/setup-just@v4
         with:
           just-version: 1.52.0

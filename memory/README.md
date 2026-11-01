@@ -1,5 +1,7 @@
 # Verification milestones
 
+- [2026-11-01: streaming image formats](2026-11-01-streaming-image-formats.md): broader input formats, preserved animation, no raw frame spool, Astra review, and local verification limits.
+
 - [2026-10-17: version 0.2.1](2026-10-17-version-0.2.1.md): prepare a patch version for the writing changes after the published 0.2.0 tag.
 
 - [2026-10-17: technical writing](2026-10-17-technical-writing.md): writing guide, revised documents and comments, and checks that preserve contracts and historical evidence.

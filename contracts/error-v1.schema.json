@@ -30,7 +30,6 @@
         "unsupported_format",
         "invalid_image",
         "unsupported_color_profile",
-        "animation_not_allowed",
         "unrepresentable_animation",
         "processor_overloaded",
         "processor_unavailable",

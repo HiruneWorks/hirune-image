@@ -22,3 +22,19 @@ Its separate scalar Python area calculation produces 4×3 reference pixels.
 The test checks transparent edges and disposal after resizing. Alpha must match exactly; RGB tolerance is one code value.
 Normal CI also runs header mutations and truncations with a fixed seed and bounded inputs.
 That test does not replace a long-running native-code fuzz campaign.
+
+## Input format references
+
+`formats-provenance.json` records the new synthetic HEIC, AVIF, JPEG XL, CMYK JPEG, and embedded SVG references.
+The source frames contain uniform red, green at alpha 128, and blue pixels.
+The AVIF animation has delays of 100, 200, and 300 ms and three total plays.
+The JPEG XL animation has three 100 ms frames and an infinite loop.
+`red-cmyk-icc.jpg` embeds a synthetic CMYK-to-XYZ LUT profile with defined RGB corner colors.
+`p3-embedded.svg` embeds the existing independent P3 color fixture.
+SVG pixel checks compare visible premultiplied color because its renderer uses an 8-bit premultiplied surface.
+
+Run `python scripts/generate_format_fixtures.py` from the repository root to regenerate these files.
+The recorded generator uses Pillow 13.0.0, pillow-heif 1.8.1, and an FFmpeg build with `libjxl_anim`.
+Normal tests read the committed files. They need none of those generation tools.
+Update `SHA256SUMS` and the provenance record after an intentional regeneration.
+The service does not execute FFmpeg.

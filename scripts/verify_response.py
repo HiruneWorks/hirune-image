@@ -53,10 +53,10 @@ def inspect_webp(data):
         cursor += 8 + length + length % 2
     assert cursor == len(data) and width and height
     assert (loops is not None) == bool(delays)
-    assert not delays or len(delays) >= 2 and all(0 < d <= 0xffffff for d in delays)
+    assert not delays or all(0 < d <= 0xffffff for d in delays)
     assert width <= 16383 and height <= 16383 and sum(delays) <= 2147483647
     assert len(data) <= 4294967294
-    return {"width": width, "height": height, "frame_count": len(delays) or 1,
+    return {"animated": loops is not None, "width": width, "height": height, "frame_count": len(delays) or 1,
             "duration_ms": sum(delays), "loop_count": loops if delays else 1}
 
 def verify(payload, source=None, recipe=None, limits=None):
@@ -95,6 +95,7 @@ def verify(payload, source=None, recipe=None, limits=None):
     if recipe is not None:
         assert manifest["recipe_sha256"] == hashlib.sha256(recipe).hexdigest()
         requested = strict_json(recipe)
+        assert requested["animation_policy"] == "preserve"
         assert [o["id"] for o in requested["outputs"]] == [o["id"] for o in outputs]
         width, height = manifest["source"]["width"], manifest["source"]["height"]
         if manifest["source"]["orientation"] >= 5:
@@ -108,6 +109,8 @@ def verify(payload, source=None, recipe=None, limits=None):
             else:
                 geometry = max(1, width * mh // height), mh
             assert (output["width"], output["height"]) == geometry, "recipe geometry mismatch"
+            for key in ("animated", "frame_count", "duration_ms", "loop_count"):
+                assert output[key] == manifest["source"][key], "animation preservation mismatch"
     aggregate = 0
     for part, output in zip(parts[1:], outputs, strict=True):
         data = part.get_payload(decode=True)
@@ -117,7 +120,7 @@ def verify(payload, source=None, recipe=None, limits=None):
         assert hashlib.sha256(data).hexdigest() == output["sha256"]
         facts = inspect_webp(data)
         for key, value in facts.items():
-            assert type(output[key]) is int and output[key] == value, "output facts mismatch"
+            assert type(output[key]) is type(value) and output[key] == value, "output facts mismatch"
         if limits is not None:
             assert max(facts["width"], facts["height"]) <= limits["output_dimension"]
             assert facts["frame_count"] <= limits["frames"] and facts["duration_ms"] <= limits["duration_ms"]

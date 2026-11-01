@@ -22,8 +22,6 @@ pub enum ProcessingError {
     InvalidImage,
     #[error("The color profile is unsupported.")]
     UnsupportedColorProfile,
-    #[error("Animation is not allowed.")]
-    AnimationNotAllowed,
     #[error("The animation cannot be represented.")]
     UnrepresentableAnimation,
     #[error("The processor is busy.")]

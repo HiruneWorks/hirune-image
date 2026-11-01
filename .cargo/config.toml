@@ -3,3 +3,7 @@ linker = "rust-lld.exe"
 
 [alias]
 xtask = "run --package xtask --"
+
+[env]
+JC_LIBAVIF_SYS_NO_PREBUILT = "1"
+HIRUNE_NATIVE_SOURCE_CACHE = { value = "target/native-sources", relative = true }
