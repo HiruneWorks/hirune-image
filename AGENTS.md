@@ -3,6 +3,7 @@
 ## Work within the request
 
 - Work autonomously within the requested scope. Preserve unrelated changes.
+- Keep public names, requirements, and benchmark profiles independent of callers. Use generic image-processing terms.
 - Before changing behavior, read [conventions](docs/conventions.md), [requirements](docs/requirements.md), and the relevant [behavior contract](docs/behavior/README.md).
 - This is a synchronous image microservice. Add no database, Cedar, sessions, object storage, persistent queue, or video without a new requirement.
 

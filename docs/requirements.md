@@ -9,6 +9,7 @@ Return validated WebP outputs and technical facts in the same HTTP request.
 The caller owns authorization, durable retries, publication, and storage.
 The service has no database, Cedar, accounts, mail, or persistent queue.
 It accepts no URL or file path as an image input. It does not process video or use FFmpeg.
+Watermarking is outside the service requirements.
 
 Accept JPEG, PNG/APNG, GIF, WebP, AVIF, HEIC/HEIF, BMP, single-page TIFF, JPEG XL, static SVG, ICO, QOI, and PNM.
 Support 8-bit and 16-bit SDR PNG/APNG and CMYK JPEG.

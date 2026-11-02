@@ -47,5 +47,6 @@ Operators can raise or lower budgets. See [configuration and memory](docs/operat
 [Criterion, Sharp, and imgproxy benchmarks](docs/benchmarks.md) measure pipeline components and complete HTTP work units separately.
 
 The [recorded local comparison](benchmarks/results/2026-10-16/README.md) includes raw reports, versions, resource settings, and measurement limits.
+The [imgproxy comparison](benchmarks/results/2026-11-02/README.md) covers accurate and preview modes, repeated baseline controls, and serial/parallel multi-output work units.
 
 Apache-2.0. Copyright 2026 Levi Laine.

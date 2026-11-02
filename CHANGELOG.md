@@ -8,6 +8,7 @@
 - Cache bounded area-filter geometry across frames. Keep the source accumulation order and linear-light premultiplied-alpha policy.
 - Use transfer lookup tables with inverse-transfer boundary fallback. Encode unchanged-size RGBA directly without cloning it.
 - Add reproducible imgproxy service benchmarks with photo, alpha, animation, concurrency, origin traffic, and one/four/eight-output workloads.
+- Record [local comparison results](benchmarks/results/2026-11-02/README.md), repeated controls, raw samples, and output-fidelity checks.
 
 ## 0.3.0
 

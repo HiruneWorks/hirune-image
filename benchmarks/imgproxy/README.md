@@ -21,11 +21,11 @@ Use `--iterations 1 --warmup 0 --cases photo --outputs 1` for a harness smoke ch
 
 - Both services receive the same source bytes and produce the same exact output dimensions.
 - Both use lossy WebP quality 85 and effort 4. These settings do not establish equal perceptual quality.
-- Both service containers use two CPU cores, 1 GiB memory, a 512 MiB tmpfs, one native processing thread per image, a non-root user, a read-only root filesystem, and no external network.
+- Both service containers use a two-CPU quota, 1 GiB memory with swap disabled, a 512 MiB tmpfs, one native processing thread per image, a non-root user, a read-only root filesystem, and no external network. CPU cores are not pinned or dedicated.
 - Set work-unit concurrency with `--concurrency`. Hirune admission and imgproxy workers follow it.
 - `--fanout serial` requests imgproxy outputs in sequence. `parallel` uses up to N output requests per work unit and records the larger worker count.
 - The `accurate` profile enables imgproxy linear colorspace and disables shrink-on-load. The `preview` profile enables linear colorspace but permits shrink-on-load. Neither is imgproxy's complete default configuration.
-- `--decode-mode preview` requests Hirune's optional preview mode after that API is available. Use `default` for the released 0.3.0 baseline.
+- `--decode-mode preview` requests Hirune's optional preview mode from 0.4.0. Use `default` for the released 0.3.0 baseline.
 
 HTTP latency includes sending and receiving all outputs for a work unit.
 Client validation occurs outside the measured batch. A batch-complete handshake lets the host read service CPU before that validation starts.
@@ -56,3 +56,19 @@ Use `--workload full` for eight widths spanning thumbnails through large present
 The tool raises Hirune's output-count limit to eight for that workload. It records duplicate actual dimensions caused by the no-enlargement rule.
 An original-sized result in this profile can prevent reduced JPEG decoding for the whole work unit.
 These cases provide bounded regression workloads. They do not represent a production image corpus.
+
+## Recorded comparison
+
+The [2026-11-02 results](../results/2026-11-02/README.md) include accurate and preview modes, serial and parallel imgproxy requests, logical concurrency one and two, and a repeated baseline control.
+They retain all raw latency samples, output facts, and resource measurements.
+Twenty observations per row provide descriptive measurements, not a tail-latency guarantee.
+
+The benchmark retains first-iteration outputs under each report's `-outputs` directory.
+After all measurements finish, compare them with Pillow 13.0.0 in the client image:
+
+```sh
+docker run --rm --network none --read-only --mount type=bind,source=REPOSITORY_PATH,target=/work --workdir /work hirune-imgproxy-benchmark-client:local python benchmarks/imgproxy/compare_outputs.py
+```
+
+Use the report names in the recorded comparison. The tool checks actual retained bytes and writes `quality-comparison.json` beside the reports.
+It compares preview pixels with accurate output. Those statistics do not establish equal perceptual quality between services.
