@@ -1,5 +1,7 @@
 # Verification milestones
 
+- [2026-11-02: imgproxy benchmark harness](2026-11-02-imgproxy-benchmark-harness.md): fixed work units, resource profiles, measured CPU intervals, visual checks, and failure retention.
+
 - [2026-11-02: version 0.3.0 publication](2026-11-02-version-0.3.0.md): immutable release tag, successful tag CI, published GHCR digest, and direct registry-image verification.
 
 - [2026-11-02: Linux container verification](2026-11-02-linux-container-verification.md): Linux workspace and resource-test evidence, runtime profile checks, and accurate HTTP request counts.

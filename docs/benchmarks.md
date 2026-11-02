@@ -4,6 +4,14 @@ Use Criterion to measure Rust pipeline components.
 Use the [Node/Sharp baseline](../benchmarks/sharp/) to compare complete HTTP requests in Docker.
 The tools do not depend on Smol. CI has no pass/fail speed threshold.
 
+## Compare imgproxy
+
+Use the [imgproxy benchmark](../benchmarks/imgproxy/README.md) to compare complete work units with the same Docker resource limits.
+Its workloads include an 11.2 MP photo, progressive and EXIF JPEG variants, transparent PNG, and 60-frame animation.
+The tool measures one or four requested sizes per source. It retains raw latencies, service CPU deltas, cgroup memory peaks, output facts, and origin traffic.
+It validates the outputs outside the measured batch.
+The experiment compares the real service interfaces. It does not add Hirune's internal verification or manifest generation to imgproxy.
+
 ## Rust components
 
 Run `just bench` or `cargo bench --locked --bench image_pipeline` from the repository root.
