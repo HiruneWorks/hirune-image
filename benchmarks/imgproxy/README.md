@@ -52,4 +52,7 @@ Every started scenario remains in the report, including startup or warmup failur
 
 Cases include an 11.2 MP photo, a progressive JPEG, odd-sized EXIF-rotated JPEG, a 1537×1025 transparent PNG, and a 638×362 animation with 60 distinct frames.
 Outputs use side limits 384, 192, 96, and 48 pixels. All animation outputs require actual resizing.
+Use `--workload wiki` for V7's current eight-width profile: 160, 320, 640, 960, 1280, 1920, 2560, and 4096, maximum height 4096, quality 90, and effort 4.
+The tool raises Hirune's output-count limit to eight for that workload. It records duplicate actual dimensions caused by the no-enlargement rule.
+An original-sized result in this profile can prevent reduced JPEG decoding for the whole work unit.
 These cases provide bounded regression workloads. They do not represent a production image corpus.

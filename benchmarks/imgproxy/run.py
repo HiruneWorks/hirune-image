@@ -42,7 +42,8 @@ def main():
     parser.add_argument("--providers", nargs="+", choices=("hirune", "imgproxy"), default=["hirune", "imgproxy"])
     parser.add_argument("--cases", nargs="+", choices=("photo", "progressive", "rotated", "alpha", "animation"),
                         default=["photo", "progressive", "rotated", "alpha", "animation"])
-    parser.add_argument("--outputs", nargs="+", type=int, choices=(1, 4), default=[1, 4])
+    parser.add_argument("--outputs", nargs="+", type=int, choices=(1, 4, 8))
+    parser.add_argument("--workload", choices=("thumbnails", "wiki"), default="thumbnails")
     parser.add_argument("--iterations", type=int, default=20)
     parser.add_argument("--warmup", type=int, default=2)
     parser.add_argument("--concurrency", type=int, default=1)
@@ -54,6 +55,8 @@ def main():
     parser.add_argument("--fixtures", type=Path, default=ROOT / "target/benchmarks/fixtures")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    args.outputs = args.outputs or ([8] if args.workload == "wiki" else [1, 4])
+    assert args.outputs == [8] if args.workload == "wiki" else all(count in (1, 4) for count in args.outputs)
     assert args.iterations > 0 and args.warmup >= 0 and 1 <= args.concurrency <= 4
     args.fixtures = args.fixtures.resolve()
     args.output = args.output.resolve()
@@ -102,7 +105,7 @@ def main():
                     row = {"case": case, "outputs": count, "provider": provider, "status": "started"}
                     report["results"].append(row)
                     stage = "start-client"
-                    environment = [f"HIRUNE_CONCURRENCY={args.concurrency}"] if provider == "hirune" else [
+                    environment = [f"HIRUNE_CONCURRENCY={args.concurrency}", f"HIRUNE_OUTPUTS={max(args.outputs)}"] if provider == "hirune" else [
                         f"IMGPROXY_WORKERS={args.concurrency * (count if args.fanout == 'parallel' else 1)}",
                         "IMGPROXY_MAX_ANIMATION_FRAMES=120", "IMGPROXY_MAX_SRC_RESOLUTION=40",
                         "IMGPROXY_MAX_SRC_FILE_SIZE=33554432", "IMGPROXY_MAX_RESULT_DIMENSION=4096",
@@ -138,7 +141,7 @@ def main():
                         common = ["docker", "exec", client, "python", "benchmarks/imgproxy/client.py", "measure",
                                   "--provider", provider, "--case", case, "--outputs", str(count),
                                   "--concurrency", str(args.concurrency), "--fanout", args.fanout,
-                                  "--profile", args.profile, "--decode-mode", args.decode_mode]
+                                  "--profile", args.profile, "--decode-mode", args.decode_mode, "--workload", args.workload]
                         if args.warmup:
                             stage = "warmup"
                             warmup = json.loads(run(*common, "--iterations", str(args.warmup),

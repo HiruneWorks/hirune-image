@@ -67,12 +67,12 @@ def serve(args):
     ThreadingHTTPServer(("0.0.0.0", 8090), Origin).serve_forever()
 
 
-def inside(width, height, side):
-    if max(width, height) <= side:
+def inside(width, height, max_width, max_height):
+    if width <= max_width and height <= max_height:
         return width, height
-    if width >= height:
-        return side, max(1, height * side // width)
-    return max(1, width * side // height), side
+    if max_width * height <= max_height * width:
+        return max_width, max(1, height * max_width // width)
+    return max(1, width * max_height // height), max_height
 
 
 def delays(data):
@@ -115,12 +115,14 @@ def inspect_output(data, provider):
 def measure(args):
     case = json.loads((args.fixtures / "manifest.json").read_text())["cases"][args.case]
     source = (args.fixtures / case["file"]).read_bytes()
-    sides = [384, 192, 96, 48][:args.outputs]
-    sizes = [inside(*case["display_size"], side) for side in sides]
+    sides = [160, 320, 640, 960, 1280, 1920, 2560, 4096] if args.workload == "wiki" else [384, 192, 96, 48][:args.outputs]
+    boxes = [(side, 4096 if args.workload == "wiki" else side) for side in sides]
+    quality = 90 if args.workload == "wiki" else 85
+    sizes = [inside(*case["display_size"], *box) for box in boxes]
     recipe = {"contract_version": 1, "animation_policy": "preserve", "outputs": [
-        {"id": f"size_{side}", "resize": {"fit": "inside", "max_width": side, "max_height": side},
-         "encoding": {"format": "webp", "mode": "lossy", "quality": 85, "effort": 4}}
-        for side in sides]}
+        {"id": f"size_{width}", "resize": {"fit": "inside", "max_width": width, "max_height": height},
+         "encoding": {"format": "webp", "mode": "lossy", "quality": quality, "effort": 4}}
+        for width, height in boxes]}
     if args.decode_mode != "default":
         recipe["decode_mode"] = args.decode_mode
     raw_recipe = json.dumps(recipe, separators=(",", ":")).encode()
@@ -129,7 +131,7 @@ def measure(args):
             + source + f'\r\n--{boundary}\r\nContent-Disposition: form-data; name="recipe"\r\nContent-Type: application/json\r\n\r\n'.encode()
             + raw_recipe + f"\r\n--{boundary}--\r\n".encode())
     encoded = base64.urlsafe_b64encode(b"http://bench-client:8090/source").decode().rstrip("=")
-    urls = [f"{args.base}/unsafe/rs:force:{w}:{h}:0/q:85/{encoded}.webp" for w, h in sizes]
+    urls = [f"{args.base}/unsafe/rs:force:{w}:{h}:0/q:{quality}/{encoded}.webp" for w, h in sizes]
     attempt_lock = threading.Lock()
     attempts = 0
 
@@ -226,6 +228,7 @@ def measure(args):
     times.sort()
     print(json.dumps({"case": args.case, "provider": args.provider, "outputs": args.outputs,
         "profile": args.profile, "decode_mode": args.decode_mode, "fanout": args.fanout,
+        "workload": args.workload, "quality": quality, "effort": 4, "unique_output_dimensions": len(set(sizes)),
         "source_sha256": case["sha256"], "source_bytes": len(source), "source_facts": case,
         "iterations": args.iterations, "concurrency": args.concurrency, "successes": len(times), "errors": errors,
         "work_units_per_second": len(times) / elapsed, "batch_seconds": elapsed,
@@ -245,7 +248,8 @@ if __name__ == "__main__":
     parser.add_argument("--provider", choices=("hirune", "imgproxy"))
     parser.add_argument("--base", default="http://bench-service:8080")
     parser.add_argument("--iterations", type=int, default=20)
-    parser.add_argument("--outputs", type=int, choices=(1, 4), default=1)
+    parser.add_argument("--outputs", type=int, choices=(1, 4, 8), default=1)
+    parser.add_argument("--workload", choices=("thumbnails", "wiki"), default="thumbnails")
     parser.add_argument("--concurrency", type=int, default=1)
     parser.add_argument("--fanout", choices=("serial", "parallel"), default="serial")
     parser.add_argument("--profile", choices=("accurate", "preview"), default="accurate")
