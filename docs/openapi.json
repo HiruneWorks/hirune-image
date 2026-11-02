@@ -128,6 +128,13 @@
         ],
         "type": "object"
       },
+      "DecodeMode": {
+        "enum": [
+          "accurate",
+          "preview"
+        ],
+        "type": "string"
+      },
       "EncodingInput": {
         "oneOf": [
           {
@@ -575,6 +582,10 @@
             "minimum": 1,
             "type": "integer"
           },
+          "decode_mode": {
+            "$ref": "#/components/schemas/DecodeMode",
+            "default": "accurate"
+          },
           "outputs": {
             "items": {
               "$ref": "#/components/schemas/OutputInput"
@@ -706,7 +717,7 @@
   },
   "info": {
     "title": "Hirune Image",
-    "version": "0.3.0"
+    "version": "0.4.0"
   },
   "openapi": "3.1.0",
   "paths": {

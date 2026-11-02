@@ -1,0 +1,1035 @@
+{
+  "schema_version": 1,
+  "host": "Windows-11-10.0.26200-SP0",
+  "docker": "28.3.3",
+  "docker_cpus": 4,
+  "docker_memory_bytes": 16771555328,
+  "harness_commit": "ac26bdd892ff25dfbcedafa8fcbcb869b9ea4ffc",
+  "harness_dirty": false,
+  "fixtures": {
+    "schema_version": 1,
+    "photo": {
+      "source": "https://images-assets.nasa.gov/image/iss043e000030/iss043e000030~orig.jpg",
+      "credit": "NASA / Expedition 43 crew",
+      "nasa_id": "iss043e000030",
+      "original_sha256": "a7f2ce1bf0b547d76fafe930926a874d3c48eb6025ca172c40c0d090581c4336",
+      "usage_guidelines": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "changes": "crop, resize, re-encode, orientation markers, EXIF variant, synthetic alpha; no endorsement"
+    },
+    "generator": {
+      "pillow": "13.0.0",
+      "jpeg": "6.2",
+      "script_sha256": "ff8178a854af7739192e2a9326550f901d4e0b52fe04b2511e9234a3be915b21"
+    },
+    "cases": {
+      "photo": {
+        "file": "photo.jpg",
+        "sha256": "b07840190a97a6e9435c9eaed31c3d4b1383b90a54f88b239485e5ce9eb5b8ff",
+        "bytes": 3670993,
+        "display_size": [
+          4000,
+          2800
+        ],
+        "orientation": 1,
+        "delays_ms": [],
+        "total_plays": 1
+      },
+      "progressive": {
+        "file": "progressive.jpg",
+        "sha256": "4d00100107764f13b880cee20046edb44126be0533e5fbe74a14489f42376dda",
+        "bytes": 3440458,
+        "display_size": [
+          4000,
+          2800
+        ],
+        "orientation": 1,
+        "delays_ms": [],
+        "total_plays": 1
+      },
+      "rotated": {
+        "file": "rotated.jpg",
+        "sha256": "6ae3aec69ad7d57e3db93b69dec5fddcace8d021fb1cae99c2955813be835315",
+        "bytes": 3723467,
+        "display_size": [
+          3997,
+          2797
+        ],
+        "orientation": 6,
+        "delays_ms": [],
+        "total_plays": 1
+      },
+      "alpha": {
+        "file": "alpha.png",
+        "sha256": "d9bffd0a386cf5990b5983f858cd2f48dbdbd5890276d39b5e5a949f69e7911c",
+        "bytes": 3195659,
+        "display_size": [
+          1537,
+          1025
+        ],
+        "orientation": 1,
+        "delays_ms": [],
+        "total_plays": 1
+      },
+      "animation": {
+        "file": "animation.gif",
+        "sha256": "237ce8948e2103b4c0a0737c0efcc58300c26b9bdb56412754baf5d9dfba75a6",
+        "bytes": 127096,
+        "display_size": [
+          638,
+          362
+        ],
+        "orientation": 1,
+        "delays_ms": [
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120
+        ],
+        "total_plays": 3
+      }
+    }
+  },
+  "images": {
+    "hirune": "hirune-image:performance",
+    "imgproxy": "ghcr.io/imgproxy/imgproxy@sha256:f5db62d528ab08e7b12f14e759fd7d62c09aeabf2e629d0e2a3963da692d0130"
+  },
+  "image_ids": {
+    "hirune": "sha256:0ba6760e1e98b45c246bd87b2c5a786bdff762a22f87e0daadc98b49d1d8f17d",
+    "imgproxy": "sha256:f5db62d528ab08e7b12f14e759fd7d62c09aeabf2e629d0e2a3963da692d0130"
+  },
+  "settings": {
+    "hirune_image": "hirune-image:performance",
+    "imgproxy_image": "ghcr.io/imgproxy/imgproxy@sha256:f5db62d528ab08e7b12f14e759fd7d62c09aeabf2e629d0e2a3963da692d0130",
+    "providers": [
+      "hirune",
+      "imgproxy"
+    ],
+    "cases": [
+      "photo",
+      "animation"
+    ],
+    "outputs": [
+      4
+    ],
+    "workload": "thumbnails",
+    "iterations": 20,
+    "warmup": 2,
+    "concurrency": 1,
+    "fanout": "parallel",
+    "profile": "accurate",
+    "decode_mode": "default",
+    "cpus": "2",
+    "memory": "1g",
+    "fixtures": "D:\\Github\\hirune-image\\target\\benchmarks\\fixtures",
+    "output": "D:\\Github\\hirune-image\\target\\benchmarks\\candidate-parallel.json"
+  },
+  "cpu_scope": "service cgroup delta after warmup through batch-complete handshake, before client validation; excludes origin and client",
+  "memory_scope": "fresh service cgroup peak including startup, warmup, measurement, tmpfs and cgroup probes",
+  "limits": [
+    "different resize filters and native codecs",
+    "Hirune verifies outputs inside the service",
+    "imgproxy fetches the source for each output URL",
+    "same quality is not equal perceptual quality",
+    "origin and client resource use is excluded from service counters"
+  ],
+  "order": "alternate provider order for successive case/output pairs",
+  "complete": true,
+  "results": [
+    {
+      "case": "photo",
+      "outputs": 4,
+      "provider": "hirune",
+      "status": "success",
+      "profile": "accurate",
+      "decode_mode": "default",
+      "fanout": "parallel",
+      "workload": "thumbnails",
+      "quality": 85,
+      "effort": 4,
+      "unique_output_dimensions": 4,
+      "source_sha256": "b07840190a97a6e9435c9eaed31c3d4b1383b90a54f88b239485e5ce9eb5b8ff",
+      "source_bytes": 3670993,
+      "source_facts": {
+        "file": "photo.jpg",
+        "sha256": "b07840190a97a6e9435c9eaed31c3d4b1383b90a54f88b239485e5ce9eb5b8ff",
+        "bytes": 3670993,
+        "display_size": [
+          4000,
+          2800
+        ],
+        "orientation": 1,
+        "delays_ms": [],
+        "total_plays": 1
+      },
+      "iterations": 20,
+      "concurrency": 1,
+      "successes": 20,
+      "errors": [],
+      "work_units_per_second": 4.546438373020159,
+      "batch_seconds": 4.399047860999417,
+      "latency_ms": {
+        "p50": 217.78494150203187,
+        "p95": 229.6710759983398
+      },
+      "latencies_ms": [
+        206.618828997307,
+        207.83066999865696,
+        209.44744699954754,
+        210.21290800126735,
+        212.09173899842426,
+        212.7140650045476,
+        213.70842900068965,
+        214.85116900294088,
+        216.83923799719196,
+        217.74055800051428,
+        217.82932500354946,
+        219.06261399999494,
+        224.17108099762117,
+        224.89921699889237,
+        225.59560100489762,
+        227.56534399377415,
+        228.0906150044757,
+        228.4831149954698,
+        229.6710759983398,
+        250.1687280018814
+      ],
+      "planned_http_processing_requests": 20,
+      "http_processing_requests": 20,
+      "origin": {
+        "requests": 0,
+        "bytes": 0
+      },
+      "output_facts": [
+        {
+          "animated": false,
+          "width": 384,
+          "height": 268,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1,
+          "bytes": 32058,
+          "sha256": "7f3a90404bc768a6169e4330ac0e6be50c8525ae1099344388bd6c8ab2cf35d2",
+          "metadata_chunks": [],
+          "mae_against_srgb_box_reference": 3.706623134328358
+        },
+        {
+          "animated": false,
+          "width": 192,
+          "height": 134,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1,
+          "bytes": 8892,
+          "sha256": "febd0684add9f0c4dc8adeb38e6344f06423c663a4bd6222d7e63cf823c14c67",
+          "metadata_chunks": [],
+          "mae_against_srgb_box_reference": 4.335250829187396
+        },
+        {
+          "animated": false,
+          "width": 96,
+          "height": 67,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1,
+          "bytes": 2478,
+          "sha256": "07df9dc4b0e02c0e182c9f6e6b4e683f11b05f7d08fd281b5a8fc2aee4690810",
+          "metadata_chunks": [],
+          "mae_against_srgb_box_reference": 5.006685323383085
+        },
+        {
+          "animated": false,
+          "width": 48,
+          "height": 33,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1,
+          "bytes": 736,
+          "sha256": "2d5232150c949302365f1417326f1141ed1ad92954517e715500dc0247d0b9cd",
+          "metadata_chunks": [],
+          "mae_against_srgb_box_reference": 6.063131313131313
+        }
+      ],
+      "cgroup_cpu_seconds": 4.404175,
+      "cgroup_memory_peak_bytes": 106602496,
+      "service_info": {
+        "contract_version": 1,
+        "processor": {
+          "version": "0.4.0",
+          "build_id": "ac26bdd892ff25dfbcedafa8fcbcb869b9ea4ffc:2b9224352736492119e1a4db7fa51e13e76d97b458e042bdc0d71f0bf5f73b55",
+          "pipeline_version": "3-planned-linear-area-jpeg-preview",
+          "image": "0.25.10",
+          "gif": "0.14.2",
+          "heic": "heic-rs/0.1.4",
+          "jxl": "jxl-oxide/0.12.6",
+          "svg": "resvg/0.49.0",
+          "libavif": "v1.3.0",
+          "libaom": "v3.13.1",
+          "libwebp_encoder": "1.5.0",
+          "libwebp_decoder": "1.5.0",
+          "libwebp_demux": "1.5.0",
+          "libwebp_mux": "1.5.0",
+          "color_engine": "moxcms/0.9.1"
+        },
+        "limits": {
+          "source_bytes": 33554432,
+          "request_bytes": 34603008,
+          "recipe_bytes": 16384,
+          "input_dimension": 8192,
+          "canvas_pixels": 40000000,
+          "frames": 120,
+          "total_frame_pixels": 100000000,
+          "decoded_bytes": 268435456,
+          "working_bytes": 268435456,
+          "duration_ms": 60000,
+          "outputs": 4,
+          "output_bytes": 33554432,
+          "output_dimension": 4096,
+          "concurrency": 1,
+          "deadline_ms": 60000,
+          "idle_ms": 10000,
+          "child_memory_bytes": 805306368,
+          "child_cpu_seconds": 60
+        },
+        "codec_limits": {
+          "webp_dimension": 16383,
+          "webp_file_bytes": 4294967294,
+          "frame_duration_ms": 16777215,
+          "cycle_duration_ms": 2147483647
+        },
+        "input_formats": [
+          "jpeg",
+          "png",
+          "apng",
+          "gif",
+          "webp",
+          "avif",
+          "heic",
+          "bmp",
+          "tiff",
+          "jxl",
+          "svg",
+          "ico",
+          "qoi",
+          "pnm"
+        ],
+        "animated_input_formats": [
+          "gif",
+          "apng",
+          "webp",
+          "avif",
+          "jxl"
+        ],
+        "output_format": "webp",
+        "encoding_modes": [
+          "lossy",
+          "lossless"
+        ],
+        "animation_policies": [
+          "preserve"
+        ],
+        "resize_fit": "inside",
+        "allow_upscale": false,
+        "zero_delay_policy": "reject_animated_zero_delay",
+        "timing_policy": "nearest_cumulative_millisecond; reject_unrepresentable_frames",
+        "color_policy": "icc_and_cicp_to_srgb8; unprofiled_srgb; reject_hdr",
+        "native_resource_fence": "rlimit_as_and_cpu"
+      },
+      "environment": [
+        "HIRUNE_CONCURRENCY=1",
+        "HIRUNE_OUTPUTS=4"
+      ]
+    },
+    {
+      "case": "photo",
+      "outputs": 4,
+      "provider": "imgproxy",
+      "status": "success",
+      "profile": "accurate",
+      "decode_mode": "default",
+      "fanout": "parallel",
+      "workload": "thumbnails",
+      "quality": 85,
+      "effort": 4,
+      "unique_output_dimensions": 4,
+      "source_sha256": "b07840190a97a6e9435c9eaed31c3d4b1383b90a54f88b239485e5ce9eb5b8ff",
+      "source_bytes": 3670993,
+      "source_facts": {
+        "file": "photo.jpg",
+        "sha256": "b07840190a97a6e9435c9eaed31c3d4b1383b90a54f88b239485e5ce9eb5b8ff",
+        "bytes": 3670993,
+        "display_size": [
+          4000,
+          2800
+        ],
+        "orientation": 1,
+        "delays_ms": [],
+        "total_plays": 1
+      },
+      "iterations": 20,
+      "concurrency": 1,
+      "successes": 20,
+      "errors": [],
+      "work_units_per_second": 4.868986946188515,
+      "batch_seconds": 4.107630646998587,
+      "latency_ms": {
+        "p50": 198.96945000073174,
+        "p95": 233.27638099726755
+      },
+      "latencies_ms": [
+        186.13590000313707,
+        188.10641299933195,
+        190.66043400380295,
+        191.14324700058205,
+        191.30791899806354,
+        191.61257000087062,
+        194.081934998394,
+        195.42037800420076,
+        195.5040749962791,
+        196.5275059992564,
+        201.4113940022071,
+        207.54514999862295,
+        210.28729400131851,
+        212.47985700028948,
+        218.88926900282968,
+        219.4445600034669,
+        222.57429800083628,
+        223.93068900419166,
+        233.27638099726755,
+        235.83749100362184
+      ],
+      "planned_http_processing_requests": 80,
+      "http_processing_requests": 80,
+      "origin": {
+        "requests": 80,
+        "bytes": 293679440
+      },
+      "output_facts": [
+        {
+          "animated": false,
+          "width": 384,
+          "height": 268,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1,
+          "bytes": 33196,
+          "sha256": "5be354fd6ec3aab2bbb3ea05051dcae60f7265ca51b001446f2aa0b17c11d88f",
+          "metadata_chunks": [
+            {
+              "kind": "EXIF",
+              "bytes": 186
+            }
+          ],
+          "mae_against_srgb_box_reference": 4.246958566542289
+        },
+        {
+          "animated": false,
+          "width": 192,
+          "height": 134,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1,
+          "bytes": 9320,
+          "sha256": "508aa44156010d04cf3bfecee89986ece93a11688b3912c0d19299a40d6b8ac9",
+          "metadata_chunks": [
+            {
+              "kind": "EXIF",
+              "bytes": 186
+            }
+          ],
+          "mae_against_srgb_box_reference": 4.958009432006634
+        },
+        {
+          "animated": false,
+          "width": 96,
+          "height": 67,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1,
+          "bytes": 2748,
+          "sha256": "dff29d1852a0413cf097aa08514b4f0d923057b7b2ae180671054352cefdde0c",
+          "metadata_chunks": [
+            {
+              "kind": "EXIF",
+              "bytes": 186
+            }
+          ],
+          "mae_against_srgb_box_reference": 5.709628938640132
+        },
+        {
+          "animated": false,
+          "width": 48,
+          "height": 33,
+          "frame_count": 1,
+          "duration_ms": 0,
+          "loop_count": 1,
+          "bytes": 948,
+          "sha256": "9a1bed7a171dfa24245ef1e3f01c82fa2e0e620f76a97a9d09888b3e1c43b94e",
+          "metadata_chunks": [
+            {
+              "kind": "EXIF",
+              "bytes": 186
+            }
+          ],
+          "mae_against_srgb_box_reference": 6.751473063973064
+        }
+      ],
+      "cgroup_cpu_seconds": 8.303888,
+      "cgroup_memory_peak_bytes": 301748224,
+      "service_info": {
+        "version": "4.0.20",
+        "native_threads": "1 set by imgproxy v4.0.20 vips.Init outside Lambda",
+        "libvips_operation_cache": "disabled by imgproxy v4.0.20 vips.Init"
+      },
+      "environment": [
+        "IMGPROXY_WORKERS=4",
+        "IMGPROXY_MAX_ANIMATION_FRAMES=120",
+        "IMGPROXY_MAX_SRC_RESOLUTION=40",
+        "IMGPROXY_MAX_SRC_FILE_SIZE=33554432",
+        "IMGPROXY_MAX_RESULT_DIMENSION=4096",
+        "IMGPROXY_USE_LINEAR_COLORSPACE=true",
+        "IMGPROXY_STRIP_METADATA=true",
+        "IMGPROXY_KEEP_COPYRIGHT=false",
+        "IMGPROXY_STRIP_COLOR_PROFILE=true",
+        "IMGPROXY_DISABLE_SHRINK_ON_LOAD=true",
+        "IMGPROXY_WEBP_EFFORT=4",
+        "IMGPROXY_TIMEOUT=60",
+        "IMGPROXY_WRITE_RESPONSE_TIMEOUT=60",
+        "IMGPROXY_ALLOWED_SOURCES=http://bench-client:8090/",
+        "IMGPROXY_LOG_LEVEL=error"
+      ]
+    },
+    {
+      "case": "animation",
+      "outputs": 4,
+      "provider": "imgproxy",
+      "status": "success",
+      "profile": "accurate",
+      "decode_mode": "default",
+      "fanout": "parallel",
+      "workload": "thumbnails",
+      "quality": 85,
+      "effort": 4,
+      "unique_output_dimensions": 4,
+      "source_sha256": "237ce8948e2103b4c0a0737c0efcc58300c26b9bdb56412754baf5d9dfba75a6",
+      "source_bytes": 127096,
+      "source_facts": {
+        "file": "animation.gif",
+        "sha256": "237ce8948e2103b4c0a0737c0efcc58300c26b9bdb56412754baf5d9dfba75a6",
+        "bytes": 127096,
+        "display_size": [
+          638,
+          362
+        ],
+        "orientation": 1,
+        "delays_ms": [
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120
+        ],
+        "total_plays": 3
+      },
+      "iterations": 20,
+      "concurrency": 1,
+      "successes": 20,
+      "errors": [],
+      "work_units_per_second": 0.6355866065217616,
+      "batch_seconds": 31.466994103997422,
+      "latency_ms": {
+        "p50": 1544.0972885007795,
+        "p95": 1699.367829998664
+      },
+      "latencies_ms": [
+        1421.6030749958009,
+        1446.6021900007036,
+        1454.5664499964914,
+        1456.013595998229,
+        1498.7995500050602,
+        1512.8027210012078,
+        1517.1732820017496,
+        1521.156852999411,
+        1523.6172789955162,
+        1535.7987719980883,
+        1552.3958050034707,
+        1581.5268229998765,
+        1602.7739959972678,
+        1626.668361001066,
+        1652.6058010058478,
+        1658.9280120024341,
+        1684.515556000406,
+        1693.4991450034431,
+        1699.367829998664,
+        1824.97929600504
+      ],
+      "planned_http_processing_requests": 80,
+      "http_processing_requests": 80,
+      "origin": {
+        "requests": 80,
+        "bytes": 10167680
+      },
+      "output_facts": [
+        {
+          "animated": true,
+          "width": 384,
+          "height": 217,
+          "frame_count": 60,
+          "duration_ms": 4800,
+          "loop_count": 3,
+          "bytes": 39912,
+          "sha256": "84e3a5a1e6fd98b1d36bd6e97e2a8463d268564de721f75e9708c3416f4ecec9",
+          "metadata_chunks": [
+            {
+              "kind": "EXIF",
+              "bytes": 186
+            }
+          ]
+        },
+        {
+          "animated": true,
+          "width": 192,
+          "height": 108,
+          "frame_count": 60,
+          "duration_ms": 4800,
+          "loop_count": 3,
+          "bytes": 30492,
+          "sha256": "66b7c5ada39c348c58366424c229af56c4e5b39cfb8a5255d326da92c4332d0a",
+          "metadata_chunks": [
+            {
+              "kind": "EXIF",
+              "bytes": 186
+            }
+          ]
+        },
+        {
+          "animated": true,
+          "width": 96,
+          "height": 54,
+          "frame_count": 60,
+          "duration_ms": 4800,
+          "loop_count": 3,
+          "bytes": 24396,
+          "sha256": "52b726261987674600fff558da8fd0bda9b7f62a32d479f154c8b08721b01663",
+          "metadata_chunks": [
+            {
+              "kind": "EXIF",
+              "bytes": 186
+            }
+          ]
+        },
+        {
+          "animated": true,
+          "width": 48,
+          "height": 27,
+          "frame_count": 60,
+          "duration_ms": 4800,
+          "loop_count": 3,
+          "bytes": 18940,
+          "sha256": "35f5f0a6f5b19b02a91c13c8a433375090820735970a8d93ed32ffbd76e8c77c",
+          "metadata_chunks": [
+            {
+              "kind": "EXIF",
+              "bytes": 186
+            }
+          ]
+        }
+      ],
+      "cgroup_cpu_seconds": 60.06558,
+      "cgroup_memory_peak_bytes": 89370624,
+      "service_info": {
+        "version": "4.0.20",
+        "native_threads": "1 set by imgproxy v4.0.20 vips.Init outside Lambda",
+        "libvips_operation_cache": "disabled by imgproxy v4.0.20 vips.Init"
+      },
+      "environment": [
+        "IMGPROXY_WORKERS=4",
+        "IMGPROXY_MAX_ANIMATION_FRAMES=120",
+        "IMGPROXY_MAX_SRC_RESOLUTION=40",
+        "IMGPROXY_MAX_SRC_FILE_SIZE=33554432",
+        "IMGPROXY_MAX_RESULT_DIMENSION=4096",
+        "IMGPROXY_USE_LINEAR_COLORSPACE=true",
+        "IMGPROXY_STRIP_METADATA=true",
+        "IMGPROXY_KEEP_COPYRIGHT=false",
+        "IMGPROXY_STRIP_COLOR_PROFILE=true",
+        "IMGPROXY_DISABLE_SHRINK_ON_LOAD=true",
+        "IMGPROXY_WEBP_EFFORT=4",
+        "IMGPROXY_TIMEOUT=60",
+        "IMGPROXY_WRITE_RESPONSE_TIMEOUT=60",
+        "IMGPROXY_ALLOWED_SOURCES=http://bench-client:8090/",
+        "IMGPROXY_LOG_LEVEL=error"
+      ]
+    },
+    {
+      "case": "animation",
+      "outputs": 4,
+      "provider": "hirune",
+      "status": "success",
+      "profile": "accurate",
+      "decode_mode": "default",
+      "fanout": "parallel",
+      "workload": "thumbnails",
+      "quality": 85,
+      "effort": 4,
+      "unique_output_dimensions": 4,
+      "source_sha256": "237ce8948e2103b4c0a0737c0efcc58300c26b9bdb56412754baf5d9dfba75a6",
+      "source_bytes": 127096,
+      "source_facts": {
+        "file": "animation.gif",
+        "sha256": "237ce8948e2103b4c0a0737c0efcc58300c26b9bdb56412754baf5d9dfba75a6",
+        "bytes": 127096,
+        "display_size": [
+          638,
+          362
+        ],
+        "orientation": 1,
+        "delays_ms": [
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120,
+          40,
+          80,
+          120
+        ],
+        "total_plays": 3
+      },
+      "iterations": 20,
+      "concurrency": 1,
+      "successes": 20,
+      "errors": [],
+      "work_units_per_second": 1.812244028137093,
+      "batch_seconds": 11.036041332998138,
+      "latency_ms": {
+        "p50": 547.6141854996968,
+        "p95": 571.3197360018967
+      },
+      "latencies_ms": [
+        534.9934220066643,
+        538.2325610044063,
+        538.4525349945761,
+        541.4805610053008,
+        541.6578720032703,
+        542.4603649953497,
+        545.0018280025688,
+        545.1540119975107,
+        547.2131610003999,
+        547.3915289985598,
+        547.8368420008337,
+        549.0286650019698,
+        550.5773540062364,
+        551.6815800001496,
+        555.3412299996126,
+        555.5323279986624,
+        559.816609005793,
+        565.8213300048374,
+        571.3197360018967,
+        605.4458069993416
+      ],
+      "planned_http_processing_requests": 20,
+      "http_processing_requests": 20,
+      "origin": {
+        "requests": 0,
+        "bytes": 0
+      },
+      "output_facts": [
+        {
+          "animated": true,
+          "width": 384,
+          "height": 217,
+          "frame_count": 60,
+          "duration_ms": 4800,
+          "loop_count": 3,
+          "bytes": 39808,
+          "sha256": "4ff88a403381de25bd75b64d52063f93166eecf5d29176391af7ece495d4124a",
+          "metadata_chunks": []
+        },
+        {
+          "animated": true,
+          "width": 192,
+          "height": 108,
+          "frame_count": 60,
+          "duration_ms": 4800,
+          "loop_count": 3,
+          "bytes": 27006,
+          "sha256": "8de2a3b8ef29705cf1444fb8f27af6b051bf756c43057bcba2e92dab3f9b1576",
+          "metadata_chunks": []
+        },
+        {
+          "animated": true,
+          "width": 96,
+          "height": 54,
+          "frame_count": 60,
+          "duration_ms": 4800,
+          "loop_count": 3,
+          "bytes": 22470,
+          "sha256": "b733c11bdbdeffb2d111bb6c03e41c0614a852b0404ed9b133e1318dcfe2ec44",
+          "metadata_chunks": []
+        },
+        {
+          "animated": true,
+          "width": 48,
+          "height": 27,
+          "frame_count": 60,
+          "duration_ms": 4800,
+          "loop_count": 3,
+          "bytes": 17392,
+          "sha256": "55b4ddbeb697306a503be0ab30b4a7b29ff6dc5703f7ea5cf3c02de44f196c50",
+          "metadata_chunks": []
+        }
+      ],
+      "cgroup_cpu_seconds": 11.032547,
+      "cgroup_memory_peak_bytes": 7450624,
+      "service_info": {
+        "contract_version": 1,
+        "processor": {
+          "version": "0.4.0",
+          "build_id": "ac26bdd892ff25dfbcedafa8fcbcb869b9ea4ffc:2b9224352736492119e1a4db7fa51e13e76d97b458e042bdc0d71f0bf5f73b55",
+          "pipeline_version": "3-planned-linear-area-jpeg-preview",
+          "image": "0.25.10",
+          "gif": "0.14.2",
+          "heic": "heic-rs/0.1.4",
+          "jxl": "jxl-oxide/0.12.6",
+          "svg": "resvg/0.49.0",
+          "libavif": "v1.3.0",
+          "libaom": "v3.13.1",
+          "libwebp_encoder": "1.5.0",
+          "libwebp_decoder": "1.5.0",
+          "libwebp_demux": "1.5.0",
+          "libwebp_mux": "1.5.0",
+          "color_engine": "moxcms/0.9.1"
+        },
+        "limits": {
+          "source_bytes": 33554432,
+          "request_bytes": 34603008,
+          "recipe_bytes": 16384,
+          "input_dimension": 8192,
+          "canvas_pixels": 40000000,
+          "frames": 120,
+          "total_frame_pixels": 100000000,
+          "decoded_bytes": 268435456,
+          "working_bytes": 268435456,
+          "duration_ms": 60000,
+          "outputs": 4,
+          "output_bytes": 33554432,
+          "output_dimension": 4096,
+          "concurrency": 1,
+          "deadline_ms": 60000,
+          "idle_ms": 10000,
+          "child_memory_bytes": 805306368,
+          "child_cpu_seconds": 60
+        },
+        "codec_limits": {
+          "webp_dimension": 16383,
+          "webp_file_bytes": 4294967294,
+          "frame_duration_ms": 16777215,
+          "cycle_duration_ms": 2147483647
+        },
+        "input_formats": [
+          "jpeg",
+          "png",
+          "apng",
+          "gif",
+          "webp",
+          "avif",
+          "heic",
+          "bmp",
+          "tiff",
+          "jxl",
+          "svg",
+          "ico",
+          "qoi",
+          "pnm"
+        ],
+        "animated_input_formats": [
+          "gif",
+          "apng",
+          "webp",
+          "avif",
+          "jxl"
+        ],
+        "output_format": "webp",
+        "encoding_modes": [
+          "lossy",
+          "lossless"
+        ],
+        "animation_policies": [
+          "preserve"
+        ],
+        "resize_fit": "inside",
+        "allow_upscale": false,
+        "zero_delay_policy": "reject_animated_zero_delay",
+        "timing_policy": "nearest_cumulative_millisecond; reject_unrepresentable_frames",
+        "color_policy": "icc_and_cicp_to_srgb8; unprofiled_srgb; reject_hdr",
+        "native_resource_fence": "rlimit_as_and_cpu"
+      },
+      "environment": [
+        "HIRUNE_CONCURRENCY=1",
+        "HIRUNE_OUTPUTS=4"
+      ]
+    }
+  ]
+}

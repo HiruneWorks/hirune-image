@@ -4,6 +4,7 @@ Hirune Image is a Rust/Axum image microservice with configurable resource limits
 Send common raster images, HEIC/HEIF, AVIF, JPEG XL, or static SVG with a typed recipe.
 The service returns verified lossy or lossless WebP outputs in every requested size.
 It preserves supported animations and processes each frame across all sizes without raw frame files.
+Accurate decoding is the default. Optional `decode_mode=preview` permits reduced JPEG decoding when all requested sizes fit the reduced canvas.
 See the [format and color contract](docs/behavior/image-processing.md) for supported variants and explicit exclusions.
 Run a published GHCR image with the [deployment Compose profile](deploy/README.md).
 For development, build the service from source.
@@ -37,14 +38,15 @@ Run `just test-container` to verify the Linux image with a non-root user and rea
 Each request has an isolated native worker.
 Temporary files have byte limits. tmpfs consumes deployment memory.
 
-Pushing `v0.3.0` publishes `ghcr.io/hiruneworks/hirune-image:0.3.0` after code and container checks pass.
+Pushing `v0.4.0` publishes `ghcr.io/hiruneworks/hirune-image:0.4.0` after code and container checks pass.
 The tag must match the workspace package version. Publication uses the exact tested `linux/amd64` image.
 Branch pushes, pull requests, and manual checks do not publish images.
 See the [release procedure](deploy/README.md#release-publication).
 
 Operators can raise or lower budgets. See [configuration and memory](docs/operations.md) and the [larger example](.envs/.example/large.env).
-[Criterion and Sharp service benchmarks](docs/benchmarks.md) measure pipeline components and complete HTTP requests separately.
+[Criterion, Sharp, and imgproxy benchmarks](docs/benchmarks.md) measure pipeline components and complete HTTP work units separately.
 
 The [recorded local comparison](benchmarks/results/2026-10-16/README.md) includes raw reports, versions, resource settings, and measurement limits.
+The [imgproxy comparison](benchmarks/results/2026-11-02/README.md) covers accurate and preview modes, repeated baseline controls, and serial/parallel multi-output work units.
 
 Apache-2.0. Copyright 2026 Levi Laine.

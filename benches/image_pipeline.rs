@@ -24,8 +24,9 @@ fn pipeline(c: &mut Criterion) {
                 image_codec::decode_source(
                     black_box(png.get_ref()),
                     &limits,
+                    None,
                     || {},
-                    |pixels, _| {
+                    |pixels, _, _| {
                         black_box(pixels);
                         Ok(())
                     },

@@ -10,6 +10,8 @@ pub struct RecipeInput {
     #[schemars(range(min = 1, max = 1))]
     pub contract_version: u32,
     pub animation_policy: AnimationPolicy,
+    #[serde(default)]
+    pub decode_mode: images::DecodeMode,
     #[schemars(length(min = 1))]
     pub outputs: Vec<OutputInput>,
 }
@@ -63,6 +65,7 @@ impl RecipeInput {
         }
         let recipe = images::Recipe {
             animation_policy: self.animation_policy,
+            decode_mode: self.decode_mode,
             outputs: self
                 .outputs
                 .into_iter()

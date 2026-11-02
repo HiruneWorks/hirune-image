@@ -81,7 +81,7 @@ checksum = "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470"
 
 [[package]]
 name = "application"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "hex",
  "schemars",
@@ -987,7 +987,7 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "hirune-image"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "application",
@@ -1258,7 +1258,7 @@ dependencies = [
 
 [[package]]
 name = "image-codec"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "application",
  "crc32fast",
@@ -1266,6 +1266,7 @@ dependencies = [
  "heic-rs",
  "image",
  "jc-libavif-sys",
+ "jpeg-decoder",
  "jxl-oxide",
  "libc",
  "libwebp-sys2 0.2.0",
@@ -1386,6 +1387,12 @@ dependencies = [
  "getrandom 0.4.3",
  "libc",
 ]
+
+[[package]]
+name = "jpeg-decoder"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "00810f1d8b74be64b13dbf3db89ac67740615d6c891f0e7b6179326533011a07"
 
 [[package]]
 name = "js-sys"
@@ -3600,7 +3607,7 @@ checksum = "ec7a2a501ed189703dba8b08142f057e887dfc4b2cc4db2d343ac6376ba3e0b9"
 
 [[package]]
 name = "xtask"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "serde_json",

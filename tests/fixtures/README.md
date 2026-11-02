@@ -38,3 +38,11 @@ The recorded generator uses Pillow 13.0.0, pillow-heif 1.8.1, and an FFmpeg buil
 Normal tests read the committed files. They need none of those generation tools.
 Update `SHA256SUMS` and the provenance record after an intentional regeneration.
 The service does not execute FFmpeg.
+
+## JPEG preview regression
+
+`preview-progressive.jpg` is a synthetic 257×131 progressive RGB JPEG with four distinct color quadrants.
+`preview-progressive-thin.jpg` is a 257×1 progressive RGB JPEG. It checks padded coefficient memory.
+Generate both with `scripts/generate_preview_fixture.py` and Pillow 13.0.0.
+Tests add minimal EXIF records and check all eight transforms, original geometry, accurate fallbacks, and resource limits.
+These generated fixtures are dedicated to the public domain under CC0.

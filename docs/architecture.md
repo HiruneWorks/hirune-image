@@ -17,6 +17,10 @@ The worker checks image headers before allocating pixel buffers.
 It decodes and normalizes each display frame, then resizes and encodes that frame for every requested output.
 It runs the output encoders in sequence. Each output keeps its compressed chunks in a separate bounded mux.
 The worker releases the display pixels before processing the next frame. It writes no raw RGBA frame files.
+Accurate decoding remains the default. Optional JPEG preview uses a shared reduced-IDCT canvas when every output fits it.
+The callback carries original display geometry and the source working reservation separately from the decoded pixel dimensions.
+Source facts and source budgets always describe the original image.
+The JPEG preview decoder uses `jpeg-decoder` 0.3.2 without Rayon. ICC and CMYK input retain the accurate decoder.
 Decoder canvases, reference frames, parsing data, and working buffers still use memory.
 JPEG XL uses an allocation tracker. The worker clears its display render cache between frames.
 HEIC checks every SPS's coded size before conformance cropping, including grid tiles and alpha items.
@@ -26,6 +30,13 @@ The Rust mux checks the combined output byte budget before adding each frame.
 It writes complete canvas frames with no blending. It retains duplicate frames and one-frame animations.
 The mux builds the final RIFF buffer directly. It does not assemble a second native copy of the animation.
 Native encoder config uses `exact=1` and `alpha_quality=100`. Codec threads are disabled.
+The resizer caches only axis geometry. It does not allocate a floating-point source canvas.
+The cache planner checks all output plans together with the source pixel reservation before it allocates them.
+It uses a conservative 48-byte-per-pixel reservation for PNG/APNG and the base 20-byte reservation for other accurate input.
+JPEG preview also reserves full-resolution, MCU-padded coefficients and reduced pixel buffers.
+If that reservation exceeds the working budget, it uses the accurate decoder before allocating coefficient storage.
+If the cache does not fit, the worker uses the same span calculations without cache allocations.
+An output with unchanged dimensions goes directly to the encoder without cloning its RGBA pixels.
 The worker verifies each completed WebP before it writes the output file.
 The API sends success only after every source frame and every output passes verification.
 Request directories contain only the compressed source, encoded outputs, and control data.

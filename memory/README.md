@@ -1,5 +1,11 @@
 # Verification milestones
 
+- [2026-11-02: imgproxy comparison results](2026-11-02-imgproxy-comparison.md): raw reports, repeated controls, accurate/preview modes, parallel fanout, resource measurements, and validation limits.
+
+- [2026-11-02: JPEG preview and resize optimization](2026-11-02-decode-resize-optimization.md): accurate defaults, bounded reduced decoding, exact area-filter comparisons, Astra review, and Windows checks.
+
+- [2026-11-02: imgproxy benchmark harness](2026-11-02-imgproxy-benchmark-harness.md): fixed work units, resource profiles, measured CPU intervals, visual checks, and failure retention.
+
 - [2026-11-02: version 0.3.0 publication](2026-11-02-version-0.3.0.md): immutable release tag, successful tag CI, published GHCR digest, and direct registry-image verification.
 
 - [2026-11-02: Linux container verification](2026-11-02-linux-container-verification.md): Linux workspace and resource-test evidence, runtime profile checks, and accurate HTTP request counts.
