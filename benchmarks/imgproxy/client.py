@@ -115,9 +115,9 @@ def inspect_output(data, provider):
 def measure(args):
     case = json.loads((args.fixtures / "manifest.json").read_text())["cases"][args.case]
     source = (args.fixtures / case["file"]).read_bytes()
-    sides = [160, 320, 640, 960, 1280, 1920, 2560, 4096] if args.workload == "wiki" else [384, 192, 96, 48][:args.outputs]
-    boxes = [(side, 4096 if args.workload == "wiki" else side) for side in sides]
-    quality = 90 if args.workload == "wiki" else 85
+    sides = [160, 320, 640, 960, 1280, 1920, 2560, 4096] if args.workload == "full" else [384, 192, 96, 48][:args.outputs]
+    boxes = [(side, 4096 if args.workload == "full" else side) for side in sides]
+    quality = 90 if args.workload == "full" else 85
     sizes = [inside(*case["display_size"], *box) for box in boxes]
     recipe = {"contract_version": 1, "animation_policy": "preserve", "outputs": [
         {"id": f"size_{width}", "resize": {"fit": "inside", "max_width": width, "max_height": height},
@@ -249,7 +249,7 @@ if __name__ == "__main__":
     parser.add_argument("--base", default="http://bench-service:8080")
     parser.add_argument("--iterations", type=int, default=20)
     parser.add_argument("--outputs", type=int, choices=(1, 4, 8), default=1)
-    parser.add_argument("--workload", choices=("thumbnails", "wiki"), default="thumbnails")
+    parser.add_argument("--workload", choices=("thumbnails", "full"), default="thumbnails")
     parser.add_argument("--concurrency", type=int, default=1)
     parser.add_argument("--fanout", choices=("serial", "parallel"), default="serial")
     parser.add_argument("--profile", choices=("accurate", "preview"), default="accurate")

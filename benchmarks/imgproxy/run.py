@@ -43,7 +43,7 @@ def main():
     parser.add_argument("--cases", nargs="+", choices=("photo", "progressive", "rotated", "alpha", "animation"),
                         default=["photo", "progressive", "rotated", "alpha", "animation"])
     parser.add_argument("--outputs", nargs="+", type=int, choices=(1, 4, 8))
-    parser.add_argument("--workload", choices=("thumbnails", "wiki"), default="thumbnails")
+    parser.add_argument("--workload", choices=("thumbnails", "full"), default="thumbnails")
     parser.add_argument("--iterations", type=int, default=20)
     parser.add_argument("--warmup", type=int, default=2)
     parser.add_argument("--concurrency", type=int, default=1)
@@ -55,8 +55,8 @@ def main():
     parser.add_argument("--fixtures", type=Path, default=ROOT / "target/benchmarks/fixtures")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    args.outputs = args.outputs or ([8] if args.workload == "wiki" else [1, 4])
-    assert args.outputs == [8] if args.workload == "wiki" else all(count in (1, 4) for count in args.outputs)
+    args.outputs = args.outputs or ([8] if args.workload == "full" else [1, 4])
+    assert args.outputs == [8] if args.workload == "full" else all(count in (1, 4) for count in args.outputs)
     assert args.iterations > 0 and args.warmup >= 0 and 1 <= args.concurrency <= 4
     args.fixtures = args.fixtures.resolve()
     args.output = args.output.resolve()

@@ -21,6 +21,8 @@ Filters, codecs, verification work, metadata, and HTTP contracts still differ.
 
 ## Decisions and constraints
 
+Benchmark profiles describe generic image workloads. Keep caller-specific application names, storage workflows, and release policies outside this service.
+
 The user selected accurate decoding as the default for the planned optimization.
 JPEG preview decoding must be an explicit request option.
 This harness commit does not implement that option.
@@ -37,7 +39,7 @@ The benchmark records imgproxy's generated EXIF without weakening Hirune's metad
 
 - Python syntax checks passed.
 - All 20 Docker smoke scenarios passed: five inputs, one or four outputs, and two providers.
-- Four additional smoke scenarios passed for V7's eight-width wiki recipe with photo and animation inputs.
+- Four additional smoke scenarios passed for an eight-width output profile with photo and animation inputs.
 - Smoke runs used one measured request per scenario. They validate the harness, not performance conclusions.
 - An intentional request for the unsupported preview option against Hirune 0.3.0 failed with HTTP 400.
 - The harness retained that scenario as failed at the warmup stage and marked the report incomplete.
