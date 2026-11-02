@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.0
+
+- Keep accurate decoding as the default. Add optional `decode_mode=preview` for shared reduced JPEG IDCT decoding.
+- Preserve original facts, oriented output geometry, and original resource checks in preview mode.
+- Retain the accurate path for ICC, CMYK, other formats, and requests that require the full-resolution image.
+- Cache bounded area-filter geometry across frames. Keep the source accumulation order and linear-light premultiplied-alpha policy.
+- Use transfer lookup tables with inverse-transfer boundary fallback. Encode unchanged-size RGBA directly without cloning it.
+- Add reproducible imgproxy service benchmarks with photo, alpha, animation, concurrency, origin traffic, and one/four/eight-output workloads.
+
 ## 0.3.0
 
 - Generate every requested size as each display frame arrives. Remove the full RGBA frame spool.

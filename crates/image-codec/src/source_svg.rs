@@ -201,8 +201,9 @@ fn embedded_png(data: &[u8], limits: &Limits, state: &Mutex<EmbeddedState>) -> R
     let decoded = crate::source::decode_source(
         data,
         limits,
+        None,
         || {},
-        |pixels, delay| {
+        |pixels, delay, _| {
             if delay > 0 {
                 return Err(Error::UnrepresentableAnimation);
             }

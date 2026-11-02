@@ -4,6 +4,7 @@ mod container;
 #[cfg(test)]
 mod container_tests;
 mod heic_dimensions;
+mod jpeg_preview;
 mod normalize;
 mod pipeline;
 mod resize;
@@ -21,6 +22,6 @@ mod webp;
 pub use normalize::normalize;
 pub use pipeline::{process_job, verify_output};
 pub use resize::resize_inside;
-pub use source::decode_source;
+pub use source::{FrameLayout, decode_source};
 pub use webp::encode;
 pub use webp::{decode_frames, probe, processor_info};

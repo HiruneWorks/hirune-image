@@ -7,6 +7,13 @@ use sha2::{Digest, Sha256};
 pub enum AnimationPolicy {
     Preserve,
 }
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, JsonSchema, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum DecodeMode {
+    #[default]
+    Accurate,
+    Preview,
+}
 #[derive(Clone, Copy, Debug, Deserialize, Serialize, JsonSchema, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum SourceFormat {
@@ -34,6 +41,8 @@ pub enum MediaType {
 #[serde(deny_unknown_fields)]
 pub struct Recipe {
     pub animation_policy: AnimationPolicy,
+    #[serde(default)]
+    pub decode_mode: DecodeMode,
     pub outputs: Vec<OutputRecipe>,
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]

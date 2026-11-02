@@ -33,6 +33,25 @@ For lossless WebP, set effort from 0 to 6. The service rejects a quality field i
 Effort sets the native libwebp method.
 The worker encodes outputs in sequence. The request succeeds only if every output succeeds.
 
+### Decode mode
+
+`decode_mode` is optional. Its default is `accurate`.
+Accurate mode decodes at full resolution and keeps the existing color and linear-light resize policy.
+Existing recipes that omit this field retain that behavior.
+
+Set `decode_mode` to `preview` to permit reduced JPEG IDCT decoding.
+The worker selects a shared 1/2, 1/4, or 1/8 decode scale only when that canvas can supply every requested output without enlargement.
+It computes final dimensions from the original oriented geometry, not the rounded reduced canvas.
+The worker retains original source facts and applies all original-canvas and decoded-work budgets before reduction.
+ICC, CMYK, non-JPEG input, and requests without a useful shared reduction use the accurate decoder.
+JPEG preview supports unprofiled 8-bit RGB and grayscale input, including progressive JPEG.
+It reserves MCU-padded full-resolution coefficients before pixel decoding. If that working plan does not fit, it uses the accurate decoder.
+
+Preview mode can change pixels because JPEG reduction occurs before the final linear-light resize.
+Lossless WebP preserves the pixels produced by the selected decode mode. It does not make preview pixels equal to accurate pixels.
+Unknown or duplicate decode-mode fields are invalid recipes.
+The version 1 manifest and capability response shapes remain unchanged.
+
 ## Response
 
 A successful request returns `200 multipart/related`.
@@ -64,6 +83,8 @@ PNG metadata decoding has a separate 2 MiB allocation limit.
 The worker treats ordinary unprofiled RGB images as sRGB.
 It rejects malformed profiles, unsupported custom PNG gamma/chromaticity, explicit PQ/HLG HDR, and floating-point TIFF.
 Resize uses an area filter in linear light with premultiplied alpha.
+The resizer preserves source-pixel accumulation order and uses transfer lookup tables with an exact inverse-transfer fallback near quantization boundaries.
+It can retain bounded geometry plans across animation frames. If the cache does not fit the remaining working plan, it computes the same geometry without a cache.
 Lossless output preserves the normalized and resized pixels. It does not reconstruct the source file.
 
 SVG support uses a static renderer. It includes embedded static JPEG, PNG, GIF, and WebP images.

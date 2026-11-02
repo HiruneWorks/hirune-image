@@ -5,7 +5,7 @@ use crate::{
 };
 use application::{
     error::{ProcessingError as Error, Result},
-    images::{Budget, ImageFacts, Limits, SourceFacts, SourceFormat},
+    images::{Budget, DecodeMode, ImageFacts, Limits, Recipe, SourceFacts, SourceFormat},
 };
 use image::{AnimationDecoder, RgbaImage, metadata::Orientation};
 use std::io::Cursor;
@@ -14,6 +14,10 @@ pub struct DecodedSource {
     pub facts: SourceFacts,
     pub delays: Vec<u32>,
     pub normalized_dimensions: (u32, u32),
+}
+pub struct FrameLayout {
+    pub display_dimensions: (u32, u32),
+    pub working_reservation_bytes: u64,
 }
 pub(crate) type Emit<'a> = dyn FnMut(RgbaImage, u32, Orientation, Option<&[u8]>) -> Result<()> + 'a;
 pub(crate) type Description = (SourceFormat, ImageFacts, u8);
@@ -38,10 +42,25 @@ pub(crate) fn static_facts(width: u32, height: u32) -> ImageFacts {
 pub fn decode_source(
     bytes: &[u8],
     limits: &Limits,
+    recipe: Option<&Recipe>,
     mut on_decoder_start: impl FnMut(),
-    mut frame: impl FnMut(RgbaImage, u32) -> Result<()>,
+    mut frame: impl FnMut(RgbaImage, u32, FrameLayout) -> Result<()>,
 ) -> Result<DecodedSource> {
     limits.validate()?;
+    on_decoder_start();
+    if let Some(recipe) = recipe
+        && recipe.decode_mode == DecodeMode::Preview
+        && bytes.starts_with(&[255, 216])
+        && let Some(preview) = crate::jpeg_preview::decode(bytes, limits, &recipe.outputs)?
+    {
+        let normalized_dimensions = preview.pixels.dimensions();
+        frame(preview.pixels, 0, preview.layout)?;
+        return Ok(DecodedSource {
+            facts: preview.source,
+            delays: vec![0],
+            normalized_dimensions,
+        });
+    }
     let mut normalized_dimensions = (0, 0);
     let mut budget = Budget::default();
     let mut delays = Vec::new();
@@ -53,11 +72,27 @@ pub fn decode_source(
                 return Err(Error::UnrepresentableAnimation);
             }
             normalized_dimensions = normalized.dimensions();
-            frame(normalized, delay)?;
+            // PNG can retain 16-bit APNG compositing buffers while the callback runs.
+            let factor = if bytes.starts_with(b"\x89PNG") {
+                48
+            } else {
+                20
+            };
+            let working_reservation_bytes = u64::from(normalized_dimensions.0)
+                .checked_mul(u64::from(normalized_dimensions.1))
+                .and_then(|pixels| pixels.checked_mul(factor))
+                .ok_or(Error::ImageLimitsExceeded)?;
+            frame(
+                normalized,
+                delay,
+                FrameLayout {
+                    display_dimensions: normalized_dimensions,
+                    working_reservation_bytes,
+                },
+            )?;
             delays.push(delay);
             Ok(())
         };
-    on_decoder_start();
     let (format, facts, orientation) = if bytes.starts_with(b"GIF8") {
         let structure = gif_structure(bytes, limits)?;
         limits.preflight(&structure.facts)?;

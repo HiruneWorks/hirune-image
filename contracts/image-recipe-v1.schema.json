@@ -6,6 +6,13 @@
       ],
       "type": "string"
     },
+    "DecodeMode": {
+      "enum": [
+        "accurate",
+        "preview"
+      ],
+      "type": "string"
+    },
     "EncodingInput": {
       "oneOf": [
         {
@@ -138,6 +145,10 @@
       "maximum": 1,
       "minimum": 1,
       "type": "integer"
+    },
+    "decode_mode": {
+      "$ref": "#/$defs/DecodeMode",
+      "default": "accurate"
     },
     "outputs": {
       "items": {

@@ -24,7 +24,7 @@ pub fn processor_info() -> ProcessorInfo {
                 option_env!("HIRUNE_BUILD_ID").unwrap_or("development"),
                 env!("HIRUNE_SOURCE_FINGERPRINT")
             ),
-            pipeline_version: "2-streaming-variants-linear-area".into(),
+            pipeline_version: "3-planned-linear-area-jpeg-preview".into(),
             image: "0.25.10".into(),
             gif: "0.14.2".into(),
             heic: "heic-rs/0.1.4".into(),

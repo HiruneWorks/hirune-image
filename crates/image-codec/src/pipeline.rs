@@ -1,6 +1,6 @@
 use crate::{
     container::webp_structure,
-    resize::resize_inside,
+    resize::{cached_plans, resize_inside},
     source::decode_source,
     webp::{self, AnimationMux},
 };
@@ -35,6 +35,7 @@ pub fn process_job(directory: &Path, job: &JobInput) -> Result<Manifest> {
     }
     let mut variants = Vec::new();
     let mut dimensions = Vec::new();
+    let mut resize_plans = None;
     let mut aggregate = 0u64;
     let mut frame_count = 0u32;
     let mut decoder_starts = 0u32;
@@ -42,14 +43,16 @@ pub fn process_job(directory: &Path, job: &JobInput) -> Result<Manifest> {
     let decoded = decode_source(
         &bytes,
         &job.limits,
+        Some(&job.recipe),
         || decoder_starts += 1,
-        |pixels, delay| {
+        |pixels, delay, layout| {
             if frame_count == 0 {
+                let display_dimensions = layout.display_dimensions;
                 animated = delay > 0;
                 for output in &job.recipe.outputs {
                     let size = inside_dimensions(
-                        pixels.width(),
-                        pixels.height(),
+                        display_dimensions.0,
+                        display_dimensions.1,
                         output.max_width,
                         output.max_height,
                     );
@@ -67,23 +70,39 @@ pub fn process_job(directory: &Path, job: &JobInput) -> Result<Manifest> {
                         EncodedVariant::Static(Vec::new())
                     });
                 }
+                resize_plans = cached_plans(
+                    pixels.dimensions(),
+                    &dimensions,
+                    layout.working_reservation_bytes,
+                    job.limits.working_bytes,
+                )?;
             } else if !animated || delay == 0 {
                 return Err(Error::UnrepresentableAnimation);
             }
-            for ((variant, &(width, height)), output) in variants
+            for (index, ((variant, &(width, height)), output)) in variants
                 .iter_mut()
                 .zip(&dimensions)
                 .zip(&job.recipe.outputs)
+                .enumerate()
             {
                 let remaining = job
                     .limits
                     .output_bytes
                     .checked_sub(aggregate)
                     .ok_or(Error::OutputLimitsExceeded)?;
-                let resized = resize_inside(&pixels, width, height);
-                let encoded =
-                    webp::encode(resized.as_raw(), width, height, &output.encoding, remaining)?;
-                drop(resized);
+                let encoded = if pixels.dimensions() == (width, height) {
+                    webp::encode(pixels.as_raw(), width, height, &output.encoding, remaining)?
+                } else {
+                    if width > pixels.width() || height > pixels.height() {
+                        return Err(Error::InternalError);
+                    }
+                    let resized = if let Some(plans) = &resize_plans {
+                        plans[index].apply(&pixels)
+                    } else {
+                        resize_inside(&pixels, width, height)
+                    };
+                    webp::encode(resized.as_raw(), width, height, &output.encoding, remaining)?
+                };
                 let added = match variant {
                     EncodedVariant::Static(data) => {
                         let added = encoded.len() as u64;
@@ -149,7 +168,18 @@ pub fn process_job(directory: &Path, job: &JobInput) -> Result<Manifest> {
         });
     }
     fs::remove_file(source_path).map_err(|_| Error::InternalError)?;
-    fs::write(directory.join("metrics.json"), format!("{{\"source_decoder_starts\":{decoder_starts},\"decoded_frames\":{frame_count},\"raw_frame_spool_bytes\":0,\"output_count\":{}}}", outputs.len())).map_err(|_| Error::InternalError)?;
+    fs::write(
+        directory.join("metrics.json"),
+        serde_json::to_vec(&serde_json::json!({
+            "source_decoder_starts": decoder_starts, "decoded_frames": frame_count,
+            "raw_frame_spool_bytes": 0, "output_count": outputs.len(),
+            "decode_mode": job.recipe.decode_mode,
+            "decoded_width": decoded.normalized_dimensions.0,
+            "decoded_height": decoded.normalized_dimensions.1,
+        }))
+        .map_err(|_| Error::InternalError)?,
+    )
+    .map_err(|_| Error::InternalError)?;
     Ok(Manifest {
         contract_version: 1,
         processor: webp::processor_info(),

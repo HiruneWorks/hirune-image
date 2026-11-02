@@ -17,6 +17,7 @@ fn multiple_outputs_share_one_measured_source_decode() {
         let job = JobInput {
             recipe: Recipe {
                 animation_policy: AnimationPolicy::Preserve,
+                decode_mode: Default::default(),
                 outputs: [4, 8, 16, 32]
                     .into_iter()
                     .map(|size| OutputRecipe {
