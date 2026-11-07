@@ -1,4 +1,7 @@
-use crate::container::{gif_structure, validate_jpeg, validate_png, webp_structure};
+use crate::{
+    container::{gif_structure, validate_jpeg, webp_structure},
+    png_container,
+};
 use application::images::Limits;
 
 #[test]
@@ -19,7 +22,7 @@ fn bounded_header_mutations_and_truncations_do_not_panic() {
             0 => gif_structure(data, &limits).map(|_| ()),
             1 => webp_structure(data, &limits).map(|_| ()),
             2 => validate_jpeg(data).map(|_| ()),
-            _ => validate_png(data).map(|_| ()),
+            _ => png_container::inspect(data).map(|_| ()),
         };
         assert!(inspect(fixture).is_ok());
         for length in (0..fixture.len()).step_by((fixture.len() / 64).max(1)) {

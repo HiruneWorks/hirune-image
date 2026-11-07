@@ -7,6 +7,8 @@ mod heic_dimensions;
 mod jpeg_preview;
 mod normalize;
 mod pipeline;
+mod png_color;
+mod png_container;
 mod resize;
 pub mod sandbox;
 mod source;

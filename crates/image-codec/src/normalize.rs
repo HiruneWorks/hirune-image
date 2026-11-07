@@ -24,6 +24,12 @@ pub(crate) fn profile(icc: &[u8]) -> Result<moxcms::ColorProfile> {
 }
 
 pub(crate) fn cicp_icc(primaries: u16, transfer: u16) -> Result<Vec<u8>> {
+    cicp_profile(primaries, transfer)?
+        .encode()
+        .map_err(|_| Error::UnsupportedColorProfile)
+}
+
+pub(crate) fn cicp_profile(primaries: u16, transfer: u16) -> Result<moxcms::ColorProfile> {
     if matches!(transfer, 16 | 18) {
         return Err(Error::UnsupportedColorProfile);
     }
@@ -65,7 +71,7 @@ pub(crate) fn cicp_icc(primaries: u16, transfer: u16) -> Result<Vec<u8>> {
             return Err(Error::UnsupportedColorProfile);
         }
     }
-    profile.encode().map_err(|_| Error::UnsupportedColorProfile)
+    Ok(profile)
 }
 
 pub(crate) fn normalize_dynamic(
@@ -73,12 +79,20 @@ pub(crate) fn normalize_dynamic(
     orientation: Orientation,
     icc: Option<&[u8]>,
 ) -> Result<RgbaImage> {
+    let profile = icc.map(profile).transpose()?;
+    normalize_dynamic_with_profile(image, orientation, profile.as_ref())
+}
+
+pub(crate) fn normalize_dynamic_with_profile(
+    image: DynamicImage,
+    orientation: Orientation,
+    profile: Option<&moxcms::ColorProfile>,
+) -> Result<RgbaImage> {
     if image.color().bits_per_pixel() / u16::from(image.color().channel_count()) <= 8 {
-        return normalize(image.into_rgba8(), orientation, icc);
+        return normalize_with_profile(image.into_rgba8(), orientation, profile);
     }
     let mut pixels = image.into_rgba16();
-    if let Some(icc) = icc {
-        let profile = profile(icc)?;
+    if let Some(profile) = profile {
         if profile.color_space != moxcms::DataColorSpace::Rgb {
             return Err(Error::UnsupportedColorProfile);
         }
@@ -97,19 +111,27 @@ pub(crate) fn normalize_dynamic(
         pixels = image::ImageBuffer::from_raw(pixels.width(), pixels.height(), output)
             .ok_or(Error::InternalError)?;
     }
-    normalize(
+    normalize_with_profile(
         DynamicImage::ImageRgba16(pixels).into_rgba8(),
         orientation,
         None,
     )
 }
 pub fn normalize(
-    mut pixels: RgbaImage,
+    pixels: RgbaImage,
     orientation: Orientation,
     icc: Option<&[u8]>,
 ) -> Result<RgbaImage> {
-    if let Some(icc) = icc {
-        let profile = profile(icc)?;
+    let profile = icc.map(profile).transpose()?;
+    normalize_with_profile(pixels, orientation, profile.as_ref())
+}
+
+fn normalize_with_profile(
+    mut pixels: RgbaImage,
+    orientation: Orientation,
+    profile: Option<&moxcms::ColorProfile>,
+) -> Result<RgbaImage> {
+    if let Some(profile) = profile {
         if profile.color_space != moxcms::DataColorSpace::Rgb {
             return Err(Error::UnsupportedColorProfile);
         }

@@ -1,6 +1,6 @@
 use crate::{
-    container::validate_png,
-    normalize::normalize_dynamic,
+    normalize::normalize_dynamic_with_profile,
+    png_container,
     source::{Description, Emit, decoder_limits},
     timeline::Timeline,
 };
@@ -12,7 +12,7 @@ use image::{DynamicImage, ImageDecoder, metadata::Orientation};
 use std::io::Cursor;
 
 pub(crate) fn decode(bytes: &[u8], limits: &Limits, emit: &mut Emit<'_>) -> Result<Description> {
-    let has_icc = validate_png(bytes)?;
+    let color = png_container::inspect(bytes)?;
     let width = u32::from_be_bytes(bytes[16..20].try_into().map_err(|_| Error::InvalidImage)?);
     let height = u32::from_be_bytes(bytes[20..24].try_into().map_err(|_| Error::InvalidImage)?);
     let mut facts = super::source::static_facts(width, height);
@@ -79,7 +79,7 @@ pub(crate) fn decode(bytes: &[u8], limits: &Limits, emit: &mut Emit<'_>) -> Resu
     let mut decoder =
         image::codecs::png::PngDecoder::with_limits(Cursor::new(bytes), metadata_limits).map_err(
             |_| {
-                if has_icc {
+                if color.has_icc {
                     Error::UnsupportedColorProfile
                 } else {
                     Error::InvalidImage
@@ -92,9 +92,7 @@ pub(crate) fn decode(bytes: &[u8], limits: &Limits, emit: &mut Emit<'_>) -> Resu
     let icc = decoder
         .icc_profile()
         .map_err(|_| Error::UnsupportedColorProfile)?;
-    if icc.is_none() && has_icc {
-        return Err(Error::UnsupportedColorProfile);
-    }
+    let profile = color.profile(icc.as_deref())?;
     let orientation = decoder.orientation().map_err(|_| Error::InvalidImage)?;
     if facts.animated {
         drop(decoder);
@@ -103,12 +101,12 @@ pub(crate) fn decode(bytes: &[u8], limits: &Limits, emit: &mut Emit<'_>) -> Resu
             limits,
             &facts,
             &delays,
-            (orientation, icc.as_deref()),
+            (orientation, profile.as_ref()),
             emit,
         )?;
     } else {
         let pixels = DynamicImage::from_decoder(decoder).map_err(|_| Error::InvalidImage)?;
-        let pixels = normalize_dynamic(pixels, orientation, icc.as_deref())?;
+        let pixels = normalize_dynamic_with_profile(pixels, orientation, profile.as_ref())?;
         emit(pixels, 0, Orientation::NoTransforms, None)?;
     }
     Ok((
