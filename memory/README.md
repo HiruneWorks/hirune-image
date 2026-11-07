@@ -1,5 +1,7 @@
 # Verification milestones
 
+- [2026-11-08: PNG color recovery and version 0.4.1](2026-11-08-png-color-recovery.md): calibrated PNG/APNG SDR color, ancillary recovery, independent color references, and release validation.
+
 - [2026-11-02: version 0.4.0 publication](2026-11-02-version-0.4.0.md): main integration, unsigned release tag, successful tag CI, immutable GHCR image, and direct accurate/preview artifact verification.
 
 - [2026-11-02: imgproxy comparison results](2026-11-02-imgproxy-comparison.md): raw reports, repeated controls, accurate/preview modes, parallel fanout, resource measurements, and validation limits.

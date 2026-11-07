@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.1
+
+- Accept standard sRGB-compatible PNG `gAMA` and `cHRM` values without an `sRGB` or `iCCP` chunk.
+- Convert calibrated SDR PNG/APNG gamma and chromaticities to sRGB. Convert supported full-range RGB `cICP` declarations.
+- Select PNG color declarations in `cICP`, ICC, `sRGB`, then `gAMA/cHRM` order. Ignore zero gamma and lower-priority malformed legacy values.
+- Recover from CRC errors in discarded text, time, pixel-density, background, histogram, and suggested-palette metadata.
+- Keep CRC checks for pixels, transparency, orientation, color, and animation. Keep existing APNG sample-space compositing and resource limits.
+- Add real HTTP/worker regressions and independent LittleCMS reference pixels for a non-D65 white point.
+
 ## 0.4.0
 
 - Keep accurate decoding as the default. Add optional `decode_mode=preview` for shared reduced JPEG IDCT decoding.

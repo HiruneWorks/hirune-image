@@ -38,7 +38,7 @@ Run `just test-container` to verify the Linux image with a non-root user and rea
 Each request has an isolated native worker.
 Temporary files have byte limits. tmpfs consumes deployment memory.
 
-Pushing `v0.4.0` publishes `ghcr.io/hiruneworks/hirune-image:0.4.0` after code and container checks pass.
+Pushing `v0.4.1` publishes `ghcr.io/hiruneworks/hirune-image:0.4.1` after code and container checks pass.
 The tag must match the workspace package version. Publication uses the exact tested `linux/amd64` image.
 Branch pushes, pull requests, and manual checks do not publish images.
 See the [release procedure](deploy/README.md#release-publication).
