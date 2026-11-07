@@ -281,7 +281,7 @@ pub fn validate_png(data: &[u8]) -> Result<bool> {
     let mut header_seen = false;
     let mut srgb = false;
     let mut gamma = None;
-    let mut chroma = false;
+    let mut chroma = None;
     let mut icc = false;
     while cursor < data.len() {
         let header = data.get(cursor..cursor + 8).ok_or(Error::InvalidImage)?;
@@ -324,7 +324,10 @@ pub fn validate_png(data: &[u8]) -> Result<bool> {
                     body.try_into().map_err(|_| Error::InvalidImage)?,
                 ))
             }
-            b"cHRM" => chroma = true,
+            b"cHRM" => {
+                let values: [u8; 32] = body.try_into().map_err(|_| Error::InvalidImage)?;
+                chroma = Some(values);
+            }
             b"IEND" => {
                 if length != 0 || end + 4 != data.len() {
                     return Err(Error::InvalidImage);
@@ -338,8 +341,15 @@ pub fn validate_png(data: &[u8]) -> Result<bool> {
     if !end_seen || !header_seen {
         return Err(Error::InvalidImage);
     }
-    // Reject custom PNG transfer functions or chromaticity without a profile. Do not assume sRGB.
-    if !icc && !srgb && (chroma || gamma.is_some_and(|g| g != 45455)) {
+    let srgb_chroma: Vec<u8> = [31270u32, 32900, 64000, 33000, 30000, 60000, 15000, 6000]
+        .into_iter()
+        .flat_map(u32::to_be_bytes)
+        .collect();
+    if !icc
+        && !srgb
+        && (chroma.is_some_and(|values| values.as_slice() != srgb_chroma)
+            || gamma.is_some_and(|g| !matches!(g, 0 | 45455)))
+    {
         return Err(Error::UnsupportedColorProfile);
     }
     Ok(icc)

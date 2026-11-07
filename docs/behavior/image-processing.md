@@ -81,6 +81,8 @@ The worker converts SDR 16-bit samples before quantizing them to 8-bit WebP pixe
 An ICC profile can be at most 1 MiB. Its declared length must match its actual length.
 PNG metadata decoding has a separate 2 MiB allocation limit.
 The worker treats ordinary unprofiled RGB images as sRGB.
+PNG accepts the standard sRGB-compatible `gAMA` and `cHRM` values without an `sRGB` or `iCCP` chunk.
+The worker ignores a zero `gAMA` value.
 It rejects malformed profiles, unsupported custom PNG gamma/chromaticity, explicit PQ/HLG HDR, and floating-point TIFF.
 Resize uses an area filter in linear light with premultiplied alpha.
 The resizer preserves source-pixel accumulation order and uses transfer lookup tables with an exact inverse-transfer fallback near quantization boundaries.
