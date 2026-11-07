@@ -13,6 +13,7 @@ Watermarking is outside the service requirements.
 
 Accept JPEG, PNG/APNG, GIF, WebP, AVIF, HEIC/HEIF, BMP, single-page TIFF, JPEG XL, static SVG, ICO, QOI, and PNM.
 Support 8-bit and 16-bit SDR PNG/APNG and CMYK JPEG.
+Support calibrated SDR PNG gamma/chromaticities and supported full-range RGB CICP declarations.
 Reject unsupported animation or color features explicitly. Never return a static substitute for an animation.
 Produce lossy or lossless WebP. Resize with `inside` fit and no enlargement.
 Default to accurate full-resolution decoding. Permit reduced JPEG decoding only when the caller selects preview mode.

@@ -23,6 +23,17 @@ The test checks transparent edges and disposal after resizing. Alpha must match 
 Normal CI also runs header mutations and truncations with a fixed seed and bounded inputs.
 That test does not replace a long-running native-code fuzz campaign.
 
+## PNG color regressions
+
+`standard-srgb-calibration.png` has standard `gAMA/cHRM` values and no `sRGB` or `iCCP` chunk.
+`linear-gamma.png` declares linear RGB samples.
+`d50-calibration.png` combines a D50 white point, standard RGB primaries, and gamma `55000`.
+LittleCMS 2.16 generated `d50-calibration-expected.rgba` with perceptual intent and exact alpha copying.
+`png-color-provenance.json` records the inputs, CMS version, hashes, and tolerances.
+Run `python scripts/generate_png_color_fixtures.py` with a LittleCMS 2 shared library to regenerate them.
+Normal tests read the committed reference and need no LittleCMS installation.
+These synthetic fixtures are dedicated to the public domain under CC0.
+
 ## Input format references
 
 `formats-provenance.json` records the new synthetic HEIC, AVIF, JPEG XL, CMYK JPEG, and embedded SVG references.

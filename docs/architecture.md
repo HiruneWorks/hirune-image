@@ -24,6 +24,9 @@ The JPEG preview decoder uses `jpeg-decoder` 0.3.2 without Rayon. ICC and CMYK i
 Decoder canvases, reference frames, parsing data, and working buffers still use memory.
 JPEG XL uses an allocation tracker. The worker clears its display render cache between frames.
 HEIC checks every SPS's coded size before conformance cropping, including grid tiles and alpha items.
+PNG container inspection checks chunk bounds and significant CRCs before pixel decoding.
+PNG color selection resolves declaration priority and builds one in-memory SDR profile for static or animated frames.
+The worker uses the existing CMS transform before it quantizes 16-bit pixels. It creates no intermediate ICC file.
 
 The native WebP writer enforces the remaining output byte limit for each encoded frame.
 The Rust mux checks the combined output byte budget before adding each frame.

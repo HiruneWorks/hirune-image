@@ -1,4 +1,4 @@
-use crate::{normalize::normalize_dynamic, source::Emit};
+use crate::{normalize::normalize_dynamic_with_profile, source::Emit};
 use application::{
     error::{ProcessingError as Error, Result},
     images::{ImageFacts, Limits},
@@ -11,7 +11,7 @@ pub(crate) fn decode(
     limits: &Limits,
     facts: &ImageFacts,
     delays: &[u32],
-    normalization: (Orientation, Option<&[u8]>),
+    normalization: (Orientation, Option<&moxcms::ColorProfile>),
     emit: &mut Emit<'_>,
 ) -> Result<()> {
     let pixels = limits.canvas(facts.width, facts.height)?;
@@ -103,7 +103,7 @@ pub(crate) fn decode(
                 over(source, target.0)
             };
         }
-        let pixels = normalize_dynamic(
+        let pixels = normalize_dynamic_with_profile(
             DynamicImage::ImageRgba16(canvas.clone()),
             normalization.0,
             normalization.1,

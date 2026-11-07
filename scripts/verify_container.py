@@ -43,7 +43,8 @@ def http_checks(base):
     http_cases = 0
     for filename in ["finite1.gif", "disposal.gif", "p3-orientation6-gps.jpg", "rust-finite1-lossless.webp",
                      "colors-animated.avif", "colors-animated.jxl", "red-static.avif", "red-static.jxl",
-                     "green-alpha.heic", "red-cmyk-icc.jpg", "p3-embedded.svg"]:
+                     "green-alpha.heic", "red-cmyk-icc.jpg", "p3-embedded.svg",
+                     "standard-srgb-calibration.png", "linear-gamma.png", "d50-calibration.png"]:
         for mode in ["lossy", "lossless"]:
             encoding = {"format": "webp", "mode": mode, "effort": 0}
             if mode == "lossy":

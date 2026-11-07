@@ -1,0 +1,24 @@
+{
+  "generator": "scripts/generate_png_color_fixtures.py",
+  "littlecms_encoded_version": 2160,
+  "intent": "perceptual (0)",
+  "gamma": 55000,
+  "chromaticities": [
+    34567,
+    35850,
+    64000,
+    33000,
+    30000,
+    60000,
+    15000,
+    6000
+  ],
+  "rgb_tolerance": 2,
+  "alpha_tolerance": 0,
+  "sha256": {
+    "standard-srgb-calibration.png": "f30ccb2ae66bb5252e0a4091685c9a82675c584dac11aeced56f3fc94394304a",
+    "linear-gamma.png": "20d96eca059d7124c08889119e5f8f748408bf0daf1c332f43686fe6b4c10abd",
+    "d50-calibration.png": "d150fbf498ff873d3397a8d15305a81d99ba6e6c5f623a3120348cb181aaa340",
+    "d50-calibration-expected.rgba": "99d7343c9c8c1cb9162fc9c4cf652766f69c00088e26edad8039eefb19bf88c8"
+  }
+}

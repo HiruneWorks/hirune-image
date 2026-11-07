@@ -39,7 +39,7 @@ pub async fn capabilities(State(app): State<Application>) -> Json<Capabilities> 
         allow_upscale: false,
         zero_delay_policy: "reject_animated_zero_delay",
         timing_policy: "nearest_cumulative_millisecond; reject_unrepresentable_frames",
-        color_policy: "icc_and_cicp_to_srgb8; unprofiled_srgb; reject_hdr",
+        color_policy: "icc_cicp_and_png_calibration_to_srgb8; unprofiled_srgb; reject_hdr",
         native_resource_fence: if cfg!(target_os = "linux") {
             "rlimit_as_and_cpu"
         } else {

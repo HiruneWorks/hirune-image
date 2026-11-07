@@ -83,7 +83,27 @@ PNG metadata decoding has a separate 2 MiB allocation limit.
 The worker treats ordinary unprofiled RGB images as sRGB.
 PNG accepts the standard sRGB-compatible `gAMA` and `cHRM` values without an `sRGB` or `iCCP` chunk.
 The worker ignores a zero `gAMA` value.
-It rejects malformed profiles, unsupported custom PNG gamma/chromaticity, explicit PQ/HLG HDR, and floating-point TIFF.
+For other positive PNG gamma values, it uses the declared power transfer function.
+It converts valid PNG chromaticities and their white point to sRGB.
+If only one of gamma or chromaticities is present, it uses the sRGB default for the missing component.
+The standard sRGB-compatible fallback combination retains its conventional sRGB interpretation.
+The worker does not encode intermediate ICC files for these conversions.
+It applies color conversion before it quantizes 16-bit samples.
+It rejects a malformed selected ICC profile, invalid or numerically degenerate chromaticities, explicit PQ/HLG HDR, and floating-point TIFF.
+
+PNG color declarations have this priority: supported `cICP`, `iCCP`, `sRGB`, then `gAMA/cHRM`.
+A valid higher-priority declaration supersedes malformed lower-priority color descriptions.
+The selected declaration must occur before `PLTE` and `IDAT`.
+The worker uses the first correctly sized `gAMA` and `cHRM` payloads. It ignores zero gamma and later duplicates.
+It validates the selected chromaticity coordinates before conversion. It uses the first valid `sRGB` intent.
+Duplicate ICC chunks remain invalid.
+PNG `cICP` must specify supported primaries and transfer values, RGB matrix `0`, and full-range flag `1`.
+Reserved or unspecified CICP values, narrow-range samples, `mDCV`, and `cLLI` remain unsupported.
+
+The worker can discard PNG `tEXt`, `zTXt`, `iTXt`, `tIME`, `pHYs`, `bKGD`, `hIST`, and `sPLT` metadata with a bad CRC.
+These chunks do not affect its pixels or geometry.
+It retains CRC checks for all other chunks, including color, orientation, transparency, and animation.
+All chunk boundaries and allocation budgets remain checked.
 Resize uses an area filter in linear light with premultiplied alpha.
 The resizer preserves source-pixel accumulation order and uses transfer lookup tables with an exact inverse-transfer fallback near quantization boundaries.
 It can retain bounded geometry plans across animation frames. If the cache does not fit the remaining working plan, it computes the same geometry without a cache.
@@ -104,6 +124,8 @@ It retains the final frame delay and identical adjacent frames. It never substit
 APNG supports both default images that participate in the animation and separate default poster images.
 The worker decodes and validates a separate poster but does not include it in the animated output.
 APNG applies SOURCE/OVER blending and NONE/BACKGROUND/PREVIOUS disposal at 16-bit precision.
+It composites encoded source samples before color normalization. This retains the existing display composition.
+OVER in this sample space approximates linear-light compositing. Linear-light processing applies to resizing.
 
 GIF repeat count `n` becomes `n+1` total plays. No loop extension means one play; zero means infinite repetition.
 APNG `num_plays`, existing WebP loop counts, and JPEG XL loop counts already describe total plays.
