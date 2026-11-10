@@ -54,12 +54,15 @@ Local fixture checks do not establish production capacity.
 
 ## Release publication
 
-The CI workflow runs code checks, then builds one `linux/amd64` candidate.
-The image contains the Git commit build ID and OCI source, revision, version, and license labels.
-CI tests the candidate with the production user, filesystem, and resource restrictions.
-It then transfers that tested image as an artifact.
+The CI workflow runs code checks and builds `linux/amd64` and `linux/arm64` candidates.
+The Rust compiler runs on x86. ARM64 uses the explicit GNU and native-code toolchains.
+Each candidate records its Git commit build ID, OCI revision and version.
+CI tests both candidates with the production user, filesystem and resource restrictions.
+The ARM64 processing checks run on physical ARM64. Both tested images transfer as artifacts.
 
-The publication job checks the loaded image ID, tags the image, and pushes it without rebuilding.
+The publication job verifies transferred runtime configuration and filesystem layers.
+It pushes the accepted platform images, creates one versioned index, and verifies both
+platform descriptors and the immutable digest. It does not rebuild the ARM64 candidate.
 Only that job receives `packages: write`.
 It uses the workflow's automatic `GITHUB_TOKEN`; no extra publishing secret is required.
 This follows [GitHub's GHCR authentication model](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) and [Docker's image transfer workflow](https://docs.docker.com/build/ci/github-actions/share-image-jobs/).
@@ -78,7 +81,7 @@ git push origin v0.4.1
 The tag must be exactly `v` followed by `workspace.package.version` from `Cargo.toml`.
 The version must also be a valid Docker tag. Cargo build metadata with `+` is rejected.
 The Git tag `v0.4.1` publishes the image tag `:0.4.1`.
-The workflow does not publish a `latest` alias or an ARM image.
+The workflow publishes both Linux platforms in the versioned index. It does not publish a `latest` alias.
 Branch pushes, pull requests, and `workflow_dispatch` run checks without publishing an image.
 
 Do not move or reuse a release tag for changed code.
