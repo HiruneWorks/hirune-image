@@ -1,5 +1,7 @@
 # Verification milestones
 
+- [2026-11-11: ARM64 image pipeline](2026-11-11-arm64-image-pipeline.md): x86 cross-compilation, physical ARM64 default/large processing and tested multi-platform publication; final hosted acceptance remains separate.
+
 - [2026-11-08: PNG color recovery and version 0.4.1](2026-11-08-png-color-recovery.md): calibrated PNG/APNG SDR color, ancillary recovery, independent color references, and release validation.
 
 - [2026-11-02: version 0.4.0 publication](2026-11-02-version-0.4.0.md): main integration, unsigned release tag, successful tag CI, immutable GHCR image, and direct accurate/preview artifact verification.

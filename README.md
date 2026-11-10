@@ -50,3 +50,8 @@ The [recorded local comparison](benchmarks/results/2026-10-16/README.md) include
 The [imgproxy comparison](benchmarks/results/2026-11-02/README.md) covers accurate and preview modes, repeated baseline controls, and serial/parallel multi-output work units.
 
 Apache-2.0. Copyright 2026 Levi Laine.
+
+## Container platforms
+
+Build and verify Linux AMD64 and ARM64 images with the
+[container platform guide](deploy/container-platforms.md).
