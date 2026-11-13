@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM rust:1.99.0-bookworm AS build
+FROM --platform=$BUILDPLATFORM rust:1.99.1-bookworm AS build
 ARG TARGETARCH
 RUN apt-get update && apt-get install -y --no-install-recommends cmake nasm pkg-config gcc-aarch64-linux-gnu g++-aarch64-linux-gnu && rm -rf /var/lib/apt/lists/*
 ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc \
